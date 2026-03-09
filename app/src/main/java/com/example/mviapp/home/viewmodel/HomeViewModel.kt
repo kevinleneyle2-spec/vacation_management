@@ -2,63 +2,64 @@ package com.example.mviapp.home.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.mviapp.home.intent.ChatIntent
-import com.example.mviapp.home.model.ChatState
-import com.example.mviapp.home.model.Message
+import com.example.data.local.model.Day
+import com.example.data.local.model.VacationDto
+import com.example.data.repository.VacationRepository
+import com.example.mviapp.home.intent.VacationIntent
+import com.example.mviapp.home.intent.VacationUiViewState
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class HomeViewModel @Inject constructor() : ViewModel() {
-    private val _state = MutableStateFlow<ChatState>(ChatState.Loading)
-    val state: StateFlow<ChatState> = _state.asStateFlow()
-    private val _intentFlow = MutableSharedFlow<ChatIntent>()
-
-    val test = listOf<String>("fraise", "banane", "cerise", "pomme")
+class HomeViewModel @Inject constructor(
+    private val vacationRepository: VacationRepository
+) : ViewModel() {
+    private val _vacationState = MutableStateFlow(VacationUiViewState())
+    val vacationState: StateFlow<VacationUiViewState> = _vacationState
 
 
     init {
-        processIntents()
+        handleIntent(VacationIntent.LoadData)
     }
 
-    fun sendIntent(intent: ChatIntent) {
-        viewModelScope.launch { _intentFlow.emit(intent) }
-    }
-
-    private fun processIntents() {
+    private fun findAllVacation() {
         viewModelScope.launch {
-            _intentFlow.collect { intent ->
-                when (intent) {
-                    is ChatIntent.LoadData -> loadData()
-                    is ChatIntent.SendMessage -> sendMessage(intent.text)
-                }
+            vacationRepository.getAllItems().collect { vacations ->
+                _vacationState.value = _vacationState.value.copy(
+                    isLoading = false,
+                    vacations = vacations
+                )
             }
+        }
+    }
+
+    private fun createVacation(vacationDto: VacationDto) {
+        viewModelScope.launch {
+            vacationRepository.insertItem(vacationDto)
+        }
+    }
+
+    private fun deleteVacation(vacationDto: VacationDto) {
+        viewModelScope.launch {
+            vacationRepository.deleteItem(vacationDto)
+        }
+    }
+
+    fun handleIntent(vacationIntent: VacationIntent) {
+        when (vacationIntent) {
+            is VacationIntent.LoadData -> loadData()
+            is VacationIntent.CreateVacation -> createVacation(vacationIntent.vacationDto)
+            is VacationIntent.DeleteVacation -> deleteVacation(vacationIntent.vacationDto)
         }
     }
 
     private fun loadData() {
+        _vacationState.value = _vacationState.value.copy(isLoading = true)
         viewModelScope.launch {
-            _state.value = try {
-                val data = listOf(
-                    Message(id = 1, text = "hello", isSentByMe = true)
-                )
-                ChatState.Success(data)
-            } catch (e: Exception) {
-                ChatState.Error(e.message ?: "Unknown error")
-            }
+            findAllVacation()
         }
-    }
-
-    private fun sendMessage(text: String) {
-        val newMessage = Message(
-            id = 1,
-            text = text,
-            isSentByMe = true
-        )
     }
 }

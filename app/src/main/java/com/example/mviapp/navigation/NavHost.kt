@@ -20,10 +20,10 @@ fun AppNavHost(
         modifier = modifier
     ) {
         composable(route = AppDestinations.HOME_ROUTE) {
-            val homeViewModel: HomeViewModel = hiltViewModel()
+            val homeViewModel = hiltViewModel<HomeViewModel>()
 
             HomeScreen(
-                fruits = homeViewModel.test,
+                viewModel = homeViewModel,
                 isLoading = false,
                 onItemSelected = { selectedAlbum ->
                     navController.currentBackStackEntry?.savedStateHandle?.set("album", selectedAlbum)
