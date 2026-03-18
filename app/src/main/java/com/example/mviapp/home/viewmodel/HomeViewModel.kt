@@ -2,7 +2,6 @@ package com.example.mviapp.home.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.data.local.model.Day
 import com.example.data.local.model.VacationDto
 import com.example.data.repository.VacationRepository
 import com.example.mviapp.home.intent.VacationIntent
@@ -36,22 +35,15 @@ class HomeViewModel @Inject constructor(
         }
     }
 
-    private fun createVacation(vacationDto: VacationDto) {
-        viewModelScope.launch {
-            vacationRepository.insertItem(vacationDto)
-        }
-    }
-
     private fun deleteVacation(vacationDto: VacationDto) {
         viewModelScope.launch {
             vacationRepository.deleteItem(vacationDto)
         }
     }
 
-    fun handleIntent(vacationIntent: VacationIntent) {
+    fun handleIntent(vacationIntent: VacationIntent, onNavigate: (String) -> Unit = {}) {
         when (vacationIntent) {
             is VacationIntent.LoadData -> loadData()
-            is VacationIntent.CreateVacation -> createVacation(vacationIntent.vacationDto)
             is VacationIntent.DeleteVacation -> deleteVacation(vacationIntent.vacationDto)
         }
     }

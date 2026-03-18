@@ -1,12 +1,17 @@
 package com.example.mviapp.navigation
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.compose.navigation
 import com.example.mviapp.home.HomeScreen
 import com.example.mviapp.home.viewmodel.HomeViewModel
+import com.example.mviapp.vacation.ui.ActivitiesScreen
+import com.example.mviapp.vacation.ui.InitScreen
+import com.example.mviapp.vacation.viewmodel.InitViewModel
 
 @Composable
 fun AppNavHost(
@@ -25,11 +30,39 @@ fun AppNavHost(
             HomeScreen(
                 viewModel = homeViewModel,
                 isLoading = false,
-                onItemSelected = { selectedAlbum ->
-                    navController.currentBackStackEntry?.savedStateHandle?.set("album", selectedAlbum)
-                    navController.navigate(AppDestinations.DETAILS_ROUTE)
+                onNavigate = { route ->
+                    navController.navigate(route)
                 }
             )
+        }
+
+        navigation(startDestination = AppDestinations.INIT_ROUTE, route = "vacation_flow") {
+            composable(AppDestinations.INIT_ROUTE) { backStackEntry ->
+                // On récupère le ViewModel scopé au parent ("vacation_flow")
+                val parentEntry = remember(backStackEntry) {
+                    navController.getBackStackEntry("vacation_flow")
+                }
+                val viewModel: InitViewModel = hiltViewModel(parentEntry)
+
+                InitScreen(
+                    viewModel = viewModel,
+                    onNavigate = { navController.navigate(AppDestinations.ACTIVITIES_ROUTE) },
+                    onBackClick = { navController.popBackStack() }
+                )
+            }
+
+            composable(AppDestinations.ACTIVITIES_ROUTE) { backStackEntry ->
+                val parentEntry = remember(backStackEntry) {
+                    navController.getBackStackEntry("vacation_flow")
+                }
+                val viewModel: InitViewModel = hiltViewModel(parentEntry)
+
+                ActivitiesScreen(
+                    viewModel = viewModel,
+                    onNavigate = { route -> navController.navigate(route) },
+                    onBackClick = { navController.popBackStack() }
+                )
+            }
         }
     }
 }

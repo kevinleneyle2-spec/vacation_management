@@ -41,7 +41,7 @@ fun VacationItem(
             .fillMaxWidth()
             .height(120.dp)
             .padding(start = 16.dp, end = 16.dp)
-            .testTag("fruitCard"),
+            .testTag("vacationCard"),
         onClick = { onItemSelected(vacationDto.name) },
     ) {
         Row {

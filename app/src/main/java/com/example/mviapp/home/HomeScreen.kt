@@ -41,12 +41,13 @@ import com.example.data.local.model.VacationDto
 import com.example.mviapp.R
 import com.example.mviapp.home.intent.VacationIntent
 import com.example.mviapp.home.viewmodel.HomeViewModel
+import com.example.mviapp.navigation.AppDestinations
 
 @Composable
 fun HomeScreen(
     viewModel: HomeViewModel,
-    onItemSelected: (String) -> Unit,
     isLoading: Boolean,
+    onNavigate: (String) -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     val vacationUiState by viewModel.vacationState.collectAsStateWithLifecycle(
@@ -105,7 +106,7 @@ fun HomeScreen(
                                 VacationItem(
                                     viewModel = viewModel,
                                     vacationDto = vacation,
-                                    onItemSelected = onItemSelected
+                                    onItemSelected = {}
                                 )
                             }
                         }
@@ -117,15 +118,7 @@ fun HomeScreen(
                         ) {
                             TextButton(
                                 onClick = {
-                                    viewModel.handleIntent(
-                                        VacationIntent.CreateVacation(
-                                            VacationDto(
-                                                name = "test", nbrDay = 5, days = listOf(
-                                                    Day("test", listOf("test"))
-                                                )
-                                            )
-                                        )
-                                    )
+                                    onNavigate(AppDestinations.INIT_ROUTE)
                                 },
                                 colors = ButtonDefaults.textButtonColors(
                                     containerColor = colorResource(id = R.color.orange),
@@ -142,15 +135,7 @@ fun HomeScreen(
                         Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                             TextButton(
                                 onClick = {
-                                    viewModel.handleIntent(
-                                        VacationIntent.CreateVacation(
-                                            VacationDto(
-                                                name = "test", nbrDay = 5, days = listOf(
-                                                    Day("test", listOf("test"))
-                                                )
-                                            )
-                                        )
-                                    )
+                                    onNavigate(AppDestinations.INIT_ROUTE)
                                 },
                                 colors = ButtonDefaults.textButtonColors(
                                     containerColor = colorResource(id = R.color.orange),
