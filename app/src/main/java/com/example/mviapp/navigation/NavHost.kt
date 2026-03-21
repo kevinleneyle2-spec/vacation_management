@@ -3,10 +3,14 @@ package com.example.mviapp.navigation
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
+import androidx.navigation.navArgument
+import com.example.mviapp.details.ui.DetailsScreen
+import com.example.mviapp.details.viewmodel.DetailsViewModel
 import com.example.mviapp.home.HomeScreen
 import com.example.mviapp.home.viewmodel.HomeViewModel
 import com.example.mviapp.vacation.ui.ActivitiesScreen
@@ -25,7 +29,7 @@ fun AppNavHost(
         modifier = modifier
     ) {
         composable(route = AppDestinations.HOME_ROUTE) {
-            val homeViewModel = hiltViewModel<HomeViewModel>()
+            val homeViewModel: HomeViewModel = hiltViewModel()
 
             HomeScreen(
                 viewModel = homeViewModel,
@@ -36,9 +40,25 @@ fun AppNavHost(
             )
         }
 
+        composable(
+            route = AppDestinations.DETAILS_ROUTE,
+            arguments = listOf(
+                navArgument("vacationId") { type = NavType.StringType }
+            )
+        ) {
+            val detailsViewModel: DetailsViewModel = hiltViewModel()
+
+            DetailsScreen(
+                viewModel = detailsViewModel,
+                onNavigate = { route ->
+                    navController.navigate(route)
+                },
+                onBackClick = { navController.popBackStack() }
+            )
+        }
+
         navigation(startDestination = AppDestinations.INIT_ROUTE, route = "vacation_flow") {
             composable(AppDestinations.INIT_ROUTE) { backStackEntry ->
-                // On récupère le ViewModel scopé au parent ("vacation_flow")
                 val parentEntry = remember(backStackEntry) {
                     navController.getBackStackEntry("vacation_flow")
                 }

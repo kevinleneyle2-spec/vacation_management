@@ -97,9 +97,6 @@ fun  InitScreen(
             if (initValidation) {
                 TextButton(
                     onClick = {
-                        viewModel.handleIntent(InitIntent.CreateVacation(
-                            vacationDto = initState.toVacationDto()
-                        ))
                         onNavigate("activities")
                     },
                     modifier = Modifier.align(Alignment.End)

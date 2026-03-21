@@ -6,7 +6,6 @@ import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -17,7 +16,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -31,15 +29,11 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.example.data.local.model.Day
-import com.example.data.local.model.VacationDto
 import com.example.mviapp.R
-import com.example.mviapp.home.intent.VacationIntent
 import com.example.mviapp.home.viewmodel.HomeViewModel
 import com.example.mviapp.navigation.AppDestinations
 
@@ -106,7 +100,9 @@ fun HomeScreen(
                                 VacationItem(
                                     viewModel = viewModel,
                                     vacationDto = vacation,
-                                    onItemSelected = {}
+                                    onItemSelected = {
+                                        onNavigate(AppDestinations.buildDetailsRoute(vacation.id))
+                                    }
                                 )
                             }
                         }
