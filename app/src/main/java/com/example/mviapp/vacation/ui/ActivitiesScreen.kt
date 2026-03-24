@@ -28,6 +28,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.data.local.model.Activity
 import com.example.data.local.model.Day
 import com.example.mviapp.ui.theme.MVIAppTheme
 import com.example.mviapp.vacation.intent.InitIntent
@@ -48,8 +49,8 @@ fun ActivitiesScreen(
         onUpdateDayName = { index, name ->
             viewModel.handleIntent(InitIntent.UpdateDayName(index, name))
         },
-        onUpdateDayActivities = { index, activities ->
-            viewModel.handleIntent(InitIntent.AddDayActivities(index, activities))
+        onUpdateDayActivities = { index, activity ->
+            viewModel.handleIntent(InitIntent.AddDayActivities(index, activity))
         },
         onCreateVacation = {
             viewModel.handleIntent(InitIntent.CreateVacation(initState.toVacationDto()))
@@ -65,7 +66,7 @@ fun ActivitiesContent(
     state: VacationState,
     onBackClick: () -> Unit,
     onUpdateDayName: (Int, String) -> Unit,
-    onUpdateDayActivities: (Int, String) -> Unit,
+    onUpdateDayActivities: (Int, Activity) -> Unit,
     onCreateVacation: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -135,7 +136,7 @@ fun ActivitiesContent(
                         }
                     },
                     onActivitiesChange = { newValue ->
-                        onUpdateDayActivities(index, newValue)
+                       onUpdateDayActivities(index, Activity(newValue, "12:00"))
                     },
                     onItemSelected = {}
                 )
@@ -156,8 +157,8 @@ fun ActivitiesScreenPreview() {
             ActivitiesContent(
                 state = VacationState(
                     days = listOf(
-                        Day("Day 1", listOf("Visit the Eiffel Tower")),
-                        Day("Day 2", listOf("Go to the Louvre"))
+                        Day("Day 1", listOf(Activity("Visit the Eiffel Tower", "10:00"))),
+                        Day("Day 2", listOf(Activity("Go to the Louvre", "14:00")))
                     )
                 ),
                 onBackClick = {},

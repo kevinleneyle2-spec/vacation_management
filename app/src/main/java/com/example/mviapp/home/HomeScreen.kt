@@ -29,25 +29,43 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.example.data.local.model.VacationDto
 import com.example.mviapp.R
+import com.example.mviapp.home.intent.VacationIntent
+import com.example.mviapp.home.intent.VacationUiViewState
 import com.example.mviapp.home.viewmodel.HomeViewModel
 import com.example.mviapp.navigation.AppDestinations
+import com.example.mviapp.ui.theme.MVIAppTheme
 
 @Composable
 fun HomeScreen(
     viewModel: HomeViewModel,
-    isLoading: Boolean,
     onNavigate: (String) -> Unit = {},
     modifier: Modifier = Modifier
 ) {
-    val vacationUiState by viewModel.vacationState.collectAsStateWithLifecycle(
-        lifecycleOwner = LocalLifecycleOwner.current
-    )
+    val vacationUiState by viewModel.vacationState.collectAsStateWithLifecycle()
 
+    HomeScreenContent(
+        vacationUiState = vacationUiState,
+        onDeleteVacation = { dto -> viewModel.handleIntent(VacationIntent.DeleteVacation(dto)) },
+        onNavigate = onNavigate,
+        modifier = modifier
+    )
+}
+
+@Composable
+fun HomeScreenContent(
+    vacationUiState: VacationUiViewState,
+    onDeleteVacation: (VacationDto) -> Unit,
+    onNavigate: (String) -> Unit,
+    modifier: Modifier = Modifier
+) {
     Scaffold(modifier = modifier) { paddingValues ->
         Box(modifier = Modifier.fillMaxSize()) {
             Image(
@@ -89,7 +107,9 @@ fun HomeScreen(
                 ) {
                     if (vacationUiState.vacations.isNotEmpty()) {
                         LazyColumn(
-                            modifier = Modifier.weight(1f),
+                            modifier = Modifier
+                                .weight(1f)
+                                .padding(top = 16.dp),
                             verticalArrangement = Arrangement.spacedBy(16.dp),
                             contentPadding = paddingValues,
                         ) {
@@ -98,7 +118,7 @@ fun HomeScreen(
                                 key = { vacation -> vacation.id }
                             ) { vacation ->
                                 VacationItem(
-                                    viewModel = viewModel,
+                                    onDeleteClick = { onDeleteVacation(vacation) },
                                     vacationDto = vacation,
                                     onItemSelected = {
                                         onNavigate(AppDestinations.buildDetailsRoute(vacation.id))
@@ -109,7 +129,7 @@ fun HomeScreen(
                         Row(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(16.dp),
+                                .padding(32.dp),
                             horizontalArrangement = Arrangement.Center
                         ) {
                             TextButton(
@@ -122,13 +142,20 @@ fun HomeScreen(
                                 )
                             ) {
                                 Text(
-                                    text = "CREATE YOUR NEXT VACATION",
-                                    fontSize = 24.sp
+                                    text = stringResource(R.string.homescreen_next_button),
+                                    fontSize = 24.sp,
+                                    textAlign = TextAlign.Center,
+                                    maxLines = 2
                                 )
                             }
                         }
                     } else {
-                        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .padding(32.dp),
+                            contentAlignment = Alignment.Center
+                        ) {
                             TextButton(
                                 onClick = {
                                     onNavigate(AppDestinations.INIT_ROUTE)
@@ -139,8 +166,10 @@ fun HomeScreen(
                                 )
                             ) {
                                 Text(
-                                    text = "CREATE YOUR FIRST VACATION",
-                                    fontSize = 24.sp
+                                    textAlign = TextAlign.Center,
+                                    maxLines = 2,
+                                    text = stringResource(R.string.homescreen_first_button),
+                                    fontSize = 24.sp,
                                 )
                             }
                         }
@@ -148,5 +177,35 @@ fun HomeScreen(
                 }
             }
         }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun HomeScreenPreview() {
+    MVIAppTheme {
+        HomeScreenContent(
+            vacationUiState = VacationUiViewState(
+                vacations = listOf(
+                    VacationDto(id = 1, name = "Paris", nbrDay = 3, days = emptyList())
+                )
+            ),
+            onDeleteVacation = {},
+            onNavigate = {}
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun HomeScreenEmptyPreview() {
+    MVIAppTheme {
+        HomeScreenContent(
+            vacationUiState = VacationUiViewState(
+                vacations = listOf()
+            ),
+            onDeleteVacation = {},
+            onNavigate = {}
+        )
     }
 }

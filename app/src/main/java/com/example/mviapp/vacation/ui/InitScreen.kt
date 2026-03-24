@@ -14,44 +14,69 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.example.mviapp.R
+import com.example.mviapp.ui.theme.MVIAppTheme
 import com.example.mviapp.vacation.intent.InitIntent
-import com.example.mviapp.vacation.viewmodel.InitViewModel
+import com.example.mviapp.vacation.intent.VacationState
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+
+interface InitViewModelActions {
+    val initState: StateFlow<VacationState>
+    val initValidation: StateFlow<Boolean>
+    fun handleIntent(intent: InitIntent)
+}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun  InitScreen(
-    viewModel: InitViewModel,
+fun InitScreen(
+    viewModel: InitViewModelActions,
     onNavigate: (String) -> Unit = {},
     onBackClick: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
-    val initState by viewModel.initState.collectAsState()
-    val initValidation by viewModel.initValidation.collectAsState()
+    val initState by viewModel.initState.collectAsStateWithLifecycle()
+    val initValidation by viewModel.initValidation.collectAsStateWithLifecycle()
 
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(text = "Initialization of your vacation") },
+                title = {
+                    Text(
+                        text = stringResource(R.string.initscreen_title),
+                        color = colorResource(R.color.white)
+                    )
+                },
                 navigationIcon = {
                     IconButton(onClick = onBackClick) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Back"
+                            contentDescription = "Back",
+                            tint = colorResource(R.color.white)
                         )
                     }
-                }
+                },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = colorResource(id = R.color.orange)
+                )
             )
         }
     ) { paddingValues ->
@@ -64,7 +89,10 @@ fun  InitScreen(
             Box(
                 contentAlignment = Alignment.Center
             ) {
-                Text(text = "Name of vacation")
+                Text(
+                    text = stringResource(R.string.initscreen_name_title),
+                    color = colorResource(R.color.orange)
+                )
             }
 
             OutlinedTextField(
@@ -74,20 +102,47 @@ fun  InitScreen(
                         viewModel.handleIntent(InitIntent.UpdateName(newValue))
                     }
                 },
-                label = { Text("Enter name") },
+                colors = OutlinedTextFieldDefaults.colors(
+                    cursorColor = colorResource(R.color.orange),
+                    focusedBorderColor = colorResource(R.color.orange),
+                    unfocusedBorderColor = colorResource(R.color.orange),
+                    focusedLabelColor = colorResource(R.color.orange),
+                    unfocusedLabelColor = colorResource(R.color.orange)
+                ),
+                label = {
+                    Text(
+                        stringResource(R.string.initscreen_name_description),
+                        color = colorResource(R.color.orange)
+                    )
+                },
                 modifier = Modifier.fillMaxWidth(),
                 singleLine = true
             )
 
             Spacer(modifier = Modifier.height(64.dp))
 
-            Text(text = "Number of days")
+            Text(
+                text = stringResource(R.string.initscreen_day_title),
+                color = colorResource(R.color.orange)
+            )
             OutlinedTextField(
                 value = if (initState.numDays == 0) "" else initState.numDays.toString(),
                 onValueChange = { newValue ->
                     viewModel.handleIntent(InitIntent.UpdateDays(newValue))
                 },
-                label = { Text("Enter number between 0-15") },
+                colors = OutlinedTextFieldDefaults.colors(
+                    cursorColor = colorResource(R.color.orange),
+                    focusedBorderColor = colorResource(R.color.orange),
+                    unfocusedBorderColor = colorResource(R.color.orange),
+                    focusedLabelColor = colorResource(R.color.orange),
+                    unfocusedLabelColor = colorResource(R.color.orange)
+                ),
+                label = {
+                    Text(
+                        stringResource(R.string.initscreen_day_description),
+                        color = colorResource(R.color.orange)
+                    )
+                },
                 modifier = Modifier.fillMaxWidth(),
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
             )
@@ -102,11 +157,42 @@ fun  InitScreen(
                     modifier = Modifier.align(Alignment.End)
                 ) {
                     Text(
-                        text = "NEXT",
-                        fontSize = 24.sp
+                        text = stringResource(R.string.initscreen_next_button),
+                        fontSize = 24.sp,
+                        color = colorResource(id = R.color.orange)
                     )
                 }
             }
         }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun InitScreenPreview() {
+    val mockActions = object : InitViewModelActions {
+        override val initState = MutableStateFlow(
+            VacationState(vacationName = "Summer Trip", numDays = 5)
+        )
+        override val initValidation = MutableStateFlow(true)
+        override fun handleIntent(intent: InitIntent) {}
+    }
+
+    MVIAppTheme {
+        InitScreen(viewModel = mockActions)
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun InitScreenEmptyPreview() {
+    val mockActions = object : InitViewModelActions {
+        override val initState = MutableStateFlow(VacationState())
+        override val initValidation = MutableStateFlow(false)
+        override fun handleIntent(intent: InitIntent) {}
+    }
+
+    MVIAppTheme {
+        InitScreen(viewModel = mockActions)
     }
 }

@@ -33,7 +33,6 @@ fun AppNavHost(
 
             HomeScreen(
                 viewModel = homeViewModel,
-                isLoading = false,
                 onNavigate = { route ->
                     navController.navigate(route)
                 }
