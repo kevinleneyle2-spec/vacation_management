@@ -59,7 +59,7 @@ fun ActivitiesItem(
         Text(text = "Activities")
 
         day.activity.forEach { activity ->
-            Text(text = activity)
+            Text(text = activity.activityName)
         }
 
         Row() {

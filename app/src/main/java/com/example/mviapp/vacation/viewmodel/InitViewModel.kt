@@ -7,6 +7,7 @@ import com.example.data.local.model.VacationDto
 import com.example.data.repository.VacationRepository
 import com.example.mviapp.vacation.intent.InitIntent
 import com.example.mviapp.vacation.intent.VacationState
+import com.example.mviapp.vacation.ui.InitViewModelActions
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -17,13 +18,13 @@ import javax.inject.Inject
 @HiltViewModel
 class InitViewModel @Inject constructor(
     private val vacationRepository: VacationRepository
-) : ViewModel() {
+) : ViewModel(), InitViewModelActions {
 
     private val _initState = MutableStateFlow(VacationState())
-    val initState: StateFlow<VacationState> = _initState
+    override val initState: StateFlow<VacationState> = _initState
 
     private val _initValidation = MutableStateFlow(false)
-    val initValidation: StateFlow<Boolean> = _initValidation
+    override val initValidation: StateFlow<Boolean> = _initValidation
 
     private fun createVacation(vacationDto: VacationDto) {
         viewModelScope.launch {
@@ -39,7 +40,7 @@ class InitViewModel @Inject constructor(
         _initValidation.value = isValid
     }
 
-    fun handleIntent(intent: InitIntent) {
+    override fun handleIntent(intent: InitIntent) {
         when (intent) {
             is InitIntent.UpdateName -> {
                 _initState.update { it.copy(vacationName = intent.name) }
@@ -54,7 +55,7 @@ class InitViewModel @Inject constructor(
                 } else {
                     val number = input.toIntOrNull()
 
-                    if (number != null && number in 0..15) {
+                    if (number != null && number in 1..15) {
                         _initState.update { currentState ->
                             val currentDays = currentState.days
                             val newDays = if (number > currentDays.size) {
@@ -83,7 +84,7 @@ class InitViewModel @Inject constructor(
 
                 if (intent.index in currentDays.indices) {
                     val updatedDay = currentDays[intent.index].copy(
-                        activity = currentDays[intent.index].activity + intent.activities
+                        activity = currentDays[intent.index].activity + intent.activity
                     )
                     currentDays[intent.index] = updatedDay
                     _initState.update { it.copy(days = currentDays) }

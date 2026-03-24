@@ -5,5 +5,5 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class Day(
     val nameDay: String,
-    val activity: List<String>
+    val activity: List<Activity>
 )
