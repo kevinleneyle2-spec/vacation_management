@@ -3,9 +3,22 @@
     <string name="homescreen_first_button">CREATE YOUR NEXT VACATION</string>
     <string name="homescreen_next_button">CREATE YOUR NEXT VACATION</string>
     <string name="initscreen_title">Your vacation</string>
+    <string name="detailsscreen_error_title">Your vacation</string>
+    <string name="detailsscreen_error_no_days">No days added to this vacation yet.</string>
+    <string name="detailsscreen_no_activities">No activities planned for this day.</string>
+    <string name="detailsscreen_loading_vacation">Loading vacation details...</string>
+    <string name="detailsscreen_edit_button">Edit</string>
     <string name="initscreen_name_title">Name of your vacation</string>
     <string name="initscreen_day_title">Number of days</string>
     <string name="initscreen_name_description">Enter name</string>
     <string name="initscreen_day_description">Enter number between 1-15</string>
     <string name="initscreen_next_button">NEXT</string>
+    <string name="activitiesscreen_title">What have you planned?</string>
+    <string name="activitiesscreen_finish_button">FINISH</string>
+    <string name="activitiesscreen_description">Activities of vacation</string>
+    <string name="activitiesscreen_name_day_title">Name of your day</string>
+    <string name="activitiesscreen_name_day_description">Enter name of your day</string>
+    <string name="activitiesscreen_activities_title">Activities</string>
+    <string name="activitiesscreen_activities_description">Enter your activity</string>
+    <string name="activitiesscreen_add_button">ADD</string>
 </resources>

@@ -12,6 +12,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -20,16 +21,21 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.data.local.model.Activity
 import com.example.data.local.model.Day
+import com.example.mviapp.R
 import com.example.mviapp.ui.theme.MVIAppTheme
 import com.example.mviapp.vacation.intent.InitIntent
 import com.example.mviapp.vacation.intent.VacationState
@@ -73,21 +79,31 @@ fun ActivitiesContent(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(text = "What have you planned?") },
+                title = {
+                    Text(
+                        text = stringResource(R.string.activitiesscreen_title),
+                        color = colorResource(R.color.white)
+                    )
+                },
                 navigationIcon = {
                     IconButton(onClick = onBackClick) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Back"
+                            contentDescription = "Back",
+                            tint = colorResource(R.color.white)
                         )
                     }
-                }
+                },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = colorResource(id = R.color.orange)
+                )
             )
         },
         bottomBar = {
             Surface(
                 tonalElevation = 3.dp,
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
+                color = colorResource(id = R.color.orange)
             ) {
                 Row(
                     modifier = Modifier
@@ -98,16 +114,22 @@ fun ActivitiesContent(
                     TextButton(
                         onClick = {
                             onCreateVacation()
-                        }
+                        },
+                        modifier = Modifier.fillMaxWidth(),
+                        colors = ButtonDefaults.textButtonColors(
+                            containerColor = colorResource(id = R.color.orange),
+                            contentColor = Color.White
+                        )
                     ) {
                         Text(
-                            text = "FINISH",
+                            text = stringResource(R.string.activitiesscreen_finish_button),
                             fontSize = 24.sp
                         )
                     }
                 }
             }
         },
+        contentWindowInsets = androidx.compose.material3.ScaffoldDefaults.contentWindowInsets,
         modifier = modifier
     ) { paddingValues ->
         LazyColumn(
@@ -123,7 +145,10 @@ fun ActivitiesContent(
                     modifier = Modifier.fillMaxWidth(),
                     contentAlignment = Alignment.Center
                 ) {
-                    Text(text = "Activities of vacation")
+                    Text(
+                        text = stringResource(R.string.activitiesscreen_description),
+                        color = colorResource(R.color.orange)
+                    )
                 }
             }
 
@@ -136,7 +161,7 @@ fun ActivitiesContent(
                         }
                     },
                     onActivitiesChange = { newValue ->
-                       onUpdateDayActivities(index, Activity(newValue, "12:00"))
+                        onUpdateDayActivities(index, Activity(newValue, "12:00"))
                     },
                     onItemSelected = {}
                 )
