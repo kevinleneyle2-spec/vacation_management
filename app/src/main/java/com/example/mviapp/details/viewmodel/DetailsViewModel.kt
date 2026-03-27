@@ -12,8 +12,6 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
-import java.text.SimpleDateFormat
-import java.util.Locale
 import javax.inject.Inject
 
 @HiltViewModel
@@ -22,7 +20,7 @@ class DetailsViewModel @Inject constructor(
     private val savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
-    private val vacationId: Int? = savedStateHandle.get<String>("vacationId")?.toIntOrNull()
+    private val vacationId: Int? = savedStateHandle.get<Int>("vacationId")
 
     val vacation: StateFlow<VacationUiModel?> = vacationId?.let { id ->
         vacationRepository.getItemById(id)

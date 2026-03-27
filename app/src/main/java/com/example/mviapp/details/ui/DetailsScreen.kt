@@ -2,6 +2,7 @@ package com.example.mviapp.details.ui
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -54,19 +55,21 @@ import com.example.mviapp.details.model.ActivityUiModel
 import com.example.mviapp.details.model.DayUiModel
 import com.example.mviapp.details.model.VacationUiModel
 import com.example.mviapp.details.viewmodel.DetailsViewModel
+import com.example.mviapp.navigation.AppDestinations
 import com.example.mviapp.ui.theme.MVIAppTheme
 
 @Composable
 fun DetailsScreen(
     viewModel: DetailsViewModel,
-    onNavigate: (String) -> Unit = {},
     onBackClick: () -> Unit = {},
+    onEditClick: (String) -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     val vacation by viewModel.vacation.collectAsState()
     DetailsScreenContent(
         vacation = vacation,
         onBackClick = onBackClick,
+        onEditClick = onEditClick,
         modifier = modifier
     )
 }
@@ -76,6 +79,7 @@ fun DetailsScreen(
 fun DetailsScreenContent(
     vacation: VacationUiModel?,
     onBackClick: () -> Unit = {},
+    onEditClick: (String) -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     Scaffold(
@@ -119,7 +123,7 @@ fun DetailsScreenContent(
                         pageSpacing = 16.dp,
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(all = 16.dp)
+                            .padding(top = 16.dp, bottom = 16.dp)
                     ) { page ->
                         DayCard(day = currentVacation.days[page])
                     }
@@ -157,7 +161,7 @@ fun DetailsScreenContent(
                 Spacer(modifier = Modifier.height(16.dp))
 
                 Button(
-                    onClick = { },
+                    onClick = { onEditClick(AppDestinations.buildEditRoute(currentVacation.id)) },
                     modifier = Modifier
                         .size(50.dp)
                         .align(Alignment.CenterHorizontally)
@@ -177,7 +181,9 @@ fun DetailsScreenContent(
                 Text(
                     text = stringResource(R.string.detailsscreen_edit_button),
                     color = colorResource(R.color.orange),
-                    modifier = Modifier.align(Alignment.CenterHorizontally)
+                    modifier = Modifier
+                        .align(Alignment.CenterHorizontally)
+                        .clickable { onEditClick(AppDestinations.buildEditRoute(currentVacation.id)) }
                 )
 
             } ?: Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {

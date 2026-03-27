@@ -24,6 +24,7 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -44,11 +45,19 @@ import com.example.mviapp.vacation.viewmodel.InitViewModel
 @Composable
 fun ActivitiesScreen(
     viewModel: InitViewModel,
+    vacationId: Int? = null,
     onNavigate: (String) -> Unit = {},
     onBackClick: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     val initState by viewModel.initState.collectAsState()
+
+    LaunchedEffect(vacationId) {
+        if (vacationId != null) {
+            viewModel.handleIntent(InitIntent.LoadVacation(vacationId))
+        }
+    }
+
     ActivitiesContent(
         state = initState,
         onBackClick = onBackClick,
@@ -62,7 +71,12 @@ fun ActivitiesScreen(
             viewModel.handleIntent(InitIntent.RemoveDayActivities(dayNumber, index))
         },
         onCreateVacation = {
-            viewModel.handleIntent(InitIntent.CreateVacation(initState.toVacationDto()))
+            if (vacationId != null) {
+                viewModel.handleIntent(InitIntent.UpdateVacation(initState.toVacationDto()))
+            } else {
+                viewModel.handleIntent(InitIntent.CreateVacation(initState.toVacationDto()))
+            }
+
             onNavigate("home")
         },
         modifier = modifier
@@ -139,8 +153,7 @@ fun ActivitiesContent(
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(paddingValues)
-                .padding(horizontal = 16.dp),
+                .padding(paddingValues),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             item {

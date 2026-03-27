@@ -9,4 +9,6 @@ object AppDestinations {
 
     const val DETAILS_ROUTE = "details/{vacationId}"
     fun buildDetailsRoute(vacationId: Int) = "details/$vacationId"
+
+    fun buildEditRoute(vacationId: Int) = "activities/$vacationId"
 }
