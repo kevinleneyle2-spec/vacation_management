@@ -23,6 +23,7 @@
     <string name="activitiesscreen_add_button">ADD</string>
     <string name="activitiesscreen_time_title">Time</string>
     <string name="activitiesscreen_duration_title">Duration</string>
+    <string name="activitiesscreen_activities_empty">No activity planned yet.</string>
     <string name="delete_vacation_title">Delete Vacation</string>
     <string name="delete_vacation_message">Are you sure you want to delete this vacation?</string>
     <string name="confirm_button">Delete</string>

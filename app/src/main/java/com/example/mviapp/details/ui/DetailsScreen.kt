@@ -224,7 +224,7 @@ fun DayCard(day: DayUiModel) {
                     verticalArrangement = Arrangement.spacedBy(4.dp),
                     modifier = Modifier.fillMaxSize()
                 ) {
-                    items(day.activities) { activity ->
+                    items(day.activities.sortedBy { it.time }) { activity ->
                         ActivityRow(activity)
                     }
                 }
@@ -281,6 +281,7 @@ fun DetailsScreenPreview() {
                         DayUiModel(
                             "Day 1",
                             listOf(
+                                ActivityUiModel("Eiffel Tower", "11:00", "2h00"),
                                 ActivityUiModel("Eiffel Tower", "10:00", "2h00"),
                                 ActivityUiModel("Louvre Museum", "14:30", "2h00")
                             )

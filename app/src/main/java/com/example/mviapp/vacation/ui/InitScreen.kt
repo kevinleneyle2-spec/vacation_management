@@ -156,19 +156,22 @@ fun InitScreen(
 
             Spacer(modifier = Modifier.height(64.dp))
 
-            if (initValidation) {
-                TextButton(
-                    onClick = {
-                        onNavigate("activities")
-                    },
-                    modifier = Modifier.align(Alignment.End)
-                ) {
-                    Text(
-                        text = stringResource(R.string.initscreen_next_button),
-                        fontSize = 24.sp,
-                        color = colorResource(id = R.color.orange)
-                    )
-                }
+
+            TextButton(
+                onClick = {
+                    onNavigate("activities")
+                },
+                enabled = initValidation,
+                modifier = Modifier.align(Alignment.End)
+            ) {
+                Text(
+                    text = stringResource(R.string.initscreen_next_button),
+                    fontSize = 24.sp,
+                    color = if (initValidation)
+                        colorResource(R.color.orange)
+                    else
+                        Color.Gray.copy(alpha = 0.2f)
+                )
             }
         }
     }
