@@ -44,6 +44,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -88,6 +89,12 @@ fun ActivitiesItem(
         }
     }
 
+    fun checkAddAllowed() : Boolean {
+        return (newActivityValue.isNotBlank()
+            && activityTimeValue.isNotBlank()
+            && activityDurationValue.isNotBlank())
+    }
+
     Card(
         modifier = modifier
             .fillMaxWidth()
@@ -106,7 +113,8 @@ fun ActivitiesItem(
         ) {
             Text(
                 text = stringResource(R.string.activitiesscreen_name_day_title),
-                color = colorResource(R.color.orange)
+                color = colorResource(R.color.orange),
+                fontWeight = FontWeight.Bold
             )
             OutlinedTextField(
                 value = day.nameDay,
@@ -131,8 +139,22 @@ fun ActivitiesItem(
 
             Text(
                 text = stringResource(R.string.activitiesscreen_activities_title),
-                color = colorResource(R.color.orange)
+                color = colorResource(R.color.orange),
+                fontWeight = FontWeight.Bold
             )
+
+            if(day.activity.isEmpty()) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text(
+                        text = stringResource(R.string.activitiesscreen_activities_empty),
+                        modifier = Modifier.weight(1f)
+                            .padding(bottom = 8.dp)
+                    )
+                }
+            }
 
             day.activity.forEachIndexed { index, activity ->
                 Row(
@@ -374,10 +396,7 @@ fun ActivitiesItem(
                 ) {
                     TextButton(
                         onClick = {
-                            if (newActivityValue.isNotBlank()
-                                && activityTimeValue.isNotBlank()
-                                && activityDurationValue.isNotBlank()
-                            ) {
+                            if (checkAddAllowed()) {
                                 onAddActivity(
                                     newActivityValue,
                                     activityTimeValue,
@@ -391,7 +410,9 @@ fun ActivitiesItem(
                         },
                         modifier = Modifier.fillMaxWidth(),
                         colors = ButtonDefaults.textButtonColors(
-                            containerColor = colorResource(id = R.color.orange),
+                            containerColor = if (checkAddAllowed()) {
+                                colorResource(id = R.color.orange)
+                            } else { Color.Gray.copy(alpha = 0.2f) },
                             contentColor = Color.White
                         )
                     ) {
