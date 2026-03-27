@@ -91,6 +91,21 @@ class InitViewModel @Inject constructor(
                 }
             }
 
+            is InitIntent.RemoveDayActivities -> {
+                val currentDays = _initState.value.days.toMutableList()
+
+                if (intent.dayNumber in currentDays.indices) {
+                    val day = currentDays[intent.dayNumber]
+                    val activities = day.activity.toMutableList()
+
+                    if (intent.index in activities.indices) {
+                        activities.removeAt(intent.index)
+                        currentDays[intent.dayNumber] = day.copy(activity = activities)
+                        _initState.update { it.copy(days = currentDays) }
+                    }
+                }
+            }
+
             is InitIntent.CreateVacation -> createVacation(intent.vacationDto)
         }
     }

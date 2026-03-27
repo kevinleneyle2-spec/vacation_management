@@ -1,6 +1,5 @@
 package com.example.mviapp.details.ui
 
-import android.widget.ImageButton
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -14,7 +13,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.pager.HorizontalPager
@@ -43,6 +41,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
@@ -85,7 +84,7 @@ fun DetailsScreenContent(
                 title = {
                     Text(
                         text = vacation?.name ?: stringResource(R.string.detailsscreen_error_title),
-                        color = colorResource(R.color.white)
+                        color = Color.White
                     )
                 },
                 navigationIcon = {
@@ -93,12 +92,12 @@ fun DetailsScreenContent(
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = "Back",
-                            tint = colorResource(R.color.white)
+                            tint = Color.White
                         )
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = colorResource(id = R.color.orange)
+                    containerColor = MaterialTheme.colorScheme.primary
                 )
             )
         },
@@ -135,9 +134,9 @@ fun DetailsScreenContent(
                     ) {
                         repeat(currentVacation.days.size) { iteration ->
                             val color = if (pagerState.currentPage == iteration) {
-                                colorResource(R.color.deep_orange)
+                                MaterialTheme.colorScheme.primary
                             } else {
-                                colorResource(R.color.orange)
+                                MaterialTheme.colorScheme.secondary
                             }
                             Box(
                                 modifier = Modifier
@@ -164,9 +163,9 @@ fun DetailsScreenContent(
                         .align(Alignment.CenterHorizontally)
                         .testTag("detailsEditButton") ,
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = colorResource(id = R.color.white)
+                        containerColor = Color.White
                     ),
-                    contentPadding = androidx.compose.foundation.layout.PaddingValues(0.dp)
+                    contentPadding = PaddingValues(0.dp)
                 ) {
                     Image(
                         painter = painterResource(id = R.drawable.edit),
@@ -196,7 +195,7 @@ fun DayCard(day: DayUiModel) {
             .height(300.dp),
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(
-            containerColor = colorResource(R.color.white_orange_dark)
+            containerColor = MaterialTheme.colorScheme.tertiary
         )
     ) {
         Column(
@@ -209,7 +208,7 @@ fun DayCard(day: DayUiModel) {
                 text = day.name,
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold,
-                color = colorResource(R.color.brown)
+                color = MaterialTheme.colorScheme.primary
             )
 
             Spacer(modifier = Modifier.height(8.dp))
@@ -227,7 +226,7 @@ fun DayCard(day: DayUiModel) {
                 Text(
                     text = stringResource(R.string.detailsscreen_no_activities),
                     style = MaterialTheme.typography.bodyMedium,
-                    color = colorResource(R.color.brown)
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
         }
@@ -247,18 +246,18 @@ fun ActivityRow(activity: ActivityUiModel) {
             imageVector = Icons.Default.AccessTime,
             contentDescription = null,
             modifier = Modifier.size(16.dp),
-            tint = colorResource(R.color.deep_orange)
+            tint = MaterialTheme.colorScheme.secondary
         )
         Text(
             text = activity.time,
             style = MaterialTheme.typography.bodySmall,
             fontWeight = FontWeight.SemiBold,
-            color = colorResource(R.color.deep_orange)
+            color = MaterialTheme.colorScheme.secondary
         )
         Text(
-            text = activity.name,
+            text = activity.name + " (" + activity.duration + ")",
             style = MaterialTheme.typography.bodyMedium,
-            color = colorResource(R.color.brown)
+            color = MaterialTheme.colorScheme.onSurface
         )
     }
 }
@@ -276,15 +275,15 @@ fun DetailsScreenPreview() {
                         DayUiModel(
                             "Day 1",
                             listOf(
-                                ActivityUiModel("Eiffel Tower", "10:00"),
-                                ActivityUiModel("Louvre Museum", "14:30")
+                                ActivityUiModel("Eiffel Tower", "10:00", "2h00"),
+                                ActivityUiModel("Louvre Museum", "14:30", "2h00")
                             )
                         ),
                         DayUiModel(
                             "Day 2",
                             listOf(
-                                ActivityUiModel("Notre Dame", "09:00"),
-                                ActivityUiModel("Seine River Cruise", "18:00")
+                                ActivityUiModel("Notre Dame", "09:00", "2h00"),
+                                ActivityUiModel("Seine River Cruise", "18:00", "2h00")
                             )
                         )
                     )

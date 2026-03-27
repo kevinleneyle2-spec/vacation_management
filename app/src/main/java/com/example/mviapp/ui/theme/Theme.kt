@@ -13,19 +13,19 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 
 private val DarkColorScheme = darkColorScheme(
-    primary = Purple80,
-    secondary = PurpleGrey80,
-    tertiary = Pink80,
-    background = Color.White,
-    surface = Color.White,
-    onBackground = Color.Black,
-    onSurface = Color.Black
+    primary = BluePrimary,
+    secondary = BlueSecondary,
+    tertiary = BlueTertiary,
+    background = Color.Black,
+    surface = Color(0xFF121212),
+    onBackground = Color.White,
+    onSurface = Color.White
 )
 
 private val LightColorScheme = lightColorScheme(
-    primary = Purple40,
-    secondary = PurpleGrey40,
-    tertiary = Pink40,
+    primary = BluePrimary,
+    secondary = BlueSecondary,
+    tertiary = BlueTertiary,
     background = Color.White,
     surface = Color.White,
     onBackground = Color.Black,
@@ -45,7 +45,7 @@ fun MVIAppTheme(
             if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
         }
 
-        darkTheme -> DarkColorScheme
+        darkTheme -> LightColorScheme
         else -> LightColorScheme
     }
 

@@ -21,4 +21,10 @@
     <string name="activitiesscreen_activities_title">Activities</string>
     <string name="activitiesscreen_activities_description">Enter your activity</string>
     <string name="activitiesscreen_add_button">ADD</string>
+    <string name="activitiesscreen_time_title">Time</string>
+    <string name="activitiesscreen_duration_title">Duration</string>
+    <string name="delete_vacation_title">Delete Vacation</string>
+    <string name="delete_vacation_message">Are you sure you want to delete this vacation?</string>
+    <string name="confirm_button">Delete</string>
+    <string name="cancel_button">Cancel</string>
 </resources>

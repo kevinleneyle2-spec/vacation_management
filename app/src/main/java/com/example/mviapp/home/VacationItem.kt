@@ -1,30 +1,36 @@
 package com.example.mviapp.home
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.data.local.model.VacationDto
 import com.example.mviapp.R
+import com.example.mviapp.ui.theme.MVIAppTheme
 
 @Composable
 fun VacationItem(
@@ -36,60 +42,83 @@ fun VacationItem(
     Card(
         modifier = modifier
             .fillMaxWidth()
-            .height(120.dp)
-            .padding(start = 16.dp, end = 16.dp)
+            .height(110.dp)
+            .padding(horizontal = 16.dp)
             .testTag("vacationCard"),
         onClick = { onItemSelected(vacationDto.name) },
         colors = CardDefaults.cardColors(
-            containerColor =  colorResource(R.color.light_grey).copy(alpha = 0.8f)
-        )
+            containerColor = MaterialTheme.colorScheme.tertiary.copy(alpha = 0.8f)
+        ),
+        shape = MaterialTheme.shapes.large
     ) {
-        Row {
-            Image(
-                painter = painterResource(id = R.drawable.vacation_ico),
-                contentDescription = "Image Button",
-                modifier = Modifier
-                    .padding(start = 16.dp)
-                    .size(72.dp)
-                    .align(Alignment.CenterVertically)
-                    .testTag("homeFavoriteButton")
-            )
+        Row(
+            modifier = Modifier
+                .fillMaxHeight()
+                .padding(horizontal = 12.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
             Box(
-                Modifier
-                    .align(Alignment.CenterVertically)
-                    .padding(start = 16.dp, end = 16.dp)
-
+                modifier = Modifier
+                    .size(64.dp)
+                    .background(Color.Transparent, CircleShape)
+                    .padding(8.dp),
+                contentAlignment = Alignment.Center
             ) {
-                Text(
-                    text = vacationDto.name,
-                    fontSize = 24.sp,
-                    maxLines = 2,
-                    overflow = TextOverflow.Ellipsis
+                Image(
+                    painter = painterResource(id = R.drawable.vacation_ico),
+                    contentDescription = null,
+                    modifier = Modifier.size(56.dp)
                 )
             }
 
-            Spacer(Modifier.weight(1f))
-
             Box(
                 Modifier
-                    .padding(start = 16.dp, end = 16.dp, top = 24.dp, bottom = 24.dp)
+                    .weight(1f)
+                    .padding(horizontal = 16.dp)
             ) {
-                Button(
-                    onClick = { onDeleteClick() },
-                    modifier = Modifier
-                        .size(72.dp)
-                        .testTag("vacationDeleteButton") ,
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = colorResource(id = R.color.white)
-                    )
-                ) {
-                    Image(
-                        painter = painterResource(id = R.drawable.trash_red),
-                        contentDescription = "Image Button",
-                        modifier = Modifier.size(50.dp)
-                    )
-                }
+                Text(
+                    text = vacationDto.name,
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.Bold,
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis,
+                    color = MaterialTheme.colorScheme.onSurface
+                )
             }
+
+            IconButton(
+                onClick = { onDeleteClick() },
+                modifier = Modifier
+                    .size(44.dp)
+                    .clip(CircleShape)
+                    .background(Color.Transparent)
+                    .testTag("vacationDeleteButton")
+            ) {
+                Image(
+                    painter = painterResource(id = R.drawable.trash_red),
+                    contentDescription = "Delete",
+                    modifier = Modifier.size(24.dp)
+                )
+            }
+        }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun VacationItemPreview() {
+    MVIAppTheme {
+        Box(modifier = Modifier.padding(vertical = 16.dp)) {
+            VacationItem(
+                vacationDto = VacationDto(
+                    id = 1,
+                    name = "Summer in Paris",
+                    nbrDay = 5,
+                    days = emptyList()
+                ),
+                onItemSelected = {},
+                onDeleteClick = {}
+            )
         }
     }
 }

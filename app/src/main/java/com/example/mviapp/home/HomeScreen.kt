@@ -16,12 +16,17 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
@@ -50,10 +55,47 @@ fun HomeScreen(
     modifier: Modifier = Modifier
 ) {
     val vacationUiState by viewModel.vacationState.collectAsStateWithLifecycle()
+    var vacationToDelete by remember { mutableStateOf<VacationDto?>(null) }
+
+    if (vacationToDelete != null) {
+        AlertDialog(
+            onDismissRequest = { vacationToDelete = null },
+            confirmButton = {
+                TextButton(onClick = {
+                    vacationToDelete?.let {
+                        viewModel.handleIntent(VacationIntent.DeleteVacation(it))
+                    }
+                    vacationToDelete = null
+                }) {
+                    Text(
+                        text = stringResource(id = R.string.confirm_button),
+                        color = colorResource(id = R.color.red)
+                    )
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { vacationToDelete = null }) {
+                    Text(
+                        text = stringResource(id = R.string.cancel_button),
+                        color = colorResource(id = R.color.black)
+                    )
+                }
+            },
+            title = { Text(
+                text = stringResource(id = R.string.delete_vacation_title),
+                color = colorResource(id = R.color.orange)
+            ) },
+            text = { Text(
+                text = stringResource(id = R.string.delete_vacation_message)
+            ) }
+        )
+    }
 
     HomeScreenContent(
         vacationUiState = vacationUiState,
-        onDeleteVacation = { dto -> viewModel.handleIntent(VacationIntent.DeleteVacation(dto)) },
+        onDeleteVacation = { dto ->
+            vacationToDelete = dto
+        },
         onNavigate = onNavigate,
         modifier = modifier
     )
@@ -130,14 +172,14 @@ fun HomeScreenContent(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .padding(32.dp),
-                            horizontalArrangement = Arrangement.Center
+                            horizontalArrangement = Arrangement.Center,
                         ) {
                             TextButton(
                                 onClick = {
                                     onNavigate(AppDestinations.INIT_ROUTE)
                                 },
                                 colors = ButtonDefaults.textButtonColors(
-                                    containerColor = colorResource(id = R.color.orange),
+                                    containerColor = MaterialTheme.colorScheme.primary,
                                     contentColor = Color.White
                                 )
                             ) {
@@ -161,7 +203,7 @@ fun HomeScreenContent(
                                     onNavigate(AppDestinations.INIT_ROUTE)
                                 },
                                 colors = ButtonDefaults.textButtonColors(
-                                    containerColor = colorResource(id = R.color.orange),
+                                    containerColor = MaterialTheme.colorScheme.primary,
                                     contentColor = Color.White
                                 )
                             ) {

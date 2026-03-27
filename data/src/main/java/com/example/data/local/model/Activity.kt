@@ -6,5 +6,6 @@ import java.sql.Time
 @Serializable
 data class Activity(
     val activityName: String,
-    val activityTime: String
+    val activityTime: String,
+    val activityDuration: String
 )
