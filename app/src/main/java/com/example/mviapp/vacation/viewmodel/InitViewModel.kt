@@ -1,5 +1,6 @@
 package com.example.mviapp.vacation.viewmodel
 
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.data.local.model.Day
@@ -17,7 +18,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class InitViewModel @Inject constructor(
-    private val vacationRepository: VacationRepository
+    private val vacationRepository: VacationRepository,
+    private val savedStateHandle: SavedStateHandle
 ) : ViewModel(), InitViewModelActions {
 
     private val _initState = MutableStateFlow(VacationState())
@@ -26,9 +28,16 @@ class InitViewModel @Inject constructor(
     private val _initValidation = MutableStateFlow(false)
     override val initValidation: StateFlow<Boolean> = _initValidation
 
+    private val vacationId: Int? = savedStateHandle.get<Int>("vacationId")
     private fun createVacation(vacationDto: VacationDto) {
         viewModelScope.launch {
             vacationRepository.insertItem(vacationDto)
+        }
+    }
+
+    private fun updateVacation(vacationDto: VacationDto) {
+        viewModelScope.launch {
+            vacationRepository.updateItem(vacationDto)
         }
     }
 
@@ -107,6 +116,27 @@ class InitViewModel @Inject constructor(
             }
 
             is InitIntent.CreateVacation -> createVacation(intent.vacationDto)
+
+            is InitIntent.UpdateVacation -> updateVacation(intent.vacationDto)
+
+            is InitIntent.LoadVacation -> {
+                viewModelScope.launch {
+                    vacationRepository.getItemById(intent.id).collect { vacation ->
+
+                        vacation?.let {
+                            _initState.update { currentState ->
+                                currentState.copy(
+                                    id = it.id,
+                                    vacationName = it.name,
+                                    numDays = it.nbrDay,
+                                    days = it.days
+                                )
+                            }
+                            updateValidation()
+                        }
+                    }
+                }
+            }
         }
     }
 }

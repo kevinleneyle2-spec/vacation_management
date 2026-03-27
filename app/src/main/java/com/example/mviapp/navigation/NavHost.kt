@@ -42,17 +42,17 @@ fun AppNavHost(
         composable(
             route = AppDestinations.DETAILS_ROUTE,
             arguments = listOf(
-                navArgument("vacationId") { type = NavType.StringType }
+                navArgument("vacationId") { type = NavType.IntType }
             )
         ) {
             val detailsViewModel: DetailsViewModel = hiltViewModel()
 
             DetailsScreen(
                 viewModel = detailsViewModel,
-                onNavigate = { route ->
+                onBackClick = { navController.popBackStack() },
+                onEditClick = { route ->
                     navController.navigate(route)
-                },
-                onBackClick = { navController.popBackStack() }
+                }
             )
         }
 
@@ -78,6 +78,19 @@ fun AppNavHost(
 
                 ActivitiesScreen(
                     viewModel = viewModel,
+                    onNavigate = { route -> navController.navigate(route) },
+                    onBackClick = { navController.popBackStack() }
+                )
+            }
+
+            composable(
+                route = "activities/{vacationId}",
+                arguments = listOf(navArgument("vacationId") { type = NavType.IntType })
+            ) { backStackEntry ->
+                val id = backStackEntry.arguments?.getInt("vacationId")
+                ActivitiesScreen(
+                    viewModel = hiltViewModel(),
+                    vacationId = id,
                     onNavigate = { route -> navController.navigate(route) },
                     onBackClick = { navController.popBackStack() }
                 )
