@@ -11,5 +11,7 @@ sealed class InitIntent {
 
     data class AddDayActivities(val index: Int, val activity: Activity) : InitIntent()
 
+    data class RemoveDayActivities(val dayNumber: Int, val index: Int) : InitIntent()
+
     data class  CreateVacation(val vacationDto: VacationDto) : InitIntent()
 }

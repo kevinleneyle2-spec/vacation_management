@@ -36,7 +36,8 @@ class DetailsViewModel @Inject constructor(
                             activities = day.activity.map { activity ->
                                 ActivityUiModel(
                                     name = activity.activityName,
-                                    time = activity.activityTime
+                                    time = activity.activityTime,
+                                    duration = activity.activityDuration
                                 )
                             }
                         )

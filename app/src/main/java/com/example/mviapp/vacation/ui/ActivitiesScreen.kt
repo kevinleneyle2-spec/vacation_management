@@ -16,6 +16,7 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -28,7 +29,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -55,8 +55,11 @@ fun ActivitiesScreen(
         onUpdateDayName = { index, name ->
             viewModel.handleIntent(InitIntent.UpdateDayName(index, name))
         },
-        onUpdateDayActivities = { index, activity ->
+        onAddDayActivities = { index, activity ->
             viewModel.handleIntent(InitIntent.AddDayActivities(index, activity))
+        },
+        onRemoveDayActivities = { dayNumber, index ->
+            viewModel.handleIntent(InitIntent.RemoveDayActivities(dayNumber, index))
         },
         onCreateVacation = {
             viewModel.handleIntent(InitIntent.CreateVacation(initState.toVacationDto()))
@@ -72,7 +75,8 @@ fun ActivitiesContent(
     state: VacationState,
     onBackClick: () -> Unit,
     onUpdateDayName: (Int, String) -> Unit,
-    onUpdateDayActivities: (Int, Activity) -> Unit,
+    onAddDayActivities: (Int, Activity) -> Unit,
+    onRemoveDayActivities: (Int, Int) -> Unit,
     onCreateVacation: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -82,7 +86,7 @@ fun ActivitiesContent(
                 title = {
                     Text(
                         text = stringResource(R.string.activitiesscreen_title),
-                        color = colorResource(R.color.white)
+                        color = Color.White
                     )
                 },
                 navigationIcon = {
@@ -90,12 +94,12 @@ fun ActivitiesContent(
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = "Back",
-                            tint = colorResource(R.color.white)
+                            tint = Color.White
                         )
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = colorResource(id = R.color.orange)
+                    containerColor = MaterialTheme.colorScheme.primary
                 )
             )
         },
@@ -103,7 +107,7 @@ fun ActivitiesContent(
             Surface(
                 tonalElevation = 3.dp,
                 modifier = Modifier.fillMaxWidth(),
-                color = colorResource(id = R.color.orange)
+                color = MaterialTheme.colorScheme.primary
             ) {
                 Row(
                     modifier = Modifier
@@ -117,7 +121,7 @@ fun ActivitiesContent(
                         },
                         modifier = Modifier.fillMaxWidth(),
                         colors = ButtonDefaults.textButtonColors(
-                            containerColor = colorResource(id = R.color.orange),
+                            containerColor = MaterialTheme.colorScheme.primary,
                             contentColor = Color.White
                         )
                     ) {
@@ -147,7 +151,7 @@ fun ActivitiesContent(
                 ) {
                     Text(
                         text = stringResource(R.string.activitiesscreen_description),
-                        color = colorResource(R.color.orange)
+                        color = MaterialTheme.colorScheme.primary
                     )
                 }
             }
@@ -160,10 +164,12 @@ fun ActivitiesContent(
                             onUpdateDayName(index, newValue)
                         }
                     },
-                    onActivitiesChange = { newValue ->
-                        onUpdateDayActivities(index, Activity(newValue, "12:00"))
+                    onAddActivity = { name, time, duration ->
+                        onAddDayActivities(index, Activity(name, time, duration))
                     },
-                    onItemSelected = {}
+                    onRemoveActivity = { removeIndex ->
+                        onRemoveDayActivities(index, removeIndex)
+                    }
                 )
             }
 
@@ -182,13 +188,14 @@ fun ActivitiesScreenPreview() {
             ActivitiesContent(
                 state = VacationState(
                     days = listOf(
-                        Day("Day 1", listOf(Activity("Visit the Eiffel Tower", "10:00"))),
-                        Day("Day 2", listOf(Activity("Go to the Louvre", "14:00")))
+                        Day("Day 1", listOf(Activity("Visit the Eiffel Tower", "10:00", "2h00"))),
+                        Day("Day 2", listOf(Activity("Go to the Louvre", "14:00", "2h00")))
                     )
                 ),
                 onBackClick = {},
                 onUpdateDayName = { _, _ -> },
-                onUpdateDayActivities = { _, _ -> },
+                onAddDayActivities = { _, _ -> },
+                onRemoveDayActivities = { _, _ -> },
                 onCreateVacation = {}
             )
         }
