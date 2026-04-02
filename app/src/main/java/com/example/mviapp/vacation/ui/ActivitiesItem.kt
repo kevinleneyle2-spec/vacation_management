@@ -51,6 +51,7 @@ import androidx.compose.ui.unit.dp
 import com.example.data.local.model.Activity
 import com.example.data.local.model.Day
 import com.example.mviapp.R
+import com.example.mviapp.ui.theme.MVIAppTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -71,7 +72,7 @@ fun ActivitiesItem(
 
     var newActivityValue by remember { mutableStateOf("") }
     var activityTimeValue by remember { mutableStateOf("12h00") }
-    var activityDurationValue by remember { mutableStateOf("") }
+    var activityDurationValue by remember { mutableStateOf("1h00") }
 
     val timeOptions = remember {
         (0..23).flatMap { hour ->
@@ -203,7 +204,7 @@ fun ActivitiesItem(
                     .padding(all = 8.dp)
             ) {
                 Text(
-                    text = "New Activity",
+                    text = stringResource(R.string.activitiesscreen_activities_add_title),
                     color = colorResource(R.color.orange)
                 )
 
@@ -405,7 +406,7 @@ fun ActivitiesItem(
 
                                 newActivityValue = ""
                                 activityTimeValue = "12h00"
-                                activityDurationValue = ""
+                                activityDurationValue = "1h00"
                             }
                         },
                         modifier = Modifier.fillMaxWidth(),
@@ -429,18 +430,20 @@ fun ActivitiesItem(
 @Preview(showBackground = true)
 @Composable
 fun ActivitiesItemPreview() {
-    val mockDay = Day(
-        nameDay = "Day 1: Paris Visit",
-        activity = listOf(
-            Activity("Visit Eiffel Tower", "12h00", "2h00"),
-            Activity("Louvre Museum", "12h00", "2h00")
+    MVIAppTheme {
+        val mockDay = Day(
+            nameDay = "Day 1: Paris Visit",
+            activity = listOf(
+                Activity("Visit Eiffel Tower", "12h00", "2h00"),
+                Activity("Louvre Museum", "12h00", "2h00")
+            )
         )
-    )
 
-    ActivitiesItem(
-        day = mockDay,
-        onNameChange = {},
-        onAddActivity = { _, _, _ -> },
-        onRemoveActivity = {}
-    )
+        ActivitiesItem(
+            day = mockDay,
+            onNameChange = {},
+            onAddActivity = { _, _, _ -> },
+            onRemoveActivity = {}
+        )
+    }
 }

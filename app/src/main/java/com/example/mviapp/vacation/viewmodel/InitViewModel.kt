@@ -68,7 +68,12 @@ class InitViewModel @Inject constructor(
                         _initState.update { currentState ->
                             val currentDays = currentState.days
                             val newDays = if (number > currentDays.size) {
-                                currentDays + List(number - currentDays.size) { Day("", emptyList()) }
+                                currentDays + List(number - currentDays.size) {
+                                    Day(
+                                        "",
+                                        emptyList()
+                                    )
+                                }
                             } else {
                                 currentDays.take(number)
                             }
@@ -83,7 +88,8 @@ class InitViewModel @Inject constructor(
                 val currentDays = _initState.value.days.toMutableList()
 
                 if (intent.index in currentDays.indices) {
-                    currentDays[intent.index] = currentDays[intent.index].copy(nameDay = intent.name)
+                    currentDays[intent.index] =
+                        currentDays[intent.index].copy(nameDay = intent.name)
                     _initState.update { it.copy(days = currentDays) }
                 }
             }
@@ -113,6 +119,20 @@ class InitViewModel @Inject constructor(
                         _initState.update { it.copy(days = currentDays) }
                     }
                 }
+            }
+
+            is InitIntent.AddIdea -> {
+                val currentIdeas = _initState.value.ideas.toMutableList()
+
+                currentIdeas.add(intent.idea)
+                _initState.update { it.copy(ideas = currentIdeas) }
+            }
+
+            is InitIntent.RemoveIdea -> {
+                val currentIdeas = _initState.value.ideas.toMutableList()
+
+                currentIdeas.removeAt(intent.index)
+                _initState.update { it.copy(ideas = currentIdeas) }
             }
 
             is InitIntent.CreateVacation -> createVacation(intent.vacationDto)

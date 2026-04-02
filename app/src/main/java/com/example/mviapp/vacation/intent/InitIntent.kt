@@ -13,6 +13,10 @@ sealed class InitIntent {
 
     data class RemoveDayActivities(val dayNumber: Int, val index: Int) : InitIntent()
 
+    data class AddIdea(val idea: String) : InitIntent()
+
+    data class RemoveIdea(val index: Int) : InitIntent()
+
     data class  CreateVacation(val vacationDto: VacationDto) : InitIntent()
 
     data class  UpdateVacation(val vacationDto: VacationDto) : InitIntent()

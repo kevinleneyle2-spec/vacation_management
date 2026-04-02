@@ -114,7 +114,8 @@ fun VacationItemPreview() {
                     id = 1,
                     name = "Summer in Paris",
                     nbrDay = 5,
-                    days = emptyList()
+                    days = emptyList(),
+                    ideas = emptyList()
                 ),
                 onItemSelected = {},
                 onDeleteClick = {}

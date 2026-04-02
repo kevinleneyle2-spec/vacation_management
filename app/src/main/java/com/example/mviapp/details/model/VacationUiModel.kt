@@ -3,7 +3,8 @@ package com.example.mviapp.details.model
 data class VacationUiModel(
     val id: Int,
     val name: String,
-    val days: List<DayUiModel>
+    val days: List<DayUiModel>,
+    val ideas: List<String>
 )
 
 data class DayUiModel(

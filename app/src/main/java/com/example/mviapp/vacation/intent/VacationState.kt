@@ -8,11 +8,13 @@ data class VacationState(
     val vacationName: String = "",
     val numDays: Int = 0,
     val days: List<Day> = emptyList(),
+    val ideas: List<String> = emptyList()
 ) {
     fun toVacationDto() = VacationDto(
         id = id,
         name = vacationName,
         nbrDay = numDays,
-        days = days
+        days = days,
+        ideas = ideas
     )
 }
