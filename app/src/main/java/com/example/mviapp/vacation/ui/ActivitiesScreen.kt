@@ -79,6 +79,12 @@ fun ActivitiesScreen(
 
             onNavigate("home")
         },
+        onAddIdea = { idea ->
+            viewModel.handleIntent(InitIntent.AddIdea(idea))
+        },
+        onRemoveIdea = { index ->
+            viewModel.handleIntent(InitIntent.RemoveIdea(index))
+        },
         modifier = modifier
     )
 }
@@ -91,6 +97,8 @@ fun ActivitiesContent(
     onUpdateDayName: (Int, String) -> Unit,
     onAddDayActivities: (Int, Activity) -> Unit,
     onRemoveDayActivities: (Int, Int) -> Unit,
+    onAddIdea: (String) -> Unit,
+    onRemoveIdea: (Int) -> Unit,
     onCreateVacation: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -157,19 +165,11 @@ fun ActivitiesContent(
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             item {
-                Spacer(modifier = Modifier.height(16.dp))
-                Box(
-                    modifier = Modifier.fillMaxWidth(),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Text(
-                        text = stringResource(R.string.activitiesscreen_description),
-                        color = MaterialTheme.colorScheme.primary
-                    )
-                }
+                Spacer(modifier = Modifier.height(8.dp))
             }
 
-            itemsIndexed(state.days) { index, day ->
+            itemsIndexed(state.days
+            ) { index, day ->
                 ActivitiesItem(
                     day = day,
                     onNameChange = { newValue ->
@@ -187,6 +187,18 @@ fun ActivitiesContent(
             }
 
             item {
+                Spacer(modifier = Modifier.height(16.dp))
+
+                IdeaItem(
+                    ideas = state.ideas,
+                    onAddIdea = { name ->
+                        onAddIdea(name)
+                    },
+                    onRemoveIdea = { index ->
+                        onRemoveIdea(index)
+                    }
+                )
+
                 Spacer(modifier = Modifier.height(16.dp))
             }
         }
@@ -209,7 +221,9 @@ fun ActivitiesScreenPreview() {
                 onUpdateDayName = { _, _ -> },
                 onAddDayActivities = { _, _ -> },
                 onRemoveDayActivities = { _, _ -> },
-                onCreateVacation = {}
+                onCreateVacation = {},
+                onAddIdea = {},
+                onRemoveIdea = {}
             )
         }
     }

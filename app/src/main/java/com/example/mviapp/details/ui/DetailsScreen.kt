@@ -3,6 +3,7 @@ package com.example.mviapp.details.ui
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.snapping.SnapPosition
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -14,6 +15,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.pager.HorizontalPager
@@ -44,10 +46,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.mviapp.R
@@ -109,6 +111,43 @@ fun DetailsScreenContent(
     ) { paddingValues ->
         Column(
             modifier = Modifier
+                .fillMaxWidth()
+                .padding(paddingValues)
+                .padding(16.dp),
+            verticalArrangement = Arrangement.Top,
+            horizontalAlignment = Alignment.End
+
+        ) {
+            Row() {
+                vacation?.let { currentVacation ->
+                    Button(
+                        onClick = { onEditClick(AppDestinations.buildEditRoute(currentVacation.id)) },
+                        modifier = Modifier
+                            .size(24.dp)
+                            .testTag("detailsEditButton"),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = Color.White
+                        ),
+                        contentPadding = PaddingValues(all = 0.dp)
+                    ) {
+                        Image(
+                            painter = painterResource(id = R.drawable.edit),
+                            contentDescription = "Image Button",
+                            modifier = Modifier.size(18.dp)
+                        )
+                    }
+
+                    Text(
+                        text = "Modify",
+                        color = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier
+                            .clickable { onEditClick(AppDestinations.buildEditRoute(currentVacation.id)) }
+                    )
+                }
+            }
+        }
+        Column(
+            modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues),
             verticalArrangement = Arrangement.Center
@@ -160,31 +199,58 @@ fun DetailsScreenContent(
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                Button(
-                    onClick = { onEditClick(AppDestinations.buildEditRoute(currentVacation.id)) },
+                Card(
                     modifier = Modifier
-                        .size(50.dp)
                         .align(Alignment.CenterHorizontally)
-                        .testTag("detailsEditButton") ,
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = Color.White
-                    ),
-                    contentPadding = PaddingValues(0.dp)
-                ) {
-                    Image(
-                        painter = painterResource(id = R.drawable.edit),
-                        contentDescription = "Image Button",
-                        modifier = Modifier.size(36.dp)
+                        .fillMaxWidth(0.7f)
+                        .padding(16.dp),
+
+                    colors = CardDefaults.cardColors(
+                        containerColor = MaterialTheme.colorScheme.secondary
                     )
+                ) {
+                    if (currentVacation.ideas.isNotEmpty()) {
+                        Text(
+                            text = stringResource(R.string.detailsscreen_idea_title),
+                            modifier = Modifier
+                                .padding(start = 32.dp, top = 16.dp, end = 32.dp)
+                                .align(Alignment.CenterHorizontally),
+                        )
+
+                        Spacer(modifier = Modifier.height(16.dp))
+
+                        LazyColumn (
+                            modifier= Modifier.wrapContentWidth()
+                        ){
+                            items(currentVacation.ideas) { idea ->
+                                Row(
+                                    modifier = Modifier
+                                        .fillMaxWidth(),
+                                    horizontalArrangement = Arrangement.Center
+                                ) {
+                                    Text(
+                                        text = "- $idea",
+                                        color = Color.White,
+                                        textAlign = TextAlign.Center
+                                    )
+                                }
+                            }
+                        }
+
+                        Spacer(modifier = Modifier.height(16.dp))
+                    } else {
+                        Text(
+                            text = stringResource(R.string.detailsscreen_error_no_idea),
+                            style = MaterialTheme.typography.bodyLarge,
+                            color = Color.White,
+                            modifier = Modifier
+                                .padding(all = 16.dp)
+                                .align(Alignment.CenterHorizontally)
+
+                        )
+                    }
                 }
 
-                Text(
-                    text = stringResource(R.string.detailsscreen_edit_button),
-                    color = colorResource(R.color.orange),
-                    modifier = Modifier
-                        .align(Alignment.CenterHorizontally)
-                        .clickable { onEditClick(AppDestinations.buildEditRoute(currentVacation.id)) }
-                )
 
             } ?: Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                 Text(text = stringResource(R.string.detailsscreen_loading_vacation))
@@ -293,7 +359,34 @@ fun DetailsScreenPreview() {
                                 ActivityUiModel("Seine River Cruise", "18:00", "2h00")
                             )
                         )
-                    )
+                    ),
+                    ideas = listOf("piscine", "tennis")
+                )
+            )
+        }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun DetailsScreenEmptyPreview() {
+    MVIAppTheme {
+        Surface {
+            DetailsScreenContent(
+                vacation = VacationUiModel(
+                    id = 1,
+                    name = "Paris Trip",
+                    days = listOf(
+                        DayUiModel(
+                            "Day 1",
+                            listOf()
+                        ),
+                        DayUiModel(
+                            "Day 2",
+                            listOf()
+                        )
+                    ),
+                    ideas = listOf()
                 )
             )
         }

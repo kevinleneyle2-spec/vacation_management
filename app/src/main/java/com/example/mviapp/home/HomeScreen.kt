@@ -229,7 +229,7 @@ fun HomeScreenPreview() {
         HomeScreenContent(
             vacationUiState = VacationUiViewState(
                 vacations = listOf(
-                    VacationDto(id = 1, name = "Paris", nbrDay = 3, days = emptyList())
+                    VacationDto(id = 1, name = "Paris", nbrDay = 3, days = emptyList(), ideas = emptyList())
                 )
             ),
             onDeleteVacation = {},

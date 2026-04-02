@@ -39,7 +39,8 @@ class DetailsViewModel @Inject constructor(
                                 )
                             }
                         )
-                    }
+                    },
+                    ideas = dto.ideas
                 )
             }
             .stateIn(
