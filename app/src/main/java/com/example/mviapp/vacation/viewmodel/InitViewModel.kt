@@ -18,8 +18,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class InitViewModel @Inject constructor(
-    private val vacationRepository: VacationRepository,
-    private val savedStateHandle: SavedStateHandle
+    private val vacationRepository: VacationRepository
 ) : ViewModel(), InitViewModelActions {
 
     private val _initState = MutableStateFlow(VacationState())
@@ -27,8 +26,6 @@ class InitViewModel @Inject constructor(
 
     private val _initValidation = MutableStateFlow(false)
     override val initValidation: StateFlow<Boolean> = _initValidation
-
-    private val vacationId: Int? = savedStateHandle.get<Int>("vacationId")
     private fun createVacation(vacationDto: VacationDto) {
         viewModelScope.launch {
             vacationRepository.insertItem(vacationDto)
@@ -135,6 +132,10 @@ class InitViewModel @Inject constructor(
                 _initState.update { it.copy(ideas = currentIdeas) }
             }
 
+            is InitIntent.UpdateImage -> {
+                _initState.update { it.copy(image = intent.image) }
+            }
+
             is InitIntent.CreateVacation -> createVacation(intent.vacationDto)
 
             is InitIntent.UpdateVacation -> updateVacation(intent.vacationDto)
@@ -149,7 +150,10 @@ class InitViewModel @Inject constructor(
                                     id = it.id,
                                     vacationName = it.name,
                                     numDays = it.nbrDay,
-                                    days = it.days
+                                    days = it.days,
+                                    ideas = it.ideas,
+                                    image = it.image,
+                                    isArchived = it.isArchived
                                 )
                             }
                             updateValidation()

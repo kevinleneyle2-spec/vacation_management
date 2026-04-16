@@ -4,7 +4,6 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -37,8 +36,17 @@ fun VacationItem(
     vacationDto: VacationDto,
     onItemSelected: (String) -> Unit,
     onDeleteClick: () -> Unit,
+    onArchiveClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val iconRes = when (vacationDto.image) {
+        "beach_ico" -> R.drawable.beach_ico
+        "ski_ico" -> R.drawable.ski_ico
+        "forest_ico" -> R.drawable.forest_ico
+        "plane_ico" -> R.drawable.plane_ico
+        else -> R.drawable.vacation_ico
+    }
+
     Card(
         modifier = modifier
             .fillMaxWidth()
@@ -65,7 +73,7 @@ fun VacationItem(
                 contentAlignment = Alignment.Center
             ) {
                 Image(
-                    painter = painterResource(id = R.drawable.vacation_ico),
+                    painter = painterResource(id = iconRes),
                     contentDescription = null,
                     modifier = Modifier.size(56.dp)
                 )
@@ -83,6 +91,25 @@ fun VacationItem(
                     maxLines = 2,
                     overflow = TextOverflow.Ellipsis,
                     color = MaterialTheme.colorScheme.onSurface
+                )
+            }
+
+            IconButton(
+                onClick = { onArchiveClick() },
+                modifier = Modifier
+                    .size(44.dp)
+                    .clip(CircleShape)
+                    .background(Color.Transparent)
+                    .testTag("vacationArchiveButton")
+            ) {
+                Image(
+                    painter =
+                        if (vacationDto.isArchived)
+                            painterResource(id = R.drawable.unarchived)
+                        else
+                            painterResource(id = R.drawable.archive),
+                    contentDescription = "Archive",
+                    modifier = Modifier.size(24.dp)
                 )
             }
 
@@ -115,10 +142,13 @@ fun VacationItemPreview() {
                     name = "Summer in Paris",
                     nbrDay = 5,
                     days = emptyList(),
-                    ideas = emptyList()
+                    ideas = emptyList(),
+                    image = "vacation_ico",
+                    isArchived = false
                 ),
                 onItemSelected = {},
-                onDeleteClick = {}
+                onDeleteClick = {},
+                onArchiveClick = {}
             )
         }
     }

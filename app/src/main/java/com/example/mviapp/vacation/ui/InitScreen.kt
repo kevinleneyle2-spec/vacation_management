@@ -1,13 +1,20 @@
 package com.example.mviapp.vacation.ui
 
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -26,8 +33,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
@@ -59,6 +68,14 @@ fun InitScreen(
     val initState by viewModel.initState.collectAsStateWithLifecycle()
     val initValidation by viewModel.initValidation.collectAsStateWithLifecycle()
 
+    val icons = listOf(
+        "vacation_ico" to R.drawable.vacation_ico,
+        "beach_ico" to R.drawable.beach_ico,
+        "ski_ico" to R.drawable.ski_ico,
+        "forest_ico" to R.drawable.forest_ico,
+        "plane_ico" to R.drawable.plane_ico
+    )
+
     Scaffold(
         topBar = {
             TopAppBar(
@@ -88,16 +105,14 @@ fun InitScreen(
                 .fillMaxSize()
                 .padding(paddingValues)
                 .padding(16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
-            Box(
-                contentAlignment = Alignment.Center
-            ) {
-                Text(
-                    text = stringResource(R.string.initscreen_name_title),
-                    color = colorResource(R.color.orange)
-                )
-            }
+            Text(
+                text = stringResource(R.string.initscreen_name_title),
+                color = colorResource(R.color.orange),
+                modifier = Modifier.align(Alignment.Start)
+            )
 
             OutlinedTextField(
                 value = initState.vacationName,
@@ -123,11 +138,12 @@ fun InitScreen(
                 singleLine = true
             )
 
-            Spacer(modifier = Modifier.height(64.dp))
+            Spacer(modifier = Modifier.height(32.dp))
 
             Text(
                 text = stringResource(R.string.initscreen_day_title),
-                color = colorResource(R.color.orange)
+                color = colorResource(R.color.orange),
+                modifier = Modifier.align(Alignment.Start)
             )
             OutlinedTextField(
                 value = if (initState.numDays == 0) "" else initState.numDays.toString(),
@@ -154,7 +170,52 @@ fun InitScreen(
                 ),
             )
 
-            Spacer(modifier = Modifier.height(64.dp))
+            Spacer(modifier = Modifier.height(32.dp))
+
+            Text(
+                text = stringResource(R.string.initscreen_choose_icon_text),
+                color = colorResource(R.color.orange),
+                modifier = Modifier.align(Alignment.Start)
+            )
+            
+            Spacer(modifier = Modifier.height(8.dp))
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceEvenly
+            ) {
+                icons.forEach { (name, resId) ->
+                    val isSelected = initState.image == name
+                    Box(
+                        modifier = Modifier
+                            .size(60.dp)
+                            .clip(CircleShape)
+                            .background(
+                                if (isSelected) colorResource(R.color.orange).copy(alpha = 0.2f)
+                                else Color.Transparent
+                            )
+                            .border(
+                                width = 2.dp,
+                                color = if (isSelected) colorResource(R.color.orange)
+                                else Color.Transparent,
+                                shape = CircleShape
+                            )
+                            .clickable {
+                                viewModel.handleIntent(InitIntent.UpdateImage(name))
+                            }
+                            .padding(8.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Image(
+                            painter = painterResource(id = resId),
+                            contentDescription = null,
+                            modifier = Modifier.size(40.dp)
+                        )
+                    }
+                }
+            }
+
+            Spacer(modifier = Modifier.height(32.dp))
 
 
             TextButton(

@@ -1,7 +1,11 @@
 <resources>
     <string name="app_name">MVIApp</string>
-    <string name="homescreen_first_button">CREATE YOUR NEXT VACATION</string>
     <string name="homescreen_next_button">CREATE YOUR NEXT VACATION</string>
+    <string name="homescreen_projects_button">My projects</string>
+    <string name="homescreen_archives_button">Archives</string>
+    <string name="homescreen_no_vacation">no vacation planned</string>
+    <string name="homescreen_no_archived_vacation">No vacations archived</string>
+    <string name="homescreen_delete_button">Archives</string>
     <string name="initscreen_title">Your vacation</string>
     <string name="detailsscreen_error_title">Your vacation</string>
     <string name="detailsscreen_error_no_days">No days added to this vacation yet.</string>
@@ -14,6 +18,7 @@
     <string name="initscreen_day_title">Number of days</string>
     <string name="initscreen_name_description">Enter name</string>
     <string name="initscreen_day_description">Enter number between 1-15</string>
+    <string name="initscreen_choose_icon_text">Choose an icon</string>
     <string name="initscreen_next_button">NEXT</string>
     <string name="activitiesscreen_title">What have you planned?</string>
     <string name="activitiesscreen_finish_button">FINISH</string>
