@@ -8,13 +8,17 @@ data class VacationState(
     val vacationName: String = "",
     val numDays: Int = 0,
     val days: List<Day> = emptyList(),
-    val ideas: List<String> = emptyList()
+    val ideas: List<String> = emptyList(),
+    val image: String = "vacation_ico",
+    val isArchived: Boolean = false
 ) {
     fun toVacationDto() = VacationDto(
         id = id,
         name = vacationName,
         nbrDay = numDays,
         days = days,
-        ideas = ideas
+        ideas = ideas,
+        image = image,
+        isArchived = isArchived
     )
 }

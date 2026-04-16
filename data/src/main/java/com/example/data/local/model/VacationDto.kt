@@ -10,5 +10,7 @@ data class VacationDto(
     @ColumnInfo val name: String,
     @ColumnInfo val nbrDay: Int,
     @ColumnInfo val days: List<Day>,
-    @ColumnInfo val ideas: List<String>
+    @ColumnInfo val ideas: List<String>,
+    @ColumnInfo val image: String,
+    @ColumnInfo val isArchived: Boolean
 )

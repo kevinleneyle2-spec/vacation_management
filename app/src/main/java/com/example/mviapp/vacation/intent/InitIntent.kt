@@ -15,6 +15,8 @@ sealed class InitIntent {
 
     data class AddIdea(val idea: String) : InitIntent()
 
+    data class UpdateImage(val image: String) : InitIntent()
+
     data class RemoveIdea(val index: Int) : InitIntent()
 
     data class  CreateVacation(val vacationDto: VacationDto) : InitIntent()
