@@ -1,6 +1,7 @@
 package com.example.mviapp.vacation.ui
 
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -12,6 +13,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -43,10 +45,12 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -109,9 +113,16 @@ fun ActivitiesItem(
             .padding(start = 16.dp, end = 16.dp)
             .testTag("vacationCard"),
         border = BorderStroke(
-            width = 2.dp,
-            color = MaterialTheme.colorScheme.primary
+            width = 3.dp,
+            brush = Brush.verticalGradient(
+                colors = listOf(
+                    MaterialTheme.colorScheme.primary,
+                    MaterialTheme.colorScheme.primary.copy(alpha = 0.4f),
+                    MaterialTheme.colorScheme.primary
+                )
+            )
         ),
+        elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
         colors = CardDefaults.cardColors(
             containerColor = colorResource(R.color.white_orange)
         )
@@ -138,11 +149,24 @@ fun ActivitiesItem(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Column(modifier = Modifier.fillMaxWidth()) {
-                Text(
-                    text = stringResource(R.string.activitiesscreen_additional_info_title),
-                    color = colorResource(R.color.orange),
-                    fontWeight = FontWeight.Bold
-                )
+                Row(
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Image(
+                        painter = painterResource(id = R.drawable.news_ico),
+                        contentDescription = "news ico",
+                        modifier = Modifier.size(18.dp)
+                    )
+
+                    Spacer(modifier = Modifier.width(12.dp))
+
+                    Text(
+                        text = stringResource(R.string.activitiesscreen_additional_info_title),
+                        color = colorResource(R.color.orange),
+                        fontWeight = FontWeight.Bold
+                    )
+                }
+
                 OutlinedTextField(
                     value = day.additionalInfo,
                     onValueChange = { newValue ->
@@ -164,11 +188,23 @@ fun ActivitiesItem(
 
                 Spacer(modifier = Modifier.height(12.dp))
 
-                Text(
-                    text = stringResource(R.string.activitiesscreen_activities_title),
-                    color = colorResource(R.color.orange),
-                    fontWeight = FontWeight.Bold
-                )
+                Row(
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Image(
+                        painter = painterResource(id = R.drawable.activities_ico),
+                        contentDescription = "activities ico",
+                        modifier = Modifier.size(18.dp)
+                    )
+
+                    Spacer(modifier = Modifier.width(12.dp))
+
+                    Text(
+                        text = stringResource(R.string.activitiesscreen_activities_title),
+                        color = colorResource(R.color.orange),
+                        fontWeight = FontWeight.Bold
+                    )
+                }
 
                 if (day.activity.isEmpty()) {
                     Row(
@@ -349,7 +385,7 @@ fun ActivitiesItem(
                                             )
                                             newActivityValue = ""
                                             activityTimeValue = "12h00"
-                                            activityDurationValue = "1h00"
+                                            activityDurationValue = "01h00"
                                             showAddActivityDialog = false
                                         }
                                     },
