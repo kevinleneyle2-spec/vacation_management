@@ -283,6 +283,15 @@ fun DayCard(day: DayUiModel) {
                 color = MaterialTheme.colorScheme.primary
             )
 
+            if (day.additionalInfo.isNotEmpty()) {
+                Text(
+                    text = day.additionalInfo,
+                    style = MaterialTheme.typography.titleSmall,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.primary.copy(alpha = 0.8f)
+                )
+            }
+
             Spacer(modifier = Modifier.height(8.dp))
 
             if (day.activities.isNotEmpty()) {
@@ -346,6 +355,7 @@ fun DetailsScreenPreview() {
                     days = listOf(
                         DayUiModel(
                             "Day 1",
+                            "father",
                             listOf(
                                 ActivityUiModel("Eiffel Tower", "11:00", "2h00"),
                                 ActivityUiModel("Eiffel Tower", "10:00", "2h00"),
@@ -354,6 +364,7 @@ fun DetailsScreenPreview() {
                         ),
                         DayUiModel(
                             "Day 2",
+                            "mother",
                             listOf(
                                 ActivityUiModel("Notre Dame", "09:00", "2h00"),
                                 ActivityUiModel("Seine River Cruise", "18:00", "2h00")
@@ -379,10 +390,12 @@ fun DetailsScreenEmptyPreview() {
                     days = listOf(
                         DayUiModel(
                             "Day 1",
+                            "father",
                             listOf()
                         ),
                         DayUiModel(
                             "Day 2",
+                            "mother",
                             listOf()
                         )
                     ),

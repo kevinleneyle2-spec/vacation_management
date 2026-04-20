@@ -11,7 +11,7 @@ import androidx.navigation.compose.navigation
 import androidx.navigation.navArgument
 import com.example.mviapp.details.ui.DetailsScreen
 import com.example.mviapp.details.viewmodel.DetailsViewModel
-import com.example.mviapp.home.HomeScreen
+import com.example.mviapp.home.ui.HomeScreen
 import com.example.mviapp.home.viewmodel.HomeViewModel
 import com.example.mviapp.vacation.ui.ActivitiesScreen
 import com.example.mviapp.vacation.ui.InitScreen

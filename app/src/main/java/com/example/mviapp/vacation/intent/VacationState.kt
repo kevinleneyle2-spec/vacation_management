@@ -6,6 +6,7 @@ import com.example.data.local.model.VacationDto
 data class VacationState(
     val id: Int = 0,
     val vacationName: String = "",
+    val startDate: String = "",
     val numDays: Int = 0,
     val days: List<Day> = emptyList(),
     val ideas: List<String> = emptyList(),
@@ -15,6 +16,7 @@ data class VacationState(
     fun toVacationDto() = VacationDto(
         id = id,
         name = vacationName,
+        startDate = startDate,
         nbrDay = numDays,
         days = days,
         ideas = ideas,

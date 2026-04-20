@@ -18,6 +18,9 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.DateRange
+import androidx.compose.material3.DatePicker
+import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -29,8 +32,12 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -50,6 +57,10 @@ import com.example.mviapp.vacation.intent.InitIntent
 import com.example.mviapp.vacation.intent.VacationState
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
+import java.util.TimeZone
 
 interface InitViewModelActions {
     val initState: StateFlow<VacationState>
@@ -68,6 +79,9 @@ fun InitScreen(
     val initState by viewModel.initState.collectAsStateWithLifecycle()
     val initValidation by viewModel.initValidation.collectAsStateWithLifecycle()
 
+    var showDatePicker by remember { mutableStateOf(false) }
+    val datePickerState = rememberDatePickerState()
+
     val icons = listOf(
         "vacation_ico" to R.drawable.vacation_ico,
         "beach_ico" to R.drawable.beach_ico,
@@ -75,6 +89,34 @@ fun InitScreen(
         "forest_ico" to R.drawable.forest_ico,
         "plane_ico" to R.drawable.plane_ico
     )
+
+    if (showDatePicker) {
+        DatePickerDialog(
+            onDismissRequest = { showDatePicker = false },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        datePickerState.selectedDateMillis?.let { millis ->
+                            val sdf = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+                            sdf.timeZone = TimeZone.getTimeZone("UTC")
+                            val dateString = sdf.format(Date(millis))
+                            viewModel.handleIntent(InitIntent.UpdateStartDate(dateString))
+                        }
+                        showDatePicker = false
+                    }
+                ) {
+                    Text("OK")
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showDatePicker = false }) {
+                    Text("Cancel")
+                }
+            }
+        ) {
+            DatePicker(state = datePickerState)
+        }
+    }
 
     Scaffold(
         topBar = {
@@ -141,6 +183,52 @@ fun InitScreen(
             Spacer(modifier = Modifier.height(32.dp))
 
             Text(
+                text = stringResource(R.string.initscreen_date_title),
+                color = colorResource(R.color.orange),
+                modifier = Modifier.align(Alignment.Start)
+            )
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable { showDatePicker = true }) {
+                OutlinedTextField(
+                    value = initState.startDate,
+                    onValueChange = { },
+                    readOnly = true,
+                    enabled = false,
+                    colors = OutlinedTextFieldDefaults.colors(
+                        disabledTextColor = MaterialTheme.colorScheme.onSurface,
+                        disabledBorderColor = colorResource(R.color.orange),
+                        disabledLabelColor = colorResource(R.color.orange),
+                        disabledTrailingIconColor = colorResource(R.color.orange),
+                        disabledPlaceholderColor = colorResource(R.color.orange),
+                        disabledContainerColor = Color.Transparent
+                    ),
+                    label = {
+                        Text(
+                            stringResource(R.string.initscreen_date_description),
+                            color = colorResource(R.color.orange)
+                        )
+                    },
+                    trailingIcon = {
+                        IconButton(onClick = { showDatePicker = true }) {
+                            Icon(
+                                imageVector = Icons.Default.DateRange,
+                                contentDescription = "Select Date",
+                                tint = colorResource(R.color.orange)
+                            )
+                        }
+                    },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable { showDatePicker = true },
+                    singleLine = true
+                )
+            }
+
+            Spacer(modifier = Modifier.height(32.dp))
+
+            Text(
                 text = stringResource(R.string.initscreen_day_title),
                 color = colorResource(R.color.orange),
                 modifier = Modifier.align(Alignment.Start)
@@ -177,7 +265,7 @@ fun InitScreen(
                 color = colorResource(R.color.orange),
                 modifier = Modifier.align(Alignment.Start)
             )
-            
+
             Spacer(modifier = Modifier.height(8.dp))
 
             Row(

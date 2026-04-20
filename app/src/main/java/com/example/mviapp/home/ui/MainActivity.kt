@@ -1,4 +1,4 @@
-package com.example.mviapp.home
+package com.example.mviapp.home.ui
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
