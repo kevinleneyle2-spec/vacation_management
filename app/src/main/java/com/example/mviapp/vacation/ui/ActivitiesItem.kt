@@ -1,9 +1,12 @@
 package com.example.mviapp.vacation.ui
 
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.PressInteraction
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -20,6 +23,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccessTime
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -57,7 +61,7 @@ import com.example.mviapp.ui.theme.MVIAppTheme
 @Composable
 fun ActivitiesItem(
     day: Day,
-    onNameChange: (String) -> Unit,
+    onAddInfo: (String) -> Unit,
     onAddActivity: (String, String, String) -> Unit,
     onRemoveActivity: (Int) -> Unit,
     modifier: Modifier = Modifier
@@ -101,27 +105,44 @@ fun ActivitiesItem(
             .fillMaxWidth()
             .padding(start = 16.dp, end = 16.dp)
             .testTag("vacationCard"),
-        border = androidx.compose.foundation.BorderStroke(
+        border = BorderStroke(
             width = 2.dp,
-            color = colorResource(R.color.orange)
+            color = MaterialTheme.colorScheme.primary
         ),
-        colors = androidx.compose.material3.CardDefaults.cardColors(
+        colors = CardDefaults.cardColors(
             containerColor = colorResource(R.color.white_orange)
         )
     ) {
         Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(MaterialTheme.colorScheme.secondary)
+        ) {
+            Box(
+                modifier = Modifier
+                    .padding(10.dp)
+                    .align(Alignment.CenterHorizontally)
+            ) {
+                Text(
+                    text = day.nameDay,
+                    color = colorResource(R.color.white),
+                    fontWeight = FontWeight.Bold
+                )
+            }
+        }
+        Column(
             modifier = modifier.padding(all = 16.dp)
         ) {
             Text(
-                text = stringResource(R.string.activitiesscreen_name_day_title),
+                text = stringResource(R.string.activitiesscreen_additional_info_title),
                 color = colorResource(R.color.orange),
                 fontWeight = FontWeight.Bold
             )
             OutlinedTextField(
-                value = day.nameDay,
+                value = day.additionalInfo,
                 onValueChange = { newValue ->
                     if (newValue.length <= 100 && !newValue.contains("\n")) {
-                        onNameChange(newValue)
+                        onAddInfo(newValue)
                     }
                 },
                 colors = OutlinedTextFieldDefaults.colors(
@@ -131,7 +152,7 @@ fun ActivitiesItem(
                     focusedLabelColor = MaterialTheme.colorScheme.primary,
                     unfocusedLabelColor = MaterialTheme.colorScheme.primary
                 ),
-                label = { Text(stringResource(R.string.activitiesscreen_name_day_description)) },
+                label = { Text(stringResource(R.string.activitiesscreen_additional_info_description)) },
                 modifier = Modifier.fillMaxWidth(),
                 singleLine = true
             )
@@ -432,7 +453,8 @@ fun ActivitiesItem(
 fun ActivitiesItemPreview() {
     MVIAppTheme {
         val mockDay = Day(
-            nameDay = "Day 1: Paris Visit",
+            nameDay = "Lundi 5 mai 2025",
+            additionalInfo = "Additional info",
             activity = listOf(
                 Activity("Visit Eiffel Tower", "12h00", "2h00"),
                 Activity("Louvre Museum", "12h00", "2h00")
@@ -441,7 +463,7 @@ fun ActivitiesItemPreview() {
 
         ActivitiesItem(
             day = mockDay,
-            onNameChange = {},
+            onAddInfo = {},
             onAddActivity = { _, _, _ -> },
             onRemoveActivity = {}
         )

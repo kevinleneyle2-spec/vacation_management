@@ -1,4 +1,4 @@
-package com.example.mviapp.home
+package com.example.mviapp.home.ui
 
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.animateFloat
@@ -35,6 +35,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -61,6 +62,7 @@ import com.example.mviapp.home.intent.VacationUiViewState
 import com.example.mviapp.home.viewmodel.HomeViewModel
 import com.example.mviapp.navigation.AppDestinations
 import com.example.mviapp.ui.theme.MVIAppTheme
+import kotlinx.coroutines.delay
 
 @Composable
 fun HomeScreen(
@@ -70,10 +72,18 @@ fun HomeScreen(
 ) {
     val vacationUiState by viewModel.vacationState.collectAsStateWithLifecycle()
     var vacationToDelete by remember { mutableStateOf<VacationDto?>(null) }
+    var archiveMessageResId by remember { mutableStateOf<Int?>(null) }
+
+    LaunchedEffect(archiveMessageResId) {
+        if (archiveMessageResId != null) {
+            delay(2000)
+            archiveMessageResId = null
+        }
+    }
 
     if (vacationToDelete != null) {
         AlertDialog(
-            onDismissRequest = { vacationToDelete = null },
+            onDismissRequest = { },
             confirmButton = {
                 TextButton(onClick = {
                     vacationToDelete?.let {
@@ -109,20 +119,49 @@ fun HomeScreen(
         )
     }
 
-    HomeScreenContent(
-        vacationUiState = vacationUiState,
-        onDeleteVacation = { dto ->
-            vacationToDelete = dto
-        },
-        onArchiveVacation = { dto ->
-            viewModel.handleIntent(VacationIntent.ArchiveVacation(dto))
-        },
-        onToggleShowArchived = {
-            viewModel.handleIntent(VacationIntent.ToggleShowArchived)
-        },
-        onNavigate = onNavigate,
-        modifier = modifier
-    )
+    Box(modifier = modifier.fillMaxSize()) {
+        HomeScreenContent(
+            vacationUiState = vacationUiState,
+            onDeleteVacation = { dto ->
+                vacationToDelete = dto
+            },
+            onArchiveVacation = { dto ->
+                viewModel.handleIntent(VacationIntent.ArchiveVacation(dto))
+                archiveMessageResId = if (dto.isArchived) R.string.unarchive_message else R.string.archive_message
+            },
+            onToggleShowArchived = {
+                viewModel.handleIntent(VacationIntent.ToggleShowArchived)
+            },
+            onNavigate = onNavigate,
+            modifier = Modifier.fillMaxSize()
+        )
+
+        archiveMessageResId?.let { resId ->
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(Color.Black.copy(alpha = 0.3f))
+                    .clickable(enabled = false) {},
+                contentAlignment = Alignment.Center
+            ) {
+                Box(
+                    modifier = Modifier
+                        .clip(RoundedCornerShape(16.dp))
+                        .background(colorResource(R.color.orange))
+                        .padding(horizontal = 32.dp, vertical = 20.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = stringResource(id = resId),
+                        color = Color.White,
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 18.sp,
+                        textAlign = TextAlign.Center
+                    )
+                }
+            }
+        }
+    }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -146,9 +185,11 @@ fun HomeScreenContent(
             containerColor = Color.Transparent,
             modifier = Modifier.fillMaxSize()
         ) { paddingValues ->
-            Box(modifier = Modifier
-                .fillMaxSize()
-                .padding(paddingValues)) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(paddingValues)
+            ) {
                 if (vacationUiState.isLoading) {
                     Box(
                         modifier = Modifier.fillMaxSize(),
@@ -182,7 +223,7 @@ fun HomeScreenContent(
                                 .padding(horizontal = 24.dp, vertical = 16.dp)
                                 .height(48.dp)
                                 .clip(RoundedCornerShape(24.dp))
-                                .background(Color.White.copy(alpha = 0.2f))
+                                .background(colorResource(R.color.orange).copy(alpha = 0.4f))
                                 .border(
                                     1.dp,
                                     Color.White.copy(alpha = 0.3f),
@@ -196,9 +237,10 @@ fun HomeScreenContent(
                                     .fillMaxHeight()
                                     .clip(RoundedCornerShape(24.dp))
                                     .background(
-                                        if (!vacationUiState.showArchived) colorResource(R.color.orange) else colorResource(
-                                            R.color.orange
-                                        ).copy(alpha = 0.4f)
+                                        if (!vacationUiState.showArchived)
+                                            colorResource(R.color.orange)
+                                        else
+                                            Color.Transparent
                                     )
                                     .clickable { if (vacationUiState.showArchived) onToggleShowArchived() },
                                 contentAlignment = Alignment.Center
@@ -219,9 +261,10 @@ fun HomeScreenContent(
                                     .fillMaxHeight()
                                     .clip(RoundedCornerShape(24.dp))
                                     .background(
-                                        if (vacationUiState.showArchived) colorResource(R.color.orange) else colorResource(
-                                            R.color.orange
-                                        ).copy(alpha = 0.4f)
+                                        if (vacationUiState.showArchived)
+                                            colorResource(R.color.orange)
+                                        else
+                                            Color.Transparent
                                     )
                                     .clickable { if (!vacationUiState.showArchived) onToggleShowArchived() },
                                 contentAlignment = Alignment.Center
@@ -330,6 +373,7 @@ fun HomeScreenPreview() {
                     VacationDto(
                         id = 1,
                         name = "Paris",
+                        startDate = "10/05/2023",
                         nbrDay = 3,
                         days = emptyList(),
                         ideas = emptyList(),

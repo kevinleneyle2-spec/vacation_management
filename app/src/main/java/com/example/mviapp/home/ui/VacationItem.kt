@@ -1,4 +1,4 @@
-package com.example.mviapp.home
+package com.example.mviapp.home.ui
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -140,6 +140,7 @@ fun VacationItemPreview() {
                 vacationDto = VacationDto(
                     id = 1,
                     name = "Summer in Paris",
+                    startDate = "10/05/2023",
                     nbrDay = 5,
                     days = emptyList(),
                     ideas = emptyList(),

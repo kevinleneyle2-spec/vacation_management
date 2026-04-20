@@ -8,6 +8,7 @@ import androidx.room.PrimaryKey
 data class VacationDto(
     @PrimaryKey(autoGenerate = true) val id: Int = 0,
     @ColumnInfo val name: String,
+    @ColumnInfo val startDate: String,
     @ColumnInfo val nbrDay: Int,
     @ColumnInfo val days: List<Day>,
     @ColumnInfo val ideas: List<String>,

@@ -31,6 +31,7 @@ class DetailsViewModel @Inject constructor(
                     days = dto.days.map { day ->
                         DayUiModel(
                             name = day.nameDay,
+                            additionalInfo = day.additionalInfo,
                             activities = day.activity.map { activity ->
                                 ActivityUiModel(
                                     name = activity.activityName,

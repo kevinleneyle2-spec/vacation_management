@@ -1,7 +1,6 @@
 package com.example.mviapp.vacation.ui
 
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -27,7 +26,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
@@ -61,8 +59,8 @@ fun ActivitiesScreen(
     ActivitiesContent(
         state = initState,
         onBackClick = onBackClick,
-        onUpdateDayName = { index, name ->
-            viewModel.handleIntent(InitIntent.UpdateDayName(index, name))
+        onUpdateAddInfo = { index, name ->
+            viewModel.handleIntent(InitIntent.UpdateAddInfo(index, name))
         },
         onAddDayActivities = { index, activity ->
             viewModel.handleIntent(InitIntent.AddDayActivities(index, activity))
@@ -94,7 +92,7 @@ fun ActivitiesScreen(
 fun ActivitiesContent(
     state: VacationState,
     onBackClick: () -> Unit,
-    onUpdateDayName: (Int, String) -> Unit,
+    onUpdateAddInfo: (Int, String) -> Unit,
     onAddDayActivities: (Int, Activity) -> Unit,
     onRemoveDayActivities: (Int, Int) -> Unit,
     onAddIdea: (String) -> Unit,
@@ -172,9 +170,9 @@ fun ActivitiesContent(
             ) { index, day ->
                 ActivitiesItem(
                     day = day,
-                    onNameChange = { newValue ->
+                    onAddInfo = { newValue ->
                         if (newValue.length <= 100 && !newValue.contains("\n")) {
-                            onUpdateDayName(index, newValue)
+                            onUpdateAddInfo(index, newValue)
                         }
                     },
                     onAddActivity = { name, time, duration ->
@@ -213,12 +211,12 @@ fun ActivitiesScreenPreview() {
             ActivitiesContent(
                 state = VacationState(
                     days = listOf(
-                        Day("Day 1", listOf(Activity("Visit the Eiffel Tower", "10:00", "2h00"))),
-                        Day("Day 2", listOf(Activity("Go to the Louvre", "14:00", "2h00")))
+                        Day("Day 1", "test", listOf(Activity("Visit the Eiffel Tower", "10:00", "2h00"))),
+                        Day("Day 2", "test", listOf(Activity("Go to the Louvre", "14:00", "2h00")))
                     )
                 ),
                 onBackClick = {},
-                onUpdateDayName = { _, _ -> },
+                onUpdateAddInfo = { _, _ -> },
                 onAddDayActivities = { _, _ -> },
                 onRemoveDayActivities = { _, _ -> },
                 onCreateVacation = {},

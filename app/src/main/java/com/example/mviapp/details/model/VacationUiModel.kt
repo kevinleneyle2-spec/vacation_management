@@ -1,5 +1,7 @@
 package com.example.mviapp.details.model
 
+import android.hardware.SensorAdditionalInfo
+
 data class VacationUiModel(
     val id: Int,
     val name: String,
@@ -9,6 +11,7 @@ data class VacationUiModel(
 
 data class DayUiModel(
     val name: String,
+    val additionalInfo: String,
     val activities: List<ActivityUiModel>
 )
 

@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">MVIApp</string>
+    <string name="app_name">DreamAct</string>
     <string name="homescreen_next_button">CREATE YOUR NEXT VACATION</string>
     <string name="homescreen_projects_button">My projects</string>
     <string name="homescreen_archives_button">Archives</string>
@@ -22,8 +22,8 @@
     <string name="initscreen_next_button">NEXT</string>
     <string name="activitiesscreen_title">What have you planned?</string>
     <string name="activitiesscreen_finish_button">FINISH</string>
-    <string name="activitiesscreen_name_day_title">Name of your day</string>
-    <string name="activitiesscreen_name_day_description">Enter name of your day</string>
+    <string name="activitiesscreen_additional_info_title">Additional information</string>
+    <string name="activitiesscreen_additional_info_description">Enter additional information for this day</string>
     <string name="activitiesscreen_activities_title">Activities</string>
     <string name="activitiesscreen_ideas_list_title">Ideas</string>
     <string name="activitiesscreen_ideas_title">Do you have other ideas ?</string>
@@ -40,4 +40,8 @@
     <string name="delete_vacation_message">Are you sure you want to delete this vacation?</string>
     <string name="confirm_button">Delete</string>
     <string name="cancel_button">Cancel</string>
+    <string name="archive_message">Vacation archived!</string>
+    <string name="unarchive_message">Vacation unarchived!</string>
+    <string name="initscreen_date_title">Start date</string>
+    <string name="initscreen_date_description">Select date</string>
 </resources>
