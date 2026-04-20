@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -48,6 +49,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -154,6 +156,19 @@ fun DetailsScreenContent(
         ) {
             vacation?.let { currentVacation ->
                 if (currentVacation.days.isNotEmpty()) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(), // Add this to fill the width
+                        horizontalArrangement = Arrangement.Center
+                    ) {
+                        Image(
+                            painter = painterResource(id = R.drawable.calendar_ico),
+                            contentDescription = "calendar ico",
+                            modifier = Modifier.size(50.dp)
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.width(10.dp))
+
                     val pagerState = rememberPagerState(pageCount = { currentVacation.days.size })
 
                     HorizontalPager(
@@ -212,6 +227,7 @@ fun DetailsScreenContent(
                     if (currentVacation.ideas.isNotEmpty()) {
                         Text(
                             text = stringResource(R.string.detailsscreen_idea_title),
+                            fontWeight = FontWeight.Bold,
                             modifier = Modifier
                                 .padding(start = 32.dp, top = 16.dp, end = 32.dp)
                                 .align(Alignment.CenterHorizontally),
@@ -273,8 +289,7 @@ fun DayCard(day: DayUiModel) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp)
+                .padding(16.dp)
         ) {
             Text(
                 text = day.name,
@@ -286,13 +301,14 @@ fun DayCard(day: DayUiModel) {
             if (day.additionalInfo.isNotEmpty()) {
                 Text(
                     text = day.additionalInfo,
-                    style = MaterialTheme.typography.titleSmall,
-                    fontWeight = FontWeight.Bold,
+                    style = MaterialTheme.typography.titleMedium,
+                    fontStyle = FontStyle.Italic,
+                    fontWeight = FontWeight.Normal,
                     color = MaterialTheme.colorScheme.primary.copy(alpha = 0.8f)
                 )
             }
 
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(16.dp))
 
             if (day.activities.isNotEmpty()) {
                 LazyColumn(
@@ -354,8 +370,8 @@ fun DetailsScreenPreview() {
                     name = "Paris Trip",
                     days = listOf(
                         DayUiModel(
-                            "Day 1",
-                            "father",
+                            "Lundi 5 mars 2025",
+                            "with my father",
                             listOf(
                                 ActivityUiModel("Eiffel Tower", "11:00", "2h00"),
                                 ActivityUiModel("Eiffel Tower", "10:00", "2h00"),
