@@ -33,7 +33,7 @@ class InitViewModel @Inject constructor(
     private val inputSdf = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).apply {
         timeZone = TimeZone.getTimeZone("UTC")
     }
-    
+
     private val outputSdf = SimpleDateFormat("EEEE d MMMM yyyy", Locale.getDefault()).apply {
         timeZone = TimeZone.getTimeZone("UTC")
     }
@@ -52,7 +52,8 @@ class InitViewModel @Inject constructor(
 
     private fun updateValidation() {
         val state = _initState.value
-        val isValid = state.vacationName.isNotBlank() && state.numDays > 0 && state.startDate.isNotBlank()
+        val isValid =
+            state.vacationName.isNotBlank() && state.numDays > 0 && state.startDate.isNotBlank()
         _initValidation.value = isValid
     }
 
@@ -91,7 +92,8 @@ class InitViewModel @Inject constructor(
 
             is InitIntent.UpdateStartDate -> {
                 _initState.update { currentState ->
-                    val newDays = calculateDays(intent.date, currentState.numDays, currentState.days)
+                    val newDays =
+                        calculateDays(intent.date, currentState.numDays, currentState.days)
                     currentState.copy(startDate = intent.date, days = newDays)
                 }
                 updateValidation()
@@ -105,7 +107,8 @@ class InitViewModel @Inject constructor(
                     val number = input.toIntOrNull()
                     if (number != null && number in 1..15) {
                         _initState.update { currentState ->
-                            val newDays = calculateDays(currentState.startDate, number, currentState.days)
+                            val newDays =
+                                calculateDays(currentState.startDate, number, currentState.days)
                             currentState.copy(numDays = number, days = newDays)
                         }
                     }
@@ -116,7 +119,8 @@ class InitViewModel @Inject constructor(
             is InitIntent.UpdateAddInfo -> {
                 val currentDays = _initState.value.days.toMutableList()
                 if (intent.index in currentDays.indices) {
-                    currentDays[intent.index] = currentDays[intent.index].copy(additionalInfo = intent.additionalInfo)
+                    currentDays[intent.index] =
+                        currentDays[intent.index].copy(additionalInfo = intent.additionalInfo)
                     _initState.update { it.copy(days = currentDays) }
                 }
             }
@@ -129,6 +133,20 @@ class InitViewModel @Inject constructor(
                     )
                     currentDays[intent.index] = updatedDay
                     _initState.update { it.copy(days = currentDays) }
+                }
+            }
+
+            is InitIntent.UpdateDayActivities -> {
+                val currentDays = _initState.value.days.toMutableList()
+                if (intent.dayNumber in currentDays.indices) {
+                    val day = currentDays[intent.dayNumber]
+                    val activities = day.activity.toMutableList()
+                    if (intent.index in activities.indices) {
+                        activities.removeAt(intent.index)
+                        activities.add(intent.index, intent.activity)
+                        currentDays[intent.dayNumber] = day.copy(activity = activities)
+                        _initState.update { it.copy(days = currentDays) }
+                    }
                 }
             }
 

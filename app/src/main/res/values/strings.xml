@@ -28,6 +28,7 @@
     <string name="activitiesscreen_ideas_list_title">Ideas</string>
     <string name="activitiesscreen_ideas_title">Do you have other ideas ?</string>
     <string name="activitiesscreen_activities_description">Enter your activity</string>
+    <string name="activitiesscreen_address_activities">Enter the address</string>
     <string name="activitiesscreen_ideas_description">Enter your idea</string>
     <string name="activitiesscreen_activities_add_title">New activity</string>
     <string name="activitiesscreen_ideas_add_title">New idea</string>

@@ -17,6 +17,7 @@ data class DayUiModel(
 
 data class ActivityUiModel(
     val name: String,
+    val location: String,
     val time: String,
     val duration: String
 )

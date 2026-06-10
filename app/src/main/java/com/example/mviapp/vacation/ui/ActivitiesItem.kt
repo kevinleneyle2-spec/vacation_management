@@ -22,11 +22,13 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccessTime
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
@@ -39,14 +41,12 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
@@ -68,20 +68,21 @@ import com.example.mviapp.ui.theme.MVIAppTheme
 fun ActivitiesItem(
     day: Day,
     onAddInfo: (String) -> Unit,
-    onAddActivity: (String, String, String) -> Unit,
+    onAddActivity: (Activity) -> Unit,
+    onModifyActivity: (Int, Activity) -> Unit,
     onRemoveActivity: (Int) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val keyboardController = LocalSoftwareKeyboardController.current
-
     var showTimeSheet by remember { mutableStateOf(false) }
     var showDurationSheet by remember { mutableStateOf(false) }
     var showAddActivityDialog by remember { mutableStateOf(false) }
+    var showUpdateActivityDialog by remember { mutableStateOf(false) }
     val timeListState = rememberLazyListState()
     val durationListState = rememberLazyListState()
-    val coroutineScope = rememberCoroutineScope()
 
-    var newActivityValue by remember { mutableStateOf("") }
+    var updateActivityIndex by remember { mutableStateOf(-1) }
+    var addressActivityValue by remember { mutableStateOf("") }
+    var nameActivityValue by remember { mutableStateOf("") }
     var activityTimeValue by remember { mutableStateOf("12h00") }
     var activityDurationValue by remember { mutableStateOf("01h00") }
 
@@ -102,9 +103,19 @@ fun ActivitiesItem(
     }
 
     fun checkAddAllowed(): Boolean {
-        return (newActivityValue.isNotBlank()
+        return (nameActivityValue.isNotBlank()
                 && activityTimeValue.isNotBlank()
                 && activityDurationValue.isNotBlank())
+    }
+
+    fun cleanDialog() {
+        nameActivityValue = ""
+        addressActivityValue = ""
+        activityTimeValue = "12h00"
+        activityDurationValue = "01h00"
+        showAddActivityDialog = false
+        showUpdateActivityDialog = false
+        updateActivityIndex = -1
     }
 
     Card(
@@ -239,10 +250,30 @@ fun ActivitiesItem(
                             },
                             modifier = Modifier.weight(1f)
                         )
+
+                        IconButton(
+                            onClick = {
+                                showUpdateActivityDialog = true
+                                updateActivityIndex = index
+                                activityTimeValue = activity.activityTime
+                                activityDurationValue = activity.activityDuration
+                                addressActivityValue = activity.activityLocation
+                                nameActivityValue = activity.activityName
+                            },
+                            modifier = Modifier
+                                .size(20.dp)
+                                .padding(start = 8.dp)
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Edit,
+                                contentDescription = "Modifier",
+                                modifier = Modifier.size(16.dp)
+                            )
+                        }
+
                         TextButton(
                             onClick = { onRemoveActivity(index) },
                             modifier = Modifier
-                                .padding(start = 8.dp)
                                 .size(width = 32.dp, height = 32.dp)
                                 .testTag("activitiesDeleteButton"),
                             colors = ButtonDefaults.buttonColors(
@@ -278,8 +309,10 @@ fun ActivitiesItem(
                 )
             }
 
-            if (showAddActivityDialog) {
-                Dialog(onDismissRequest = { showAddActivityDialog = false }) {
+            if (showAddActivityDialog || showUpdateActivityDialog) {
+                Dialog(onDismissRequest = {
+                    cleanDialog()
+                }) {
                     Card(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -303,9 +336,19 @@ fun ActivitiesItem(
                             Spacer(modifier = Modifier.height(16.dp))
 
                             OutlinedTextField(
-                                value = newActivityValue,
-                                onValueChange = { newActivityValue = it },
+                                value = nameActivityValue,
+                                onValueChange = { nameActivityValue = it },
                                 label = { Text(stringResource(R.string.activitiesscreen_activities_description)) },
+                                modifier = Modifier.fillMaxWidth(),
+                                singleLine = true
+                            )
+
+                            Spacer(modifier = Modifier.height(8.dp))
+
+                            OutlinedTextField(
+                                value = addressActivityValue,
+                                onValueChange = { addressActivityValue = it },
+                                label = { Text(stringResource(R.string.activitiesscreen_address_activities)) },
                                 modifier = Modifier.fillMaxWidth(),
                                 singleLine = true
                             )
@@ -375,21 +418,35 @@ fun ActivitiesItem(
                                 modifier = Modifier.fillMaxWidth(),
                                 horizontalArrangement = Arrangement.End
                             ) {
-                                TextButton(onClick = { showAddActivityDialog = false }) {
+                                TextButton(onClick = {
+                                    cleanDialog()
+                                }) {
                                     Text(stringResource(R.string.cancel_button))
                                 }
                                 TextButton(
                                     onClick = {
                                         if (checkAddAllowed()) {
-                                            onAddActivity(
-                                                newActivityValue,
-                                                activityTimeValue,
-                                                activityDurationValue
-                                            )
-                                            newActivityValue = ""
-                                            activityTimeValue = "12h00"
-                                            activityDurationValue = "01h00"
-                                            showAddActivityDialog = false
+                                            if (showAddActivityDialog) {
+                                                onAddActivity(
+                                                    Activity(
+                                                        activityName = nameActivityValue,
+                                                        activityLocation = addressActivityValue,
+                                                        activityTime = activityTimeValue,
+                                                        activityDuration = activityDurationValue
+                                                    )
+                                                )
+                                            } else {
+                                                onModifyActivity(
+                                                    updateActivityIndex,
+                                                    Activity(
+                                                        activityName = nameActivityValue,
+                                                        activityLocation = addressActivityValue,
+                                                        activityTime = activityTimeValue,
+                                                        activityDuration = activityDurationValue
+                                                    )
+                                                )
+                                            }
+                                            cleanDialog()
                                         }
                                     },
                                     enabled = checkAddAllowed()
@@ -499,7 +556,8 @@ fun ActivitiesItemPreview() {
         ActivitiesItem(
             day = mockDay,
             onAddInfo = {},
-            onAddActivity = { _, _, _ -> },
+            onAddActivity = { _ -> },
+            onModifyActivity = { _, _ -> },
             onRemoveActivity = {}
         )
     }
