@@ -100,7 +100,7 @@ fun VacationItem(
                     .size(44.dp)
                     .clip(CircleShape)
                     .background(Color.Transparent)
-                    .testTag("vacationArchiveButton")
+                    .testTag("archivedVacationButton")
             ) {
                 Image(
                     painter =

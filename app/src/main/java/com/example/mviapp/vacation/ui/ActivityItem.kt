@@ -194,7 +194,8 @@ fun ActivitiesItem(
                         unfocusedLabelColor = MaterialTheme.colorScheme.primary
                     ),
                     label = { Text(stringResource(R.string.activitiesscreen_additional_info_description)) },
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier.fillMaxWidth()
+                        .testTag("activityAdditionalInfoTextField"),
                     singleLine = true
                 )
 
@@ -275,7 +276,7 @@ fun ActivitiesItem(
                             onClick = { onRemoveActivity(index) },
                             modifier = Modifier
                                 .size(width = 32.dp, height = 32.dp)
-                                .testTag("activitiesDeleteButton"),
+                                .testTag("activityDeleteButton"),
                             colors = ButtonDefaults.buttonColors(
                                 containerColor = Color.Transparent
                             ),
@@ -298,7 +299,8 @@ fun ActivitiesItem(
                     .size(36.dp)
                     .clip(CircleShape)
                     .background(colorResource(R.color.orange))
-                    .clickable { showAddActivityDialog = true },
+                    .clickable { showAddActivityDialog = true }
+                    .testTag("activitiesAddButton"),
                 contentAlignment = Alignment.Center
             ) {
                 Icon(
@@ -339,7 +341,8 @@ fun ActivitiesItem(
                                 value = nameActivityValue,
                                 onValueChange = { nameActivityValue = it },
                                 label = { Text(stringResource(R.string.activitiesscreen_activities_description)) },
-                                modifier = Modifier.fillMaxWidth(),
+                                modifier = Modifier.fillMaxWidth()
+                                    .testTag("activityNameTextField"),
                                 singleLine = true
                             )
 
@@ -349,7 +352,8 @@ fun ActivitiesItem(
                                 value = addressActivityValue,
                                 onValueChange = { addressActivityValue = it },
                                 label = { Text(stringResource(R.string.activitiesscreen_address_activities)) },
-                                modifier = Modifier.fillMaxWidth(),
+                                modifier = Modifier.fillMaxWidth()
+                                    .testTag("activityAddressTextField"),
                                 singleLine = true
                             )
 
@@ -381,6 +385,7 @@ fun ActivitiesItem(
                                             disabledContainerColor = Color.Transparent
                                         ),
                                         modifier = Modifier.fillMaxWidth()
+                                            .testTag("activityTimeTextField"),
                                     )
                                 }
                                 Box(
@@ -408,6 +413,7 @@ fun ActivitiesItem(
                                             disabledContainerColor = Color.Transparent
                                         ),
                                         modifier = Modifier.fillMaxWidth()
+                                            .testTag("activityDurationTextField"),
                                     )
                                 }
                             }

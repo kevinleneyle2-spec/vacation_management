@@ -43,6 +43,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -187,7 +188,8 @@ fun InitScreen(
                         color = colorResource(R.color.orange)
                     )
                 },
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier.fillMaxWidth()
+                    .testTag("initNameTextField"),
                 singleLine = true
             )
 
@@ -232,7 +234,8 @@ fun InitScreen(
                     },
                     modifier = Modifier
                         .fillMaxWidth()
-                        .clickable { showDatePicker = true },
+                        .clickable { showDatePicker = true }
+                        .testTag("initDateTextField"),
                     singleLine = true
                 )
             }
@@ -262,7 +265,8 @@ fun InitScreen(
                         color = colorResource(R.color.orange)
                     )
                 },
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier.fillMaxWidth()
+                    .testTag("initNumDayTextField"),
                 keyboardOptions = KeyboardOptions(
                     keyboardType = KeyboardType.Number,
                     imeAction = ImeAction.Done
@@ -323,6 +327,7 @@ fun InitScreen(
                 },
                 enabled = initValidation,
                 modifier = Modifier.align(Alignment.End)
+                    .testTag("initNextButton")
             ) {
                 Text(
                     text = stringResource(R.string.initscreen_next_button),
