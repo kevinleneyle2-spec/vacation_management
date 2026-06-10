@@ -65,6 +65,9 @@ fun ActivitiesScreen(
         onAddDayActivities = { index, activity ->
             viewModel.handleIntent(InitIntent.AddDayActivities(index, activity))
         },
+        onModifyDayActivities = { dayNumber, index, activity ->
+            viewModel.handleIntent(InitIntent.UpdateDayActivities(dayNumber, index, activity))
+        },
         onRemoveDayActivities = { dayNumber, index ->
             viewModel.handleIntent(InitIntent.RemoveDayActivities(dayNumber, index))
         },
@@ -94,6 +97,7 @@ fun ActivitiesContent(
     onBackClick: () -> Unit,
     onUpdateAddInfo: (Int, String) -> Unit,
     onAddDayActivities: (Int, Activity) -> Unit,
+    onModifyDayActivities: (Int, Int, Activity) -> Unit,
     onRemoveDayActivities: (Int, Int) -> Unit,
     onAddIdea: (String) -> Unit,
     onRemoveIdea: (Int) -> Unit,
@@ -166,7 +170,8 @@ fun ActivitiesContent(
                 Spacer(modifier = Modifier.height(8.dp))
             }
 
-            itemsIndexed(state.days
+            itemsIndexed(
+                state.days
             ) { index, day ->
                 ActivitiesItem(
                     day = day,
@@ -175,8 +180,14 @@ fun ActivitiesContent(
                             onUpdateAddInfo(index, newValue)
                         }
                     },
-                    onAddActivity = { name, time, duration ->
-                        onAddDayActivities(index, Activity(name, time, duration))
+                    onAddActivity = { activity ->
+                        onAddDayActivities(
+                            index,
+                            activity
+                        )
+                    },
+                    onModifyActivity = { updateIndex, activity ->
+                        onModifyDayActivities(index, updateIndex, activity)
                     },
                     onRemoveActivity = { removeIndex ->
                         onRemoveDayActivities(index, removeIndex)
@@ -211,13 +222,18 @@ fun ActivitiesScreenPreview() {
             ActivitiesContent(
                 state = VacationState(
                     days = listOf(
-                        Day("Day 1", "test", listOf(Activity("Visit the Eiffel Tower", "10:00", "2h00"))),
+                        Day(
+                            "Day 1",
+                            "test",
+                            listOf(Activity("Visit the Eiffel Tower", "10:00", "2h00"))
+                        ),
                         Day("Day 2", "", listOf(Activity("Go to the Louvre", "14:00", "2h00")))
                     )
                 ),
                 onBackClick = {},
                 onUpdateAddInfo = { _, _ -> },
                 onAddDayActivities = { _, _ -> },
+                onModifyDayActivities = { _, _, _ -> },
                 onRemoveDayActivities = { _, _ -> },
                 onCreateVacation = {},
                 onAddIdea = {},

@@ -3,7 +3,6 @@ package com.example.mviapp.details.ui
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.gestures.snapping.SnapPosition
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -42,18 +41,25 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Dialog
+import coil.compose.AsyncImage
 import com.example.mviapp.R
 import com.example.mviapp.details.model.ActivityUiModel
 import com.example.mviapp.details.model.DayUiModel
@@ -86,6 +92,24 @@ fun DetailsScreenContent(
     onEditClick: (String) -> Unit = {},
     modifier: Modifier = Modifier
 ) {
+    var selectedLocation by remember { mutableStateOf<String?>(null) }
+
+    selectedLocation?.let { location ->
+        Dialog(
+            onDismissRequest = { selectedLocation = null }
+        ) {
+            Surface(
+                shape = MaterialTheme.shapes.medium,
+                tonalElevation = 6.dp
+            ) {
+                Text(
+                    text = location,
+                    modifier = Modifier.padding(24.dp)
+                )
+            }
+        }
+    }
+
     Scaffold(
         topBar = {
             TopAppBar(
@@ -157,7 +181,7 @@ fun DetailsScreenContent(
             vacation?.let { currentVacation ->
                 if (currentVacation.days.isNotEmpty()) {
                     Row(
-                        modifier = Modifier.fillMaxWidth(), // Add this to fill the width
+                        modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.Center
                     ) {
                         Image(
@@ -179,7 +203,10 @@ fun DetailsScreenContent(
                             .fillMaxWidth()
                             .padding(top = 16.dp, bottom = 16.dp)
                     ) { page ->
-                        DayCard(day = currentVacation.days[page])
+                        DayCard(
+                            day = currentVacation.days[page],
+                            onLocationClick = { location -> selectedLocation = location }
+                        )
                     }
 
                     Spacer(modifier = Modifier.height(16.dp))
@@ -235,9 +262,9 @@ fun DetailsScreenContent(
 
                         Spacer(modifier = Modifier.height(16.dp))
 
-                        LazyColumn (
-                            modifier= Modifier.wrapContentWidth()
-                        ){
+                        LazyColumn(
+                            modifier = Modifier.wrapContentWidth()
+                        ) {
                             items(currentVacation.ideas) { idea ->
                                 Row(
                                     modifier = Modifier
@@ -276,7 +303,7 @@ fun DetailsScreenContent(
 }
 
 @Composable
-fun DayCard(day: DayUiModel) {
+fun DayCard(day: DayUiModel, onLocationClick: (String) -> Unit) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -316,7 +343,7 @@ fun DayCard(day: DayUiModel) {
                     modifier = Modifier.fillMaxSize()
                 ) {
                     items(day.activities.sortedBy { it.time }) { activity ->
-                        ActivityRow(activity)
+                        ActivityRow(activity, onLocationClick = onLocationClick)
                     }
                 }
             } else {
@@ -331,7 +358,7 @@ fun DayCard(day: DayUiModel) {
 }
 
 @Composable
-fun ActivityRow(activity: ActivityUiModel) {
+fun ActivityRow(activity: ActivityUiModel, onLocationClick: (String) -> Unit) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(8.dp),
@@ -354,8 +381,41 @@ fun ActivityRow(activity: ActivityUiModel) {
         Text(
             text = activity.name + " (" + activity.duration + ")",
             style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.onSurface
+            textDecoration =
+                if (activity.location.isNotEmpty()) {
+                    TextDecoration.Underline
+                } else {
+                    TextDecoration.None
+                },
+            color = MaterialTheme.colorScheme.onSurface,
+            modifier = Modifier
+                .clickable { onLocationClick(activity.location) }
         )
+
+        if (activity.location.isNotEmpty()) {
+            IconButton(
+                onClick = { onLocationClick(activity.location) },
+                modifier = Modifier
+                    .size(20.dp)
+                    .clip(CircleShape)
+                    .background(Color.Transparent)
+                    .testTag("addressButton")
+            ) {
+                if (LocalInspectionMode.current) {
+                    Image(
+                        painter = painterResource(R.drawable.map_ico),
+                        contentDescription = null,
+                        modifier = Modifier.size(16.dp)
+                    )
+                } else {
+                    AsyncImage(
+                        model = R.drawable.map_ico,
+                        contentDescription = null,
+                        modifier = Modifier.size(16.dp)
+                    )
+                }
+            }
+        }
     }
 }
 
@@ -373,17 +433,17 @@ fun DetailsScreenPreview() {
                             "Lundi 5 mars 2025",
                             "with my father",
                             listOf(
-                                ActivityUiModel("Eiffel Tower", "11:00", "2h00"),
-                                ActivityUiModel("Eiffel Tower", "10:00", "2h00"),
-                                ActivityUiModel("Louvre Museum", "14:30", "2h00")
+                                ActivityUiModel("Eiffel Tower", "", "11:00", "2h00"),
+                                ActivityUiModel("Eiffel Tower", "test", "10:00", "2h00"),
+                                ActivityUiModel("Louvre Museum", "", "14:30", "2h00")
                             )
                         ),
                         DayUiModel(
                             "Day 2",
                             "mother",
                             listOf(
-                                ActivityUiModel("Notre Dame", "09:00", "2h00"),
-                                ActivityUiModel("Seine River Cruise", "18:00", "2h00")
+                                ActivityUiModel("Notre Dame", "", "09:00", "2h00"),
+                                ActivityUiModel("Seine River Cruise", "", "18:00", "2h00")
                             )
                         )
                     ),
