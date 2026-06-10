@@ -27,7 +27,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Archive
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -44,8 +43,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -55,6 +56,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import coil.compose.AsyncImage
 import com.example.data.local.model.VacationDto
 import com.example.mviapp.R
 import com.example.mviapp.home.intent.VacationIntent
@@ -127,7 +129,8 @@ fun HomeScreen(
             },
             onArchiveVacation = { dto ->
                 viewModel.handleIntent(VacationIntent.ArchiveVacation(dto))
-                archiveMessageResId = if (dto.isArchived) R.string.unarchive_message else R.string.archive_message
+                archiveMessageResId =
+                    if (dto.isArchived) R.string.unarchive_message else R.string.archive_message
             },
             onToggleShowArchived = {
                 viewModel.handleIntent(VacationIntent.ToggleShowArchived)
@@ -175,12 +178,21 @@ fun HomeScreenContent(
     modifier: Modifier = Modifier
 ) {
     Box(modifier = modifier.fillMaxSize()) {
-        Image(
-            painter = painterResource(id = R.drawable.background_home),
-            contentDescription = null,
-            modifier = Modifier.fillMaxSize(),
-            contentScale = ContentScale.Crop
-        )
+        if (LocalInspectionMode.current) {
+            Image(
+                painter = painterResource(id = R.drawable.background_home),
+                contentDescription = null,
+                modifier = Modifier.fillMaxSize(),
+                contentScale = ContentScale.Crop
+            )
+        } else {
+            AsyncImage(
+                model = R.drawable.background_home,
+                contentDescription = null,
+                modifier = Modifier.fillMaxSize(),
+                contentScale = ContentScale.Crop
+            )
+        }
         Scaffold(
             containerColor = Color.Transparent,
             modifier = Modifier.fillMaxSize()
@@ -221,11 +233,11 @@ fun HomeScreenContent(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .padding(horizontal = 24.dp, vertical = 16.dp)
-                                .height(48.dp)
+                                .height(32.dp)
                                 .clip(RoundedCornerShape(24.dp))
-                                .background(colorResource(R.color.orange).copy(alpha = 0.4f))
+                                .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.3f))
                                 .border(
-                                    1.dp,
+                                    0.dp,
                                     Color.White.copy(alpha = 0.3f),
                                     RoundedCornerShape(24.dp)
                                 ),
@@ -313,47 +325,91 @@ fun HomeScreenContent(
                                 }
                             }
                         } else {
-                            Box(
+                            Column(
                                 modifier = Modifier
-                                    .weight(1f)
                                     .fillMaxWidth()
-                                    .padding(32.dp),
-                                contentAlignment = Alignment.Center
+                                    .weight(1f),
+                                verticalArrangement = Arrangement.Top,
+                                horizontalAlignment = Alignment.CenterHorizontally
                             ) {
-                                Text(
-                                    text = if (vacationUiState.showArchived) {
-                                        stringResource(id = R.string.homescreen_no_archived_vacation)
-                                    } else {
-                                        stringResource(id = R.string.homescreen_no_vacation)
-                                    },
-                                    color = MaterialTheme.colorScheme.primary,
-                                    fontSize = 18.sp,
-                                    textAlign = TextAlign.Center
-                                )
+                                Box(
+                                    modifier = Modifier
+                                        .padding(32.dp)
+                                        .clip(RoundedCornerShape(24.dp))
+                                        .background(Color.White.copy(alpha = 0.2f)),
+                                    contentAlignment = Alignment.TopCenter
+                                ) {
+                                    Text(
+                                        text = if (vacationUiState.showArchived) {
+                                            stringResource(id = R.string.homescreen_no_archived_vacation)
+                                        } else {
+                                            stringResource(id = R.string.homescreen_no_vacation)
+                                        },
+                                        color = MaterialTheme.colorScheme.primary,
+                                        fontSize = 18.sp,
+                                        textAlign = TextAlign.Center,
+                                        modifier = Modifier.padding(horizontal = 16.dp)
+                                    )
+                                }
                             }
                         }
 
                         Row(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(32.dp),
+                                .padding(bottom = 40.dp, start = 32.dp, end = 32.dp),
                             horizontalArrangement = Arrangement.Center,
                         ) {
-                            TextButton(
-                                onClick = {
-                                    onNavigate(AppDestinations.INIT_ROUTE)
-                                },
-                                colors = ButtonDefaults.textButtonColors(
-                                    containerColor = MaterialTheme.colorScheme.primary,
-                                    contentColor = Color.White
-                                )
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(70.dp)
+                                    .clip(RoundedCornerShape(24.dp))
+                                    .background(
+                                        Brush.horizontalGradient(
+                                            colors = listOf(
+                                                MaterialTheme.colorScheme.primary,
+                                                colorResource(id = R.color.orange)
+                                            )
+                                        )
+                                    )
+                                    .border(
+                                        width = 2.dp,
+                                        brush = Brush.verticalGradient(
+                                            colors = listOf(
+                                                Color.White.copy(alpha = 0.6f),
+                                                Color.White.copy(alpha = 0.1f)
+                                            )
+                                        ),
+                                        shape = RoundedCornerShape(24.dp)
+                                    )
+                                    .clickable { onNavigate(AppDestinations.INIT_ROUTE) },
+                                contentAlignment = Alignment.Center
                             ) {
-                                Text(
-                                    text = stringResource(R.string.homescreen_next_button),
-                                    fontSize = 24.sp,
-                                    textAlign = TextAlign.Center,
-                                    maxLines = 2
-                                )
+                                Row(
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    horizontalArrangement = Arrangement.Center,
+                                    modifier = Modifier.padding(horizontal = 24.dp)
+                                ) {
+                                    Image(
+                                        painter = painterResource(id = R.drawable.next_vacation_ico),
+                                        contentDescription = null,
+                                        modifier = Modifier.size(40.dp)
+                                    )
+
+                                    Spacer(modifier = Modifier.width(12.dp))
+
+                                    Text(
+                                        text = stringResource(R.string.homescreen_next_button),
+                                        color = Color.White,
+                                        fontSize = 18.sp,
+                                        fontWeight = FontWeight.Black,
+                                        letterSpacing = 1.sp,
+                                        textAlign = TextAlign.Start,
+                                        lineHeight = 22.sp,
+                                        modifier = Modifier.weight(1f, fill = false)
+                                    )
+                                }
                             }
                         }
                     }
@@ -380,6 +436,23 @@ fun HomeScreenPreview() {
                         image = "vacation_ico",
                         isArchived = false
                     )
+                )
+            ),
+            onDeleteVacation = {},
+            onArchiveVacation = {},
+            onToggleShowArchived = {},
+            onNavigate = {}
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun HomeScreenEmptyPreview() {
+    MVIAppTheme {
+        HomeScreenContent(
+            vacationUiState = VacationUiViewState(
+                vacations = listOf(
                 )
             ),
             onDeleteVacation = {},

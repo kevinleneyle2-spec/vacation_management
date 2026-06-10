@@ -27,7 +27,6 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
@@ -54,6 +53,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -124,7 +124,7 @@ fun ActivitiesItem(
         ),
         elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
         colors = CardDefaults.cardColors(
-            containerColor = colorResource(R.color.white_orange)
+            containerColor = colorResource(R.color.white)
         )
     ) {
         Column(
@@ -163,6 +163,7 @@ fun ActivitiesItem(
                     Text(
                         text = stringResource(R.string.activitiesscreen_additional_info_title),
                         color = colorResource(R.color.orange),
+                        textDecoration = TextDecoration.Underline,
                         fontWeight = FontWeight.Bold
                     )
                 }
@@ -201,6 +202,7 @@ fun ActivitiesItem(
 
                     Text(
                         text = stringResource(R.string.activitiesscreen_activities_title),
+                        textDecoration = TextDecoration.Underline,
                         color = colorResource(R.color.orange),
                         fontWeight = FontWeight.Bold
                     )
@@ -260,18 +262,19 @@ fun ActivitiesItem(
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            IconButton(
-                onClick = { showAddActivityDialog = true },
+            Box(
                 modifier = Modifier
-                    .size(56.dp)
+                    .size(36.dp)
                     .clip(CircleShape)
                     .background(colorResource(R.color.orange))
+                    .clickable { showAddActivityDialog = true },
+                contentAlignment = Alignment.Center
             ) {
                 Icon(
                     imageVector = Icons.Default.Add,
                     contentDescription = "Add activity",
                     tint = Color.White,
-                    modifier = Modifier.size(32.dp)
+                    modifier = Modifier.size(20.dp)
                 )
             }
 

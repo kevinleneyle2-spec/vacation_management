@@ -212,7 +212,7 @@ fun ActivitiesScreenPreview() {
                 state = VacationState(
                     days = listOf(
                         Day("Day 1", "test", listOf(Activity("Visit the Eiffel Tower", "10:00", "2h00"))),
-                        Day("Day 2", "test", listOf(Activity("Go to the Louvre", "14:00", "2h00")))
+                        Day("Day 2", "", listOf(Activity("Go to the Louvre", "14:00", "2h00")))
                     )
                 ),
                 onBackClick = {},
