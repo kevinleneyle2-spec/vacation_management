@@ -47,6 +47,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalInspectionMode
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -254,7 +255,8 @@ fun HomeScreenContent(
                                         else
                                             Color.Transparent
                                     )
-                                    .clickable { if (vacationUiState.showArchived) onToggleShowArchived() },
+                                    .clickable { if (vacationUiState.showArchived) onToggleShowArchived() }
+                                    .testTag("unarchivedVacationViewButton"),
                                 contentAlignment = Alignment.Center
                             ) {
                                 Text(
@@ -278,7 +280,8 @@ fun HomeScreenContent(
                                         else
                                             Color.Transparent
                                     )
-                                    .clickable { if (!vacationUiState.showArchived) onToggleShowArchived() },
+                                    .clickable { if (!vacationUiState.showArchived) onToggleShowArchived() }
+                                    .testTag("archivedVacationViewButton"),
                                 contentAlignment = Alignment.Center
                             ) {
                                 Row(verticalAlignment = Alignment.CenterVertically) {
@@ -383,7 +386,9 @@ fun HomeScreenContent(
                                         ),
                                         shape = RoundedCornerShape(24.dp)
                                     )
-                                    .clickable { onNavigate(AppDestinations.INIT_ROUTE) },
+                                    .clickable { onNavigate(AppDestinations.INIT_ROUTE) }
+                                    .testTag("newVacationButton"),
+
                                 contentAlignment = Alignment.Center
                             ) {
                                 Row(
