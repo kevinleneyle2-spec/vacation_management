@@ -44,6 +44,7 @@ import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -87,7 +88,7 @@ fun IdeaItem(
         ),
         elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
         colors = CardDefaults.cardColors(
-            containerColor = colorResource(R.color.white_orange)
+            containerColor = colorResource(R.color.white)
         )
     ) {
         Column(
@@ -130,6 +131,7 @@ fun IdeaItem(
 
                     Text(
                         text = stringResource(R.string.activitiesscreen_ideas_list_title),
+                        textDecoration = TextDecoration.Underline,
                         color = colorResource(R.color.orange),
                         fontWeight = FontWeight.Bold
                     )
@@ -184,7 +186,7 @@ fun IdeaItem(
             IconButton(
                 onClick = { showAddIdeaDialog = true },
                 modifier = Modifier
-                    .size(56.dp)
+                    .size(48.dp)
                     .clip(CircleShape)
                     .background(colorResource(R.color.orange))
             ) {
@@ -192,7 +194,7 @@ fun IdeaItem(
                     imageVector = Icons.Default.Add,
                     contentDescription = "Add idea",
                     tint = Color.White,
-                    modifier = Modifier.size(32.dp)
+                    modifier = Modifier.size(24.dp)
                 )
             }
 

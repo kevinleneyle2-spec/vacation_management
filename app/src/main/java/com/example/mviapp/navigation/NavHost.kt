@@ -4,6 +4,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.Lifecycle
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -34,7 +35,9 @@ fun AppNavHost(
             HomeScreen(
                 viewModel = homeViewModel,
                 onNavigate = { route ->
-                    navController.navigate(route)
+                    navController.navigate(route) {
+                        launchSingleTop = true
+                    }
                 }
             )
         }
@@ -44,12 +47,16 @@ fun AppNavHost(
             arguments = listOf(
                 navArgument("vacationId") { type = NavType.IntType }
             )
-        ) {
+        ) { backStackEntry ->
             val detailsViewModel: DetailsViewModel = hiltViewModel()
 
             DetailsScreen(
                 viewModel = detailsViewModel,
-                onBackClick = { navController.popBackStack() },
+                onBackClick = {
+                    if (backStackEntry.lifecycle.currentState == Lifecycle.State.RESUMED) {
+                        navController.popBackStack()
+                    }
+                },
                 onEditClick = { route ->
                     navController.navigate(route)
                 }
@@ -66,7 +73,11 @@ fun AppNavHost(
                 InitScreen(
                     viewModel = viewModel,
                     onNavigate = { navController.navigate(AppDestinations.ACTIVITIES_ROUTE) },
-                    onBackClick = { navController.popBackStack() }
+                    onBackClick = {
+                        if (backStackEntry.lifecycle.currentState == Lifecycle.State.RESUMED) {
+                            navController.popBackStack()
+                        }
+                    }
                 )
             }
 
@@ -78,8 +89,20 @@ fun AppNavHost(
 
                 ActivitiesScreen(
                     viewModel = viewModel,
-                    onNavigate = { route -> navController.navigate(route) },
-                    onBackClick = { navController.popBackStack() }
+                    onNavigate = { route ->
+                        if (route == AppDestinations.HOME_ROUTE) {
+                            navController.navigate(route) {
+                                popUpTo(AppDestinations.HOME_ROUTE) { inclusive = true }
+                            }
+                        } else {
+                            navController.navigate(route)
+                        }
+                    },
+                    onBackClick = {
+                        if (backStackEntry.lifecycle.currentState == Lifecycle.State.RESUMED) {
+                            navController.popBackStack()
+                        }
+                    }
                 )
             }
 
@@ -91,8 +114,20 @@ fun AppNavHost(
                 ActivitiesScreen(
                     viewModel = hiltViewModel(),
                     vacationId = id,
-                    onNavigate = { route -> navController.navigate(route) },
-                    onBackClick = { navController.popBackStack() }
+                    onNavigate = { route ->
+                        if (route == AppDestinations.HOME_ROUTE) {
+                            navController.navigate(route) {
+                                popUpTo(AppDestinations.HOME_ROUTE) { inclusive = true }
+                            }
+                        } else {
+                            navController.navigate(route)
+                        }
+                    },
+                    onBackClick = {
+                        if (backStackEntry.lifecycle.currentState == Lifecycle.State.RESUMED) {
+                            navController.popBackStack()
+                        }
+                    }
                 )
             }
         }

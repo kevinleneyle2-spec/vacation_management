@@ -50,7 +50,7 @@ fun VacationItem(
     Card(
         modifier = modifier
             .fillMaxWidth()
-            .height(110.dp)
+            .height(80.dp)
             .padding(horizontal = 16.dp)
             .testTag("vacationCard"),
         onClick = { onItemSelected(vacationDto.name) },
