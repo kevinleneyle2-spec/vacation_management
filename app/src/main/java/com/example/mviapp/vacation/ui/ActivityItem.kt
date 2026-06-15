@@ -23,6 +23,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccessTime
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -80,6 +81,7 @@ fun ActivitiesItem(
     val timeListState = rememberLazyListState()
     val durationListState = rememberLazyListState()
 
+    var errorMessageShowed by remember { mutableStateOf<Boolean?>(false) }
     var updateActivityIndex by remember { mutableStateOf(-1) }
     var addressActivityValue by remember { mutableStateOf("") }
     var nameActivityValue by remember { mutableStateOf("") }
@@ -116,6 +118,31 @@ fun ActivitiesItem(
         showAddActivityDialog = false
         showUpdateActivityDialog = false
         updateActivityIndex = -1
+    }
+
+    fun checkMaxActivities(): Boolean {
+        return day.activity.size >= 15
+    }
+
+    if (errorMessageShowed == true) {
+        AlertDialog(
+            onDismissRequest = { errorMessageShowed = false },
+            confirmButton = {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.Center
+                ) {
+                    TextButton(
+                        onClick = { errorMessageShowed = false },
+                        modifier = Modifier.testTag("alertDialogOkButton")
+                    ) {
+                        Text(stringResource(R.string.common_ok_button))
+                    }
+                }
+            },
+            title = { Text(stringResource(R.string.common_error_title)) },
+            text = { Text(stringResource(R.string.activitiesscreen_activities_max_text)) },
+        )
     }
 
     Card(
@@ -182,7 +209,7 @@ fun ActivitiesItem(
                 OutlinedTextField(
                     value = day.additionalInfo,
                     onValueChange = { newValue ->
-                        if (newValue.length <= 100 && !newValue.contains("\n")) {
+                        if (newValue.length <= 40 && !newValue.contains("\n")) {
                             onAddInfo(newValue)
                         }
                     },
@@ -194,7 +221,8 @@ fun ActivitiesItem(
                         unfocusedLabelColor = MaterialTheme.colorScheme.primary
                     ),
                     label = { Text(stringResource(R.string.activitiesscreen_additional_info_description)) },
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier
+                        .fillMaxWidth()
                         .testTag("activityAdditionalInfoTextField"),
                     singleLine = true
                 )
@@ -238,6 +266,7 @@ fun ActivitiesItem(
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
                         modifier = Modifier.fillMaxWidth()
+                            .testTag("activityList")
                     ) {
                         Text(
                             text = buildString {
@@ -299,7 +328,13 @@ fun ActivitiesItem(
                     .size(36.dp)
                     .clip(CircleShape)
                     .background(colorResource(R.color.orange))
-                    .clickable { showAddActivityDialog = true }
+                    .clickable {
+                        if (checkMaxActivities()) {
+                            errorMessageShowed = true
+                        } else {
+                            showAddActivityDialog = true
+                        }
+                    }
                     .testTag("activitiesAddButton"),
                 contentAlignment = Alignment.Center
             ) {
@@ -339,9 +374,16 @@ fun ActivitiesItem(
 
                             OutlinedTextField(
                                 value = nameActivityValue,
-                                onValueChange = { nameActivityValue = it },
+                                onValueChange = { newValue ->
+                                    val truncated =
+                                        if (newValue.length > 25) newValue.take(25) else newValue
+                                    if (!truncated.contains("\n")) {
+                                        nameActivityValue = truncated
+                                    }
+                                },
                                 label = { Text(stringResource(R.string.activitiesscreen_activities_description)) },
-                                modifier = Modifier.fillMaxWidth()
+                                modifier = Modifier
+                                    .fillMaxWidth()
                                     .testTag("activityNameTextField"),
                                 singleLine = true
                             )
@@ -350,9 +392,16 @@ fun ActivitiesItem(
 
                             OutlinedTextField(
                                 value = addressActivityValue,
-                                onValueChange = { addressActivityValue = it },
+                                onValueChange = { newValue ->
+                                    val truncated =
+                                        if (newValue.length > 25) newValue.take(25) else newValue
+                                    if (!truncated.contains("\n")) {
+                                        addressActivityValue = truncated
+                                    }
+                                },
                                 label = { Text(stringResource(R.string.activitiesscreen_address_activities)) },
-                                modifier = Modifier.fillMaxWidth()
+                                modifier = Modifier
+                                    .fillMaxWidth()
                                     .testTag("activityAddressTextField"),
                                 singleLine = true
                             )
@@ -384,7 +433,8 @@ fun ActivitiesItem(
                                             disabledTrailingIconColor = MaterialTheme.colorScheme.primary,
                                             disabledContainerColor = Color.Transparent
                                         ),
-                                        modifier = Modifier.fillMaxWidth()
+                                        modifier = Modifier
+                                            .fillMaxWidth()
                                             .testTag("activityTimeTextField"),
                                     )
                                 }
@@ -412,7 +462,8 @@ fun ActivitiesItem(
                                             disabledTrailingIconColor = MaterialTheme.colorScheme.primary,
                                             disabledContainerColor = Color.Transparent
                                         ),
-                                        modifier = Modifier.fillMaxWidth()
+                                        modifier = Modifier
+                                            .fillMaxWidth()
                                             .testTag("activityDurationTextField"),
                                     )
                                 }
@@ -427,7 +478,7 @@ fun ActivitiesItem(
                                 TextButton(onClick = {
                                     cleanDialog()
                                 }) {
-                                    Text(stringResource(R.string.cancel_button))
+                                    Text(stringResource(R.string.common_cancel_button))
                                 }
                                 TextButton(
                                     onClick = {
@@ -481,6 +532,7 @@ fun ActivitiesItem(
                         horizontalAlignment = Alignment.CenterHorizontally,
                         modifier = Modifier
                             .fillMaxWidth()
+                            .testTag("activitiesContainer")
                             .height(300.dp)
                     ) {
                         items(timeOptions) { time ->

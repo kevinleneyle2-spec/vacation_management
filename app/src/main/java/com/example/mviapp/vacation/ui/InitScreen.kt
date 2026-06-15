@@ -171,8 +171,9 @@ fun InitScreen(
             OutlinedTextField(
                 value = initState.vacationName,
                 onValueChange = { newValue ->
-                    if (newValue.length <= 100 && !newValue.contains("\n")) {
-                        viewModel.handleIntent(InitIntent.UpdateName(newValue))
+                    val truncated = if (newValue.length > 25) newValue.take(25) else newValue
+                    if (!truncated.contains("\n")) {
+                        viewModel.handleIntent(InitIntent.UpdateName(truncated))
                     }
                 },
                 colors = OutlinedTextFieldDefaults.colors(
@@ -188,7 +189,8 @@ fun InitScreen(
                         color = colorResource(R.color.orange)
                     )
                 },
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier
+                    .fillMaxWidth()
                     .testTag("initNameTextField"),
                 singleLine = true
             )
@@ -265,7 +267,8 @@ fun InitScreen(
                         color = colorResource(R.color.orange)
                     )
                 },
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier
+                    .fillMaxWidth()
                     .testTag("initNumDayTextField"),
                 keyboardOptions = KeyboardOptions(
                     keyboardType = KeyboardType.Number,
@@ -326,7 +329,8 @@ fun InitScreen(
                     onNavigate("activities")
                 },
                 enabled = initValidation,
-                modifier = Modifier.align(Alignment.End)
+                modifier = Modifier
+                    .align(Alignment.End)
                     .testTag("initNextButton")
             ) {
                 Text(
