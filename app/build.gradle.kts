@@ -81,4 +81,7 @@ dependencies {
     debugImplementation(libs.androidx.compose.ui.tooling)
     debugImplementation(libs.androidx.compose.ui.test.manifest)
     testImplementation(libs.org.assertj)
+    testImplementation(libs.kotlinx.coroutines.test)
+    testImplementation(libs.google.truth)
+    testImplementation(libs.cash.turbine)
 }
