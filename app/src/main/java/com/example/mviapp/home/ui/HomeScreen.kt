@@ -95,7 +95,7 @@ fun HomeScreen(
                     vacationToDelete = null
                 }) {
                     Text(
-                        text = stringResource(id = R.string.confirm_button),
+                        text = stringResource(id = R.string.common_delete_button),
                         color = colorResource(id = R.color.red)
                     )
                 }
@@ -103,20 +103,20 @@ fun HomeScreen(
             dismissButton = {
                 TextButton(onClick = { vacationToDelete = null }) {
                     Text(
-                        text = stringResource(id = R.string.cancel_button),
+                        text = stringResource(id = R.string.common_cancel_button),
                         color = colorResource(id = R.color.black)
                     )
                 }
             },
             title = {
                 Text(
-                    text = stringResource(id = R.string.delete_vacation_title),
+                    text = stringResource(id = R.string.homescreen_delete_vacation_title),
                     color = colorResource(id = R.color.orange)
                 )
             },
             text = {
                 Text(
-                    text = stringResource(id = R.string.delete_vacation_message)
+                    text = stringResource(id = R.string.homescreen_delete_vacation_message)
                 )
             }
         )
@@ -131,7 +131,7 @@ fun HomeScreen(
             onArchiveVacation = { dto ->
                 viewModel.handleIntent(VacationIntent.ArchiveVacation(dto))
                 archiveMessageResId =
-                    if (dto.isArchived) R.string.unarchive_message else R.string.archive_message
+                    if (dto.isArchived) R.string.homescreen_unarchive_message else R.string.homescreen_archive_message
             },
             onToggleShowArchived = {
                 viewModel.handleIntent(VacationIntent.ToggleShowArchived)
@@ -360,7 +360,7 @@ fun HomeScreenContent(
                         Row(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(bottom = 40.dp, start = 32.dp, end = 32.dp),
+                                .padding(top = 24.dp, bottom = 40.dp, start = 32.dp, end = 32.dp),
                             horizontalArrangement = Arrangement.Center,
                         ) {
                             Box(
@@ -388,8 +388,7 @@ fun HomeScreenContent(
                                     )
                                     .clickable { onNavigate(AppDestinations.INIT_ROUTE) }
                                     .testTag("newVacationButton"),
-
-                                contentAlignment = Alignment.Center
+                                contentAlignment = Alignment.Center,
                             ) {
                                 Row(
                                     verticalAlignment = Alignment.CenterVertically,

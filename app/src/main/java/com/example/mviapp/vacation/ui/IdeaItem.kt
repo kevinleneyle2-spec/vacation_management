@@ -3,6 +3,7 @@ package com.example.mviapp.vacation.ui
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -18,6 +19,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -64,11 +66,32 @@ fun IdeaItem(
 
 
     var showAddIdeaDialog by remember { mutableStateOf(false) }
-
+    var errorMessageShowed by remember { mutableStateOf<Boolean?>(false) }
     var newIdeaValue by remember { mutableStateOf("") }
 
     fun checkAddAllowed(): Boolean {
         return newIdeaValue.isNotBlank()
+    }
+    fun checkMaxIdeas(): Boolean {
+        return ideas.size >= 10
+    }
+
+    if (errorMessageShowed == true) {
+        AlertDialog(
+            onDismissRequest = { errorMessageShowed = false },
+            confirmButton = {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.Center
+                ) {
+                    TextButton(onClick = { errorMessageShowed = false }) {
+                        Text(stringResource(R.string.common_ok_button))
+                    }
+                }
+            },
+            title = { Text(stringResource(R.string.common_error_title)) },
+            text = { Text(stringResource(R.string.activitiesscreen_activities_max_text)) },
+        )
     }
 
     Card(
@@ -183,18 +206,26 @@ fun IdeaItem(
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            IconButton(
-                onClick = { showAddIdeaDialog = true },
+            Box(
                 modifier = Modifier
-                    .size(48.dp)
+                    .size(36.dp)
                     .clip(CircleShape)
                     .background(colorResource(R.color.orange))
+                    .clickable {
+                        if (checkMaxIdeas()) {
+                            errorMessageShowed = true
+                        } else {
+                            showAddIdeaDialog = true
+                        }
+                    }
+                    .testTag("activitiesAddButtonIdea"),
+                contentAlignment = Alignment.Center
             ) {
                 Icon(
                     imageVector = Icons.Default.Add,
                     contentDescription = "Add idea",
                     tint = Color.White,
-                    modifier = Modifier.size(24.dp)
+                    modifier = Modifier.size(20.dp)
                 )
             }
 
@@ -224,7 +255,11 @@ fun IdeaItem(
 
                             OutlinedTextField(
                                 value = newIdeaValue,
-                                onValueChange = { newIdeaValue = it },
+                                onValueChange = { newValue ->
+                                    if (newValue.length <= 25 && !newValue.contains("\n")) {
+                                        newIdeaValue = newValue
+                                    }
+                                },
                                 label = { Text(stringResource(R.string.activitiesscreen_ideas_description)) },
                                 modifier = Modifier.fillMaxWidth(),
                                 singleLine = true
@@ -237,7 +272,7 @@ fun IdeaItem(
                                 horizontalArrangement = Arrangement.End
                             ) {
                                 TextButton(onClick = { showAddIdeaDialog = false }) {
-                                    Text(stringResource(R.string.cancel_button))
+                                    Text(stringResource(R.string.common_cancel_button))
                                 }
                                 TextButton(
                                     onClick = {

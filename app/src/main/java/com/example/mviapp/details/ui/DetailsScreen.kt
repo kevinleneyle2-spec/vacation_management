@@ -9,13 +9,13 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.pager.HorizontalPager
@@ -25,6 +25,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.AccessTime
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -36,6 +37,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
@@ -58,7 +60,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.window.Dialog
 import coil.compose.AsyncImage
 import com.example.mviapp.R
 import com.example.mviapp.details.model.ActivityUiModel
@@ -95,19 +96,21 @@ fun DetailsScreenContent(
     var selectedLocation by remember { mutableStateOf<String?>(null) }
 
     selectedLocation?.let { location ->
-        Dialog(
-            onDismissRequest = { selectedLocation = null }
-        ) {
-            Surface(
-                shape = MaterialTheme.shapes.medium,
-                tonalElevation = 6.dp
-            ) {
-                Text(
-                    text = location,
-                    modifier = Modifier.padding(24.dp)
-                )
-            }
-        }
+        AlertDialog(
+            onDismissRequest = { selectedLocation = null },
+            confirmButton = {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.Center
+                ) {
+                    TextButton(onClick = { selectedLocation = null }) {
+                        Text(stringResource(R.string.common_ok_button))
+                    }
+                }
+            },
+            title = { Text(stringResource(R.string.detailsscreen_dialog_address_title)) },
+            text = { Text(location) }
+        )
     }
 
     Scaffold(
@@ -184,7 +187,9 @@ fun DetailsScreenContent(
             vacation?.let { currentVacation ->
                 if (currentVacation.days.isNotEmpty()) {
                     Row(
-                        modifier = Modifier.fillMaxWidth(),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(top = 60.dp, bottom = 16.dp),
                         horizontalArrangement = Arrangement.Center
                     ) {
                         Image(
@@ -248,6 +253,7 @@ fun DetailsScreenContent(
                     modifier = Modifier
                         .align(Alignment.CenterHorizontally)
                         .fillMaxWidth(0.7f)
+                        .fillMaxHeight(0.7f)
                         .padding(16.dp),
 
                     colors = CardDefaults.cardColors(
@@ -266,7 +272,7 @@ fun DetailsScreenContent(
                         Spacer(modifier = Modifier.height(16.dp))
 
                         LazyColumn(
-                            modifier = Modifier.wrapContentWidth()
+                            modifier = Modifier.fillMaxSize()
                         ) {
                             items(currentVacation.ideas) { idea ->
                                 Row(
@@ -285,15 +291,22 @@ fun DetailsScreenContent(
 
                         Spacer(modifier = Modifier.height(16.dp))
                     } else {
-                        Text(
-                            text = stringResource(R.string.detailsscreen_error_no_idea),
-                            style = MaterialTheme.typography.bodyLarge,
-                            color = Color.White,
+                        Row(
                             modifier = Modifier
-                                .padding(all = 16.dp)
-                                .align(Alignment.CenterHorizontally)
+                                .fillMaxSize()
+                                .fillMaxHeight(1f),
+                            horizontalArrangement = Arrangement.Center,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text(
+                                text = stringResource(R.string.detailsscreen_error_no_idea),
+                                style = MaterialTheme.typography.bodyLarge,
+                                color = Color.White,
+                                modifier = Modifier
+                                    .padding(all = 16.dp)
 
-                        )
+                            )
+                        }
                     }
                 }
 

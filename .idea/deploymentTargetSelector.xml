@@ -16,19 +16,19 @@
       <SelectionState runConfigName="data">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
-      <SelectionState runConfigName="readVacation()">
+      <SelectionState runConfigName="init_num_day_wrong()">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
-      <SelectionState runConfigName="readVacations()">
+      <SelectionState runConfigName="activities_name_too_long()">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
-      <SelectionState runConfigName="VacationDatabaseTest">
+      <SelectionState runConfigName="activities_address_too_long()">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
-      <SelectionState runConfigName="deleteAndReadVacation()">
+      <SelectionState runConfigName="activities_too_many_activities()">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
-      <SelectionState runConfigName="updateAndReadVacation()">
+      <SelectionState runConfigName="Tests in 'com.example.mviapp'">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
     </selectionStates>
