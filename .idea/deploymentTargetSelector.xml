@@ -16,19 +16,19 @@
       <SelectionState runConfigName="data">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
-      <SelectionState runConfigName="init_completed_fields_not_work()">
+      <SelectionState runConfigName="readVacation()">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
-      <SelectionState runConfigName="init_name_missing()">
+      <SelectionState runConfigName="readVacations()">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
-      <SelectionState runConfigName="init_date_missing()">
+      <SelectionState runConfigName="VacationDatabaseTest">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
-      <SelectionState runConfigName="activities_completed_fields_work()">
+      <SelectionState runConfigName="deleteAndReadVacation()">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
-      <SelectionState runConfigName="details_screen_works()">
+      <SelectionState runConfigName="updateAndReadVacation()">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
     </selectionStates>
