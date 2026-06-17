@@ -1,0 +1,55 @@
+<resources>
+    <string name="app_name">TripInMind</string>
+    <string name="homescreen_next_button">PREPARE TES VACANCES</string>
+    <string name="homescreen_projects_button">Mes séjours</string>
+    <string name="homescreen_archives_button">Archives</string>
+    <string name="homescreen_no_vacation">Pas de vacances prévues</string>
+    <string name="homescreen_no_archived_vacation">Aucune archive de vacances</string>
+    <string name="homescreen_delete_vacation_title">Supprimer ce séjour</string>
+    <string name="homescreen_delete_vacation_message">Es-tu sûre de vouloir supprimer ce séjour ?</string>
+    <string name="homescreen_archive_message">Séjour archivé!</string>
+    <string name="homescreen_unarchive_message">Séjour désarchivé!</string>
+    <string name="initscreen_title">Ton séjour</string>
+    <string name="detailsscreen_error_title">Ton séjour</string>
+    <string name="detailsscreen_dialog_address_title">Adresse</string>
+    <string name="detailsscreen_error_no_days">Aucun jour n\'a encore été ajouté à ce séjour.</string>
+    <string name="detailsscreen_no_activities">Aucune activité prévue pour cette journée.</string>
+    <string name="detailsscreen_error_no_idea">Aucune idée pour le moment.</string>
+    <string name="detailsscreen_idea_title">Quelques autres idées :</string>
+    <string name="detailsscreen_loading_vacation">Chargement des détails de ce séjour...</string>
+    <string name="detailsscreen_edit_button">Modifier</string>
+
+    <string name="initscreen_name_title">Nom de ton séjour</string>
+    <string name="initscreen_day_title">Nombre de jours</string>
+    <string name="initscreen_name_description">Donne un nom à ton séjour</string>
+    <string name="initscreen_day_description">Choisis un nombre entre 1 et 15</string>
+    <string name="initscreen_choose_icon_text">Choisis une icône</string>
+    <string name="initscreen_next_button">SUIVANT</string>
+    <string name="initscreen_date_title">Date de début</string>
+    <string name="initscreen_date_description">Choisis une date</string>
+
+    <string name="activitiesscreen_title">Qu\'as-tu prévu ?</string>
+    <string name="activitiesscreen_finish_button">TERMINER</string>
+    <string name="activitiesscreen_additional_info_title">Notes de la journée</string>
+    <string name="activitiesscreen_additional_info_description">Avec qui ? Où ? ...</string>
+    <string name="activitiesscreen_activities_title">Activités</string>
+    <string name="activitiesscreen_ideas_list_title">Idées</string>
+    <string name="activitiesscreen_ideas_title">As-tu d\'autres idées ?</string>
+    <string name="activitiesscreen_activities_description">Décris ton activité</string>
+    <string name="activitiesscreen_address_activities">Saisis une adresse</string>
+    <string name="activitiesscreen_ideas_description">Décris ton idée</string>
+    <string name="activitiesscreen_activities_add_title">Nouvelle activité</string>
+    <string name="activitiesscreen_ideas_add_title">Nouvelle idée</string>
+    <string name="activitiesscreen_activities_max_text">Désolé, tu as créé trop d\'activités pour cette journée.</string>
+    <string name="activitiesscreen_add_button">AJOUTER</string>
+    <string name="activitiesscreen_time_title">Heure</string>
+    <string name="activitiesscreen_duration_title">Durée</string>
+    <string name="activitiesscreen_activities_empty">Aucune activité prévue pour le moment.</string>
+    <string name="activitiesscreen_ideas_empty">Aucune idée pour le moment.</string>
+    <string name="activitiesscreen_ideas_max_text">Désolé, tu as créé trop d\'idées pour ce séjour.</string>
+
+    <string name="common_error_title">Erreur</string>
+    <string name="common_delete_button">Supprimer</string>
+    <string name="common_cancel_button">Annuler</string>
+    <string name="common_ok_button">OK</string>
+</resources>

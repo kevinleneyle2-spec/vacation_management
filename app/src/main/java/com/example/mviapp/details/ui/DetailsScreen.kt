@@ -170,7 +170,7 @@ fun DetailsScreenContent(
                     }
 
                     Text(
-                        text = "Modify",
+                        text = stringResource(R.string.detailsscreen_edit_button),
                         color = MaterialTheme.colorScheme.primary,
                         modifier = Modifier
                             .clickable { onEditClick(AppDestinations.buildEditRoute(currentVacation.id)) }
@@ -300,6 +300,7 @@ fun DetailsScreenContent(
                         ) {
                             Text(
                                 text = stringResource(R.string.detailsscreen_error_no_idea),
+                                textAlign = TextAlign.Center,
                                 style = MaterialTheme.typography.bodyLarge,
                                 color = Color.White,
                                 modifier = Modifier
