@@ -1,4 +1,4 @@
-package com.example.mviapp.home.ui
+package com.vacation.tripinmind.home.ui
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -28,8 +28,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.data.local.model.VacationDto
-import com.example.mviapp.R
-import com.example.mviapp.ui.theme.MVIAppTheme
+import com.vacation.tripinmind.R
+import com.vacation.tripinmind.ui.theme.MVIAppTheme
 
 @Composable
 fun VacationItem(

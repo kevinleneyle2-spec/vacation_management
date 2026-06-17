@@ -7,11 +7,11 @@ plugins {
 }
 
 android {
-    namespace = "com.example.mviapp"
+    namespace = "com.vacation.tripinmind"
     compileSdk = 36
 
     defaultConfig {
-        applicationId = "com.example.mviapp"
+        applicationId = "com.vacation.tripinmind"
         minSdk = 24
         targetSdk = 36
         versionCode = 1

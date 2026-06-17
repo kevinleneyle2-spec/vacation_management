@@ -1,11 +1,11 @@
-package com.example.mviapp
+package com.vacation.tripinmind
 
 import com.google.common.truth.Truth.assertThat
 import com.example.data.local.interfaces.VacationDao
 import com.example.data.local.model.VacationDto
 import com.example.data.repository.VacationRepository
-import com.example.mviapp.home.intent.VacationIntent
-import com.example.mviapp.home.viewmodel.HomeViewModel
+import com.vacation.tripinmind.home.intent.VacationIntent
+import com.vacation.tripinmind.home.viewmodel.HomeViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow

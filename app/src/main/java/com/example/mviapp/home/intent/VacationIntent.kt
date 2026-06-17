@@ -1,4 +1,4 @@
-package com.example.mviapp.home.intent
+package com.vacation.tripinmind.home.intent
 
 import com.example.data.local.model.VacationDto
 

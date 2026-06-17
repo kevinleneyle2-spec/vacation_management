@@ -1,4 +1,4 @@
-package com.example.mviapp
+package com.vacation.tripinmind
 
 import android.app.Application
 import dagger.hilt.android.HiltAndroidApp

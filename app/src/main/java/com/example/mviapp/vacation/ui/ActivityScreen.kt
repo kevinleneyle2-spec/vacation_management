@@ -1,4 +1,4 @@
-package com.example.mviapp.vacation.ui
+package com.vacation.tripinmind.vacation.ui
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
@@ -35,11 +35,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.data.local.model.Activity
 import com.example.data.local.model.Day
-import com.example.mviapp.R
-import com.example.mviapp.ui.theme.MVIAppTheme
-import com.example.mviapp.vacation.intent.InitIntent
-import com.example.mviapp.vacation.intent.VacationState
-import com.example.mviapp.vacation.viewmodel.InitViewModel
+import com.vacation.tripinmind.R
+import com.vacation.tripinmind.navigation.AppDestinations
+import com.vacation.tripinmind.ui.theme.MVIAppTheme
+import com.vacation.tripinmind.vacation.intent.InitIntent
+import com.vacation.tripinmind.vacation.intent.VacationState
+import com.vacation.tripinmind.vacation.viewmodel.InitViewModel
 
 @Composable
 fun ActivitiesScreen(
@@ -75,11 +76,11 @@ fun ActivitiesScreen(
         onCreateVacation = {
             if (vacationId != null) {
                 viewModel.handleIntent(InitIntent.UpdateVacation(initState.toVacationDto()))
+                onBackClick()
             } else {
                 viewModel.handleIntent(InitIntent.CreateVacation(initState.toVacationDto()))
+                onNavigate(AppDestinations.HOME_ROUTE)
             }
-
-            onNavigate("home")
         },
         onAddIdea = { idea ->
             viewModel.handleIntent(InitIntent.AddIdea(idea))

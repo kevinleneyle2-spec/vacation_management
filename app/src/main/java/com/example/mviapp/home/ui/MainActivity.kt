@@ -1,4 +1,4 @@
-package com.example.mviapp.home.ui
+package com.vacation.tripinmind.home.ui
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -8,9 +8,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.compose.rememberNavController
-import com.example.mviapp.navigation.AppDestinations
-import com.example.mviapp.navigation.AppNavHost
-import com.example.mviapp.ui.theme.MVIAppTheme
+import com.vacation.tripinmind.navigation.AppDestinations
+import com.vacation.tripinmind.navigation.AppNavHost
+import com.vacation.tripinmind.ui.theme.MVIAppTheme
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint

@@ -1,4 +1,4 @@
-package com.example.mviapp.ui.theme
+package com.vacation.tripinmind.ui.theme
 
 import android.app.Activity
 import android.os.Build

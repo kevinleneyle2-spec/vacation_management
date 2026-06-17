@@ -1,11 +1,11 @@
-package com.example.mviapp.home.viewmodel
+package com.vacation.tripinmind.home.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.data.local.model.VacationDto
 import com.example.data.repository.VacationRepository
-import com.example.mviapp.home.intent.VacationIntent
-import com.example.mviapp.home.intent.VacationUiViewState
+import com.vacation.tripinmind.home.intent.VacationIntent
+import com.vacation.tripinmind.home.intent.VacationUiViewState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow

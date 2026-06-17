@@ -1,4 +1,4 @@
-package com.example.mviapp.navigation
+package com.vacation.tripinmind.navigation
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
@@ -10,13 +10,13 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
 import androidx.navigation.navArgument
-import com.example.mviapp.details.ui.DetailsScreen
-import com.example.mviapp.details.viewmodel.DetailsViewModel
-import com.example.mviapp.home.ui.HomeScreen
-import com.example.mviapp.home.viewmodel.HomeViewModel
-import com.example.mviapp.vacation.ui.ActivitiesScreen
-import com.example.mviapp.vacation.ui.InitScreen
-import com.example.mviapp.vacation.viewmodel.InitViewModel
+import com.vacation.tripinmind.details.ui.DetailsScreen
+import com.vacation.tripinmind.details.viewmodel.DetailsViewModel
+import com.vacation.tripinmind.home.ui.HomeScreen
+import com.vacation.tripinmind.home.viewmodel.HomeViewModel
+import com.vacation.tripinmind.vacation.ui.ActivitiesScreen
+import com.vacation.tripinmind.vacation.ui.InitScreen
+import com.vacation.tripinmind.vacation.viewmodel.InitViewModel
 
 @Composable
 fun AppNavHost(

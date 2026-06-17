@@ -1,4 +1,4 @@
-package com.example.mviapp
+package com.vacation.tripinmind
 
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.test.assertIsDisplayed
@@ -12,9 +12,9 @@ import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.example.data.local.model.VacationDto
-import com.example.mviapp.home.intent.VacationUiViewState
-import com.example.mviapp.home.ui.HomeScreenContent
-import com.example.mviapp.ui.theme.MVIAppTheme
+import com.vacation.tripinmind.home.intent.VacationUiViewState
+import com.vacation.tripinmind.home.ui.HomeScreenContent
+import com.vacation.tripinmind.ui.theme.MVIAppTheme
 import org.junit.Assert.assertEquals
 import org.junit.Rule
 import org.junit.Test
@@ -34,7 +34,7 @@ class HomeScreenTest {
     @Test
     fun useAppContext() {
         val appContext = InstrumentationRegistry.getInstrumentation().targetContext
-        assertEquals("com.example.mviapp", appContext.packageName)
+        assertEquals("com.vacation.tripinmind", appContext.packageName)
     }
 
     @Test

@@ -1,4 +1,4 @@
-package com.example.mviapp.vacation.intent
+package com.vacation.tripinmind.vacation.intent
 
 import android.hardware.SensorAdditionalInfo
 import com.example.data.local.model.Activity

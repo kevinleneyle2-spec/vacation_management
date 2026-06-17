@@ -1,12 +1,12 @@
-package com.example.mviapp
+package com.vacation.tripinmind
 
 import com.example.data.local.interfaces.VacationDao
 import com.example.data.local.model.Activity
 import com.example.data.local.model.Day
 import com.example.data.local.model.VacationDto
 import com.example.data.repository.VacationRepository
-import com.example.mviapp.vacation.intent.InitIntent
-import com.example.mviapp.vacation.viewmodel.InitViewModel
+import com.vacation.tripinmind.vacation.intent.InitIntent
+import com.vacation.tripinmind.vacation.viewmodel.InitViewModel
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
