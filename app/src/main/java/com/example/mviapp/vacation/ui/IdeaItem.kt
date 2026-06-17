@@ -1,4 +1,4 @@
-package com.example.mviapp.vacation.ui
+package com.vacation.tripinmind.vacation.ui
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
@@ -51,8 +51,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
-import com.example.mviapp.R
-import com.example.mviapp.ui.theme.MVIAppTheme
+import com.vacation.tripinmind.R
+import com.vacation.tripinmind.ui.theme.MVIAppTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

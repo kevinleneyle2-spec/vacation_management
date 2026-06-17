@@ -1,12 +1,12 @@
-package com.example.mviapp.details.viewmodel
+package com.vacation.tripinmind.details.viewmodel
 
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.data.repository.VacationRepository
-import com.example.mviapp.details.model.ActivityUiModel
-import com.example.mviapp.details.model.DayUiModel
-import com.example.mviapp.details.model.VacationUiModel
+import com.vacation.tripinmind.details.model.ActivityUiModel
+import com.vacation.tripinmind.details.model.DayUiModel
+import com.vacation.tripinmind.details.model.VacationUiModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow

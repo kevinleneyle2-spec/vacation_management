@@ -1,4 +1,4 @@
-package com.example.mviapp
+package com.vacation.tripinmind
 
 import androidx.lifecycle.SavedStateHandle
 import app.cash.turbine.test
@@ -7,7 +7,7 @@ import com.example.data.local.model.Activity
 import com.example.data.local.model.Day
 import com.example.data.local.model.VacationDto
 import com.example.data.repository.VacationRepository
-import com.example.mviapp.details.viewmodel.DetailsViewModel
+import com.vacation.tripinmind.details.viewmodel.DetailsViewModel
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi

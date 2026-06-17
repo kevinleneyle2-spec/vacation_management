@@ -1,13 +1,13 @@
-package com.example.mviapp.vacation.viewmodel
+package com.vacation.tripinmind.vacation.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.data.local.model.Day
 import com.example.data.local.model.VacationDto
 import com.example.data.repository.VacationRepository
-import com.example.mviapp.vacation.intent.InitIntent
-import com.example.mviapp.vacation.intent.VacationState
-import com.example.mviapp.vacation.ui.InitViewModelActions
+import com.vacation.tripinmind.vacation.intent.InitIntent
+import com.vacation.tripinmind.vacation.intent.VacationState
+import com.vacation.tripinmind.vacation.ui.InitViewModelActions
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow

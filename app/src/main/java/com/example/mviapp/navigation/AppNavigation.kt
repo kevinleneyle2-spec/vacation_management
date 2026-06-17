@@ -1,4 +1,4 @@
-package com.example.mviapp.navigation
+package com.vacation.tripinmind.navigation
 
 object AppDestinations {
     const val HOME_ROUTE = "home"

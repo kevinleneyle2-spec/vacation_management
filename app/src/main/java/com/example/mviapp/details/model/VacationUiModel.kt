@@ -1,4 +1,4 @@
-package com.example.mviapp.details.model
+package com.vacation.tripinmind.details.model
 
 import android.hardware.SensorAdditionalInfo
 

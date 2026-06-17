@@ -1,4 +1,4 @@
-package com.example.mviapp.home.ui
+package com.vacation.tripinmind.home.ui
 
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.animateFloat
@@ -59,12 +59,12 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
 import com.example.data.local.model.VacationDto
-import com.example.mviapp.R
-import com.example.mviapp.home.intent.VacationIntent
-import com.example.mviapp.home.intent.VacationUiViewState
-import com.example.mviapp.home.viewmodel.HomeViewModel
-import com.example.mviapp.navigation.AppDestinations
-import com.example.mviapp.ui.theme.MVIAppTheme
+import com.vacation.tripinmind.R
+import com.vacation.tripinmind.home.intent.VacationIntent
+import com.vacation.tripinmind.home.intent.VacationUiViewState
+import com.vacation.tripinmind.home.viewmodel.HomeViewModel
+import com.vacation.tripinmind.navigation.AppDestinations
+import com.vacation.tripinmind.ui.theme.MVIAppTheme
 import kotlinx.coroutines.delay
 
 @Composable

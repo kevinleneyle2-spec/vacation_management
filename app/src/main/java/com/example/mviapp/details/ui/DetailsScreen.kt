@@ -1,4 +1,4 @@
-package com.example.mviapp.details.ui
+package com.vacation.tripinmind.details.ui
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -61,13 +61,13 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
-import com.example.mviapp.R
-import com.example.mviapp.details.model.ActivityUiModel
-import com.example.mviapp.details.model.DayUiModel
-import com.example.mviapp.details.model.VacationUiModel
-import com.example.mviapp.details.viewmodel.DetailsViewModel
-import com.example.mviapp.navigation.AppDestinations
-import com.example.mviapp.ui.theme.MVIAppTheme
+import com.vacation.tripinmind.R
+import com.vacation.tripinmind.details.model.ActivityUiModel
+import com.vacation.tripinmind.details.model.DayUiModel
+import com.vacation.tripinmind.details.model.VacationUiModel
+import com.vacation.tripinmind.details.viewmodel.DetailsViewModel
+import com.vacation.tripinmind.navigation.AppDestinations
+import com.vacation.tripinmind.ui.theme.MVIAppTheme
 
 @Composable
 fun DetailsScreen(

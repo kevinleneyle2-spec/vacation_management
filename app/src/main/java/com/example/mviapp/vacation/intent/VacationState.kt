@@ -1,4 +1,4 @@
-package com.example.mviapp.vacation.intent
+package com.vacation.tripinmind.vacation.intent
 
 import com.example.data.local.model.Day
 import com.example.data.local.model.VacationDto

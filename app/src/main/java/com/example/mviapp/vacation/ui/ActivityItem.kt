@@ -1,4 +1,4 @@
-package com.example.mviapp.vacation.ui
+package com.vacation.tripinmind.vacation.ui
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
@@ -61,8 +61,8 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import com.example.data.local.model.Activity
 import com.example.data.local.model.Day
-import com.example.mviapp.R
-import com.example.mviapp.ui.theme.MVIAppTheme
+import com.vacation.tripinmind.R
+import com.vacation.tripinmind.ui.theme.MVIAppTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -149,7 +149,7 @@ fun ActivitiesItem(
         modifier = modifier
             .fillMaxWidth()
             .padding(start = 16.dp, end = 16.dp)
-            .testTag("vacationCard"),
+            .testTag("activityCard"),
         border = BorderStroke(
             width = 3.dp,
             brush = Brush.verticalGradient(

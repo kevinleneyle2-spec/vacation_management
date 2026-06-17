@@ -1,4 +1,4 @@
-package com.example.mviapp
+package com.vacation.tripinmind
 
 import org.junit.Test
 

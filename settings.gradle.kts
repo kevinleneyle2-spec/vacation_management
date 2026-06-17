@@ -22,6 +22,6 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "MVIApp"
+rootProject.name = "TripInMind"
 include(":app")
 include(":data")
