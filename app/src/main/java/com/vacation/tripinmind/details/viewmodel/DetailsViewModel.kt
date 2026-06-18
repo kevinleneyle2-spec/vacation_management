@@ -1,0 +1,56 @@
+package com.vacation.tripinmind.details.viewmodel
+
+import androidx.lifecycle.SavedStateHandle
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.vacation.tripinmind.data.repository.VacationRepository
+import com.vacation.tripinmind.details.model.ActivityUiModel
+import com.vacation.tripinmind.details.model.DayUiModel
+import com.vacation.tripinmind.details.model.VacationUiModel
+import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
+import javax.inject.Inject
+
+@HiltViewModel
+class DetailsViewModel @Inject constructor(
+    private val vacationRepository: VacationRepository,
+    savedStateHandle: SavedStateHandle
+) : ViewModel() {
+
+    private val vacationId: String? = savedStateHandle.get<String>("vacationId")
+
+    val vacation: StateFlow<VacationUiModel?> = vacationId?.let { id ->
+        vacationRepository.getItemById(id)
+            .map { dto ->
+                dto?.let {
+                    VacationUiModel(
+                        id = dto.id,
+                        name = dto.name,
+                        days = dto.days.map { day ->
+                            DayUiModel(
+                                name = day.nameDay,
+                                additionalInfo = day.additionalInfo,
+                                activities = day.activity.map { activity ->
+                                    ActivityUiModel(
+                                        name = activity.activityName,
+                                        location = activity.activityLocation,
+                                        time = activity.activityTime,
+                                        duration = activity.activityDuration
+                                    )
+                                }
+                            )
+                        },
+                        ideas = dto.ideas
+                    )
+                }
+            }
+            .stateIn(
+                scope = viewModelScope,
+                started = SharingStarted.WhileSubscribed(5000),
+                initialValue = null
+            )
+    } ?: kotlinx.coroutines.flow.MutableStateFlow(null)
+}

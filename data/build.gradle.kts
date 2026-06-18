@@ -7,7 +7,7 @@ plugins {
 }
 
 android {
-    namespace = "com.example.data"
+    namespace = "com.vacation.tripinmind.data"
     compileSdk = 36
 
     defaultConfig {
@@ -57,6 +57,11 @@ dependencies {
     implementation(libs.okhttp.logging)
 
     implementation(libs.kotlin.serialization.json)
+
+    // Firebase
+    implementation(platform(libs.firebase.bom))
+    implementation(libs.firebase.firestore)
+    implementation(libs.firebase.auth)
 
     testImplementation(libs.junit)
     testImplementation(libs.mockito.core)
