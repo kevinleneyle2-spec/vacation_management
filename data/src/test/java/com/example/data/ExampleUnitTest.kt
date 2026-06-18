@@ -1,4 +1,4 @@
-package com.example.data
+package com.vacation.tripinmind.data
 
 import org.junit.Test
 

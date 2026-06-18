@@ -1,0 +1,487 @@
+package com.vacation.tripinmind.home.ui
+
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.tween
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Archive
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.rotate
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalInspectionMode
+import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import coil.compose.AsyncImage
+import com.vacation.tripinmind.R
+import com.vacation.tripinmind.data.local.model.VacationDto
+import com.vacation.tripinmind.home.intent.VacationIntent
+import com.vacation.tripinmind.home.intent.VacationUiViewState
+import com.vacation.tripinmind.home.viewmodel.HomeViewModel
+import com.vacation.tripinmind.navigation.AppDestinations
+import com.vacation.tripinmind.ui.theme.MVIAppTheme
+import kotlinx.coroutines.delay
+
+@Composable
+fun HomeScreen(
+    viewModel: HomeViewModel,
+    onNavigate: (String) -> Unit = {},
+    modifier: Modifier = Modifier
+) {
+    val vacationUiState by viewModel.vacationState.collectAsStateWithLifecycle()
+    var vacationToDelete by remember { mutableStateOf<VacationDto?>(null) }
+    var archiveMessageResId by remember { mutableStateOf<Int?>(null) }
+
+    LaunchedEffect(archiveMessageResId) {
+        if (archiveMessageResId != null) {
+            delay(2000)
+            archiveMessageResId = null
+        }
+
+        viewModel.handleIntent(VacationIntent.CreateShareCode)
+    }
+
+    if (vacationToDelete != null) {
+        AlertDialog(
+            onDismissRequest = { },
+            confirmButton = {
+                TextButton(onClick = {
+                    vacationToDelete?.let {
+                        viewModel.handleIntent(VacationIntent.DeleteVacation(it))
+                    }
+                    vacationToDelete = null
+                }) {
+                    Text(
+                        text = stringResource(id = R.string.common_delete_button),
+                        color = colorResource(id = R.color.red)
+                    )
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { vacationToDelete = null }) {
+                    Text(
+                        text = stringResource(id = R.string.common_cancel_button),
+                        color = colorResource(id = R.color.black)
+                    )
+                }
+            },
+            title = {
+                Text(
+                    text = stringResource(id = R.string.homescreen_delete_vacation_title),
+                    color = colorResource(id = R.color.orange)
+                )
+            },
+            text = {
+                Text(
+                    text = stringResource(id = R.string.homescreen_delete_vacation_message)
+                )
+            }
+        )
+    }
+
+    Box(modifier = modifier.fillMaxSize()) {
+        HomeScreenContent(
+            vacationUiState = vacationUiState,
+            onDeleteVacation = { dto ->
+                vacationToDelete = dto
+            },
+            onArchiveVacation = { dto ->
+                viewModel.handleIntent(VacationIntent.ArchiveVacation(dto))
+                archiveMessageResId =
+                    if (dto.isArchived) R.string.homescreen_unarchive_message else R.string.homescreen_archive_message
+            },
+            onToggleShowArchived = {
+                viewModel.handleIntent(VacationIntent.ToggleShowArchived)
+            },
+            onNavigate = onNavigate,
+            modifier = Modifier.fillMaxSize()
+        )
+
+        archiveMessageResId?.let { resId ->
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(Color.Black.copy(alpha = 0.3f))
+                    .clickable(enabled = false) {},
+                contentAlignment = Alignment.Center
+            ) {
+                Box(
+                    modifier = Modifier
+                        .clip(RoundedCornerShape(16.dp))
+                        .background(colorResource(R.color.orange))
+                        .padding(horizontal = 32.dp, vertical = 20.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = stringResource(id = resId),
+                        color = Color.White,
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 18.sp,
+                        textAlign = TextAlign.Center
+                    )
+                }
+            }
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun HomeScreenContent(
+    vacationUiState: VacationUiViewState,
+    onDeleteVacation: (VacationDto) -> Unit,
+    onArchiveVacation: (VacationDto) -> Unit,
+    onToggleShowArchived: () -> Unit,
+    onNavigate: (String) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Box(modifier = modifier.fillMaxSize()) {
+        if (LocalInspectionMode.current) {
+            Image(
+                painter = painterResource(id = R.drawable.background_home),
+                contentDescription = null,
+                modifier = Modifier.fillMaxSize(),
+                contentScale = ContentScale.Crop
+            )
+        } else {
+            AsyncImage(
+                model = R.drawable.background_home,
+                contentDescription = null,
+                modifier = Modifier.fillMaxSize(),
+                contentScale = ContentScale.Crop
+            )
+        }
+        Scaffold(
+            containerColor = Color.Transparent,
+            modifier = Modifier.fillMaxSize()
+        ) { paddingValues ->
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(paddingValues)
+            ) {
+                if (vacationUiState.isLoading) {
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        val infiniteTransition =
+                            rememberInfiniteTransition(label = "loader-rotation")
+                        val angle by infiniteTransition.animateFloat(
+                            initialValue = 0f,
+                            targetValue = 360f,
+                            animationSpec = infiniteRepeatable(
+                                animation = tween(2000, easing = LinearEasing)
+                            ),
+                            label = "loader-angle"
+                        )
+                        Image(
+                            painter = painterResource(id = R.drawable.ic_launcher_background),
+                            contentDescription = "Loading",
+                            modifier = Modifier
+                                .size(24.dp)
+                                .rotate(angle)
+                        )
+                    }
+                } else {
+                    Column(
+                        modifier = Modifier.fillMaxSize()
+                    ) {
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 24.dp, vertical = 16.dp)
+                                .height(32.dp)
+                                .clip(RoundedCornerShape(24.dp))
+                                .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.3f))
+                                .border(
+                                    0.dp,
+                                    Color.White.copy(alpha = 0.3f),
+                                    RoundedCornerShape(24.dp)
+                                ),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Box(
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .fillMaxHeight()
+                                    .clip(RoundedCornerShape(24.dp))
+                                    .background(
+                                        if (!vacationUiState.showArchived)
+                                            colorResource(R.color.orange)
+                                        else
+                                            Color.Transparent
+                                    )
+                                    .clickable { if (vacationUiState.showArchived) onToggleShowArchived() }
+                                    .testTag("unarchivedVacationViewButton"),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Text(
+                                    text = stringResource(R.string.homescreen_projects_button),
+                                    color = Color.White,
+                                    fontWeight = if (!vacationUiState.showArchived) FontWeight.Bold else FontWeight.Normal,
+                                    fontSize = 16.sp
+                                )
+                            }
+
+                            Spacer(Modifier.width(16.dp))
+
+                            Box(
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .fillMaxHeight()
+                                    .clip(RoundedCornerShape(24.dp))
+                                    .background(
+                                        if (vacationUiState.showArchived)
+                                            colorResource(R.color.orange)
+                                        else
+                                            Color.Transparent
+                                    )
+                                    .clickable { if (!vacationUiState.showArchived) onToggleShowArchived() }
+                                    .testTag("archivedVacationViewButton"),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Row(verticalAlignment = Alignment.CenterVertically) {
+                                    Icon(
+                                        imageVector = Icons.Default.Archive,
+                                        contentDescription = null,
+                                        modifier = Modifier.size(18.dp),
+                                        tint = Color.White
+                                    )
+                                    Spacer(Modifier.width(8.dp))
+                                    Text(
+                                        text = stringResource(R.string.homescreen_archives_button),
+                                        color = Color.White,
+                                        fontWeight = if (vacationUiState.showArchived) FontWeight.Bold else FontWeight.Normal,
+                                        fontSize = 16.sp
+                                    )
+                                }
+                            }
+                        }
+
+                        val filteredVacations = vacationUiState.vacations.filter {
+                            it.isArchived == vacationUiState.showArchived
+                        }
+
+                        if (filteredVacations.isNotEmpty()) {
+                            LazyColumn(
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .padding(top = 16.dp),
+                                verticalArrangement = Arrangement.spacedBy(16.dp),
+                            ) {
+                                items(
+                                    items = filteredVacations,
+                                    key = { vacation -> vacation.id }
+                                ) { vacation ->
+                                    VacationItem(
+                                        onDeleteClick = { onDeleteVacation(vacation) },
+                                        vacationDto = vacation,
+                                        onItemSelected = {
+                                            onNavigate(AppDestinations.buildDetailsRoute(vacation.id))
+                                        },
+                                        onArchiveClick = { onArchiveVacation(vacation) }
+                                    )
+                                }
+                            }
+                        } else {
+                            Column(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .weight(1f),
+                                verticalArrangement = Arrangement.Top,
+                                horizontalAlignment = Alignment.CenterHorizontally
+                            ) {
+                                Box(
+                                    modifier = Modifier
+                                        .padding(32.dp)
+                                        .clip(RoundedCornerShape(24.dp))
+                                        .background(Color.White.copy(alpha = 0.2f)),
+                                    contentAlignment = Alignment.TopCenter
+                                ) {
+                                    Text(
+                                        text = if (vacationUiState.showArchived) {
+                                            stringResource(id = R.string.homescreen_no_archived_vacation)
+                                        } else {
+                                            stringResource(id = R.string.homescreen_no_vacation)
+                                        },
+                                        color = MaterialTheme.colorScheme.primary,
+                                        fontSize = 18.sp,
+                                        textAlign = TextAlign.Center,
+                                        modifier = Modifier.padding(horizontal = 16.dp)
+                                    )
+                                }
+                            }
+                        }
+
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(top = 24.dp, bottom = 16.dp, start = 32.dp, end = 32.dp),
+                            horizontalArrangement = Arrangement.Center,
+                        ) {
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(70.dp)
+                                    .clip(RoundedCornerShape(24.dp))
+                                    .background(
+                                        Brush.horizontalGradient(
+                                            colors = listOf(
+                                                MaterialTheme.colorScheme.primary,
+                                                colorResource(id = R.color.orange)
+                                            )
+                                        )
+                                    )
+                                    .border(
+                                        width = 2.dp,
+                                        brush = Brush.verticalGradient(
+                                            colors = listOf(
+                                                Color.White.copy(alpha = 0.6f),
+                                                Color.White.copy(alpha = 0.1f)
+                                            )
+                                        ),
+                                        shape = RoundedCornerShape(24.dp)
+                                    )
+                                    .clickable { onNavigate(AppDestinations.INIT_ROUTE) }
+                                    .testTag("newVacationButton"),
+                                contentAlignment = Alignment.Center,
+                            ) {
+                                Row(
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    horizontalArrangement = Arrangement.Center,
+                                    modifier = Modifier.padding(horizontal = 24.dp)
+                                ) {
+                                    Image(
+                                        painter = painterResource(id = R.drawable.next_vacation_ico),
+                                        contentDescription = null,
+                                        modifier = Modifier.size(40.dp)
+                                    )
+
+                                    Spacer(modifier = Modifier.width(12.dp))
+
+                                    Text(
+                                        text = stringResource(R.string.homescreen_next_button),
+                                        color = Color.White,
+                                        fontSize = 18.sp,
+                                        fontWeight = FontWeight.Black,
+                                        letterSpacing = 1.sp,
+                                        textAlign = TextAlign.Start,
+                                        lineHeight = 22.sp,
+                                        modifier = Modifier.weight(1f, fill = false)
+                                    )
+                                }
+                            }
+                        }
+
+                        Row(
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            Text(
+                                text = stringResource(R.string.homescreen_share_code_text) + vacationUiState.shareCode,
+                                style = MaterialTheme.typography.titleMedium,
+                                fontWeight = FontWeight.Bold,
+                                color = Color.White,
+                                textAlign = TextAlign.Center,
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(bottom = 16.dp)
+                            )
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun HomeScreenPreview() {
+    MVIAppTheme {
+        HomeScreenContent(
+            vacationUiState = VacationUiViewState(
+                vacations = listOf(
+                    VacationDto(
+                        id = "1",
+                        name = "Paris",
+                        startDate = "10/05/2023",
+                        nbrDay = 3,
+                        days = emptyList(),
+                        ideas = emptyList(),
+                        image = "vacation_ico",
+                        isArchived = false,
+                        createdBy = "",
+                        shareWith = listOf()
+                    )
+                )
+            ),
+            onDeleteVacation = {},
+            onArchiveVacation = {},
+            onToggleShowArchived = {},
+            onNavigate = {}
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun HomeScreenEmptyPreview() {
+    MVIAppTheme {
+        HomeScreenContent(
+            vacationUiState = VacationUiViewState(
+                vacations = listOf(
+                )
+            ),
+            onDeleteVacation = {},
+            onArchiveVacation = {},
+            onToggleShowArchived = {},
+            onNavigate = {}
+        )
+    }
+}

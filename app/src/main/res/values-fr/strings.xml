@@ -9,7 +9,8 @@
     <string name="homescreen_delete_vacation_message">Es-tu sûre de vouloir supprimer ce séjour ?</string>
     <string name="homescreen_archive_message">Séjour archivé!</string>
     <string name="homescreen_unarchive_message">Séjour désarchivé!</string>
-    <string name="initscreen_title">Ton séjour</string>
+    <string name="homescreen_share_code_text">Ton code de partage est : </string>
+
     <string name="detailsscreen_error_title">Ton séjour</string>
     <string name="detailsscreen_dialog_address_title">Adresse</string>
     <string name="detailsscreen_error_no_days">Aucun jour n\'a encore été ajouté à ce séjour.</string>
@@ -19,6 +20,7 @@
     <string name="detailsscreen_loading_vacation">Chargement des détails de ce séjour...</string>
     <string name="detailsscreen_edit_button">Modifier</string>
 
+    <string name="initscreen_title">Ton séjour</string>
     <string name="initscreen_name_title">Nom de ton séjour</string>
     <string name="initscreen_day_title">Nombre de jours</string>
     <string name="initscreen_name_description">Donne un nom à ton séjour</string>
@@ -52,4 +54,5 @@
     <string name="common_delete_button">Supprimer</string>
     <string name="common_cancel_button">Annuler</string>
     <string name="common_ok_button">OK</string>
+    <string name="common_error_auth_message">une erreur est apparu pendant l\'authentification.</string>">
 </resources>

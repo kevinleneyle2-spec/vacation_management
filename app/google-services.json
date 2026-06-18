@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "245997124828",
+    "project_id": "tripinmind-a8af2",
+    "storage_bucket": "tripinmind-a8af2.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:245997124828:android:4fa304957ef1121a534819",
+        "android_client_info": {
+          "package_name": "com.vacation.tripinmind"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBf5FaRRO8X-RS5_tsdJXahw8Tcc70Gx_8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
