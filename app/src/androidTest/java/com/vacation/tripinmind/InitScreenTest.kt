@@ -27,7 +27,7 @@ class InitScreenTest {
 
     @Test
     fun init_completed_fields_work() {
-        val date = LocalDate.now().plusDays(10)
+        val date = LocalDate.now().plusDays(1)
         val formatter = DateTimeFormatter.ofPattern("EEEE, MMMM d, yyyy", Locale.ENGLISH)
 
         val formattedDate = date.format(formatter)
@@ -49,7 +49,7 @@ class InitScreenTest {
 
     @Test
     fun init_num_day_missing() {
-        val date = LocalDate.now().plusDays(10)
+        val date = LocalDate.now().plusDays(1)
         val formatter = DateTimeFormatter.ofPattern("EEEE, MMMM d, yyyy", Locale.ENGLISH)
 
         val formattedDate = date.format(formatter)
@@ -70,7 +70,7 @@ class InitScreenTest {
 
     @Test
     fun init_name_missing() {
-        val date = LocalDate.now().plusDays(10)
+        val date = LocalDate.now().plusDays(1)
         val formatter = DateTimeFormatter.ofPattern("EEEE, MMMM d, yyyy", Locale.ENGLISH)
 
         val formattedDate = date.format(formatter)
@@ -92,7 +92,7 @@ class InitScreenTest {
 
     @Test
     fun init_date_missing() {
-        val date = LocalDate.now().plusDays(10)
+        val date = LocalDate.now().plusDays(1)
         val formatter = DateTimeFormatter.ofPattern("EEEE, MMMM d, yyyy", Locale.ENGLISH)
 
         val formattedDate = date.format(formatter)

@@ -209,7 +209,8 @@ class InitViewModel @Inject constructor(
                                     image = it.image,
                                     isArchived = it.isArchived,
                                     createdBy = it.createdBy,
-                                    shareWith = it.shareWith
+                                    shareWith = it.shareWith,
+                                    shareWithUid = it.shareWithUid
                                 )
                             }
                             updateValidation()

@@ -15,6 +15,7 @@ data class VacationState(
     val isArchived: Boolean = false,
     val createdBy: String = "",
     val shareWith: List<String> = listOf(),
+    val shareWithUid: List<String> = listOf(),
     val errorMessage: UiText? = null
 ) {
     fun toVacationDto() = VacationDto(
@@ -27,6 +28,7 @@ data class VacationState(
         image = image,
         isArchived = isArchived,
         createdBy = createdBy,
-        shareWith = shareWith
+        shareWith = shareWith,
+        shareWithUid = shareWithUid
     )
 }

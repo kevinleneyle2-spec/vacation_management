@@ -53,7 +53,7 @@ class HomeScreenTest {
                 HomeScreenContent(
                     vacationUiState = VacationUiViewState(),
                     onDeleteVacation = {}, onArchiveVacation = {},
-                    onToggleShowArchived = {},
+                    onToggleShowFilterVacations = {},
                     onNavigate = { navigated = true }
                 )
             }
@@ -72,7 +72,7 @@ class HomeScreenTest {
                 HomeScreenContent(
                     vacationUiState = VacationUiViewState(vacations = listOf(fakeVacation)),
                     onDeleteVacation = {}, onArchiveVacation = {},
-                    onToggleShowArchived = {},
+                    onToggleShowFilterVacations = {},
                     onNavigate = { route ->
                         if (route.contains("1")) clickedId = 1
                     }
@@ -103,9 +103,8 @@ class HomeScreenTest {
                         }
                         uiState.value = uiState.value.copy(vacations = updatedList)
                     },
-                    onToggleShowArchived = {
-                        uiState.value =
-                            uiState.value.copy(showArchived = !uiState.value.showArchived)
+                    onToggleShowFilterVacations = { selectFilter ->
+                        uiState.value = uiState.value.copy(selectedFilter = selectFilter)
                     },
                     onNavigate = {}
                 )
@@ -132,9 +131,40 @@ class HomeScreenTest {
 
         composeTestRule.onNodeWithText("No vacations archived").assertIsDisplayed()
 
-        composeTestRule.onNodeWithTag("unarchivedVacationViewButton").performClick()
+        composeTestRule.onNodeWithTag("vacationViewButton").performClick()
 
         firstCard.assertIsDisplayed()
+    }
+
+    @Test
+    fun vacation_shared_button_works() {
+        val uiState = mutableStateOf(
+            VacationUiViewState(vacations = listOf(fakeVacation))
+        )
+
+        composeTestRule.setContent {
+            MVIAppTheme {
+                HomeScreenContent(
+                    vacationUiState = uiState.value,
+                    onDeleteVacation = {},
+                    onArchiveVacation = { clickedVacation ->
+                        val updatedList = uiState.value.vacations.map {
+                            if (it.id == clickedVacation.id) it.copy(isArchived = !it.isArchived)
+                            else it
+                        }
+                        uiState.value = uiState.value.copy(vacations = updatedList)
+                    },
+                    onToggleShowFilterVacations = { selectFilter ->
+                        uiState.value = uiState.value.copy(selectedFilter = selectFilter)
+                    },
+                    onNavigate = {}
+                )
+            }
+        }
+
+        composeTestRule.onNodeWithTag("sharedVacationViewButton").performClick()
+
+        composeTestRule.onNodeWithText("No vacations shared").assertIsDisplayed()
     }
 
     @Test
@@ -149,7 +179,7 @@ class HomeScreenTest {
                     vacationUiState = uiState.value,
                     onDeleteVacation = { uiState.value = VacationUiViewState() },
                     onArchiveVacation = {},
-                    onToggleShowArchived = {},
+                    onToggleShowFilterVacations = {},
                     onNavigate = {}
                 )
             }

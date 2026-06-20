@@ -3,13 +3,15 @@
     <string name="homescreen_next_button">PREPARE YOUR NEXT VACATION</string>
     <string name="homescreen_projects_button">My vacations</string>
     <string name="homescreen_archives_button">Archives</string>
+    <string name="homescreen_shared_button">Shared</string>
     <string name="homescreen_no_vacation">No vacation planned</string>
     <string name="homescreen_no_archived_vacation">No vacations archived</string>
+    <string name="homescreen_no_shared_vacation">No vacations shared</string>
     <string name="homescreen_delete_vacation_title">Delete Vacation</string>
     <string name="homescreen_delete_vacation_message">Are you sure you want to delete this vacation?</string>
     <string name="homescreen_archive_message">Vacation archived!</string>
     <string name="homescreen_unarchive_message">Vacation unarchived!</string>
-    <string name="homescreen_share_code_text">Your share code is : </string>
+    <string name="homescreen_share_code_text">Your share code is :\ </string>
 
     <string name="detailsscreen_error_title">Your vacation</string>
     <string name="detailsscreen_dialog_address_title">Address</string>
@@ -19,6 +21,20 @@
     <string name="detailsscreen_idea_title">Some other ideas :</string>
     <string name="detailsscreen_loading_vacation">Loading vacation details...</string>
     <string name="detailsscreen_edit_button">Edit</string>
+    <string name="detailsscreen_share_button">Share</string>
+    <string name="detailsscreen_share_bottomsheet_title">SHARE YOUR VACATION</string>
+    <string name="detailsscreen_share_bottomsheet_text">Allow other people to view this vacation planning</string>
+    <string name="detailsscreen_share_bottomsheet_text_2">Viewers can see the itinerary, activities and information but cannot modify anything</string>
+    <string name="detailsscreen_share_bottomsheet_add_viewer_title">Add a viewer</string>
+    <string name="detailsscreen_share_bottomsheet_add_viewer_button">ADD VIEWER</string>
+    <string name="detailsscreen_share_bottomsheet_add_viewer_description">Ask the viewers for their code. It can be found on their home screen</string>
+    <string name="detailsscreen_share_bottomsheet_access_text">People with access :\ </string>
+    <string name="detailsscreen_share_bottomsheet_add_viewer_text">Enter the share code (5 max)</string>
+    <string name="detailsscreen_share_bottomsheet_placeholder">ABC-123-ABC-123</string>
+    <string name="detailsscreen_share_error_not_found">User not found with this code.</string>
+    <string name="detailsscreen_share_error_already_added">This user is already a viewer.</string>
+    <string name="detailsscreen_share_error_not_yourself">You can\'t add yourself.</string>
+    <string name="detailsscreen_share_error_too_many_viewers">You have reached the limit of 5 viewers.</string>
 
     <string name="initscreen_title">Your vacation</string>
     <string name="initscreen_name_title">Name of your vacation</string>
@@ -54,5 +70,5 @@
     <string name="common_delete_button">Delete</string>
     <string name="common_cancel_button">Cancel</string>
     <string name="common_ok_button">OK</string>
-    <string name="common_error_auth_message">An error occurred during authentication.</string>">
+    <string name="common_error_auth_message">An error occurred during authentication.</string>
 </resources>

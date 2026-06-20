@@ -15,5 +15,6 @@ data class VacationDto(
     @ColumnInfo val image: String = "",
     @ColumnInfo val isArchived: Boolean = false,
     @ColumnInfo val createdBy: String = "",
-    @ColumnInfo val shareWith: List<String> = listOf()
+    @ColumnInfo val shareWith: List<String> = listOf(),
+    @ColumnInfo val shareWithUid: List<String> = listOf()
 )

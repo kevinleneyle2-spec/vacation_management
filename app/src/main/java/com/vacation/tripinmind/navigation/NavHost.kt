@@ -45,7 +45,11 @@ fun AppNavHost(
         composable(
             route = AppDestinations.DETAILS_ROUTE,
             arguments = listOf(
-                navArgument("vacationId") { type = NavType.StringType }
+                navArgument("vacationId") { type = NavType.StringType },
+                navArgument("sharedVacation") {
+                    type = NavType.BoolType
+                    defaultValue = false
+                }
             )
         ) { backStackEntry ->
             val detailsViewModel: DetailsViewModel = hiltViewModel()

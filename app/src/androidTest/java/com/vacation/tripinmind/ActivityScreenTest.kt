@@ -27,7 +27,7 @@ class ActivityScreenTest {
 
     @Test
     fun activities_completed_fields_work() {
-        val date = LocalDate.now().plusDays(10)
+        val date = LocalDate.now().plusDays(1)
         val formatter = DateTimeFormatter.ofPattern("EEEE, MMMM d, yyyy", Locale.ENGLISH)
 
         val formattedDate = date.format(formatter)
@@ -73,7 +73,7 @@ class ActivityScreenTest {
 
     @Test
     fun activities_add_info_too_long() {
-        val date = LocalDate.now().plusDays(10)
+        val date = LocalDate.now().plusDays(1)
         val formatter = DateTimeFormatter.ofPattern("EEEE, MMMM d, yyyy", Locale.ENGLISH)
         val formattedDate = date.format(formatter)
 
@@ -101,7 +101,7 @@ class ActivityScreenTest {
 
     @Test
     fun activities_name_too_long() {
-        val date = LocalDate.now().plusDays(10)
+        val date = LocalDate.now().plusDays(1)
         val formatter = DateTimeFormatter.ofPattern("EEEE, MMMM d, yyyy", Locale.ENGLISH)
         val formattedDate = date.format(formatter)
 
@@ -129,7 +129,7 @@ class ActivityScreenTest {
 
     @Test
     fun activities_address_too_long() {
-        val date = LocalDate.now().plusDays(10)
+        val date = LocalDate.now().plusDays(1)
         val formatter = DateTimeFormatter.ofPattern("EEEE, MMMM d, yyyy", Locale.ENGLISH)
         val formattedDate = date.format(formatter)
 
@@ -157,7 +157,7 @@ class ActivityScreenTest {
 
     @Test
     fun activities_too_many_activities() {
-        val date = LocalDate.now().plusDays(10)
+        val date = LocalDate.now().plusDays(1)
         val formatter = DateTimeFormatter.ofPattern("EEEE, MMMM d, yyyy", Locale.ENGLISH)
         val formattedDate = date.format(formatter)
 

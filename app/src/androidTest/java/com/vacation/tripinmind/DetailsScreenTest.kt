@@ -23,7 +23,7 @@ class DetailsScreenTest {
 
     @Test
     fun details_screen_works() {
-        val date = LocalDate.now().plusDays(10)
+        val date = LocalDate.now().plusDays(1)
         val formatter = DateTimeFormatter.ofPattern("EEEE, MMMM d, yyyy", Locale.ENGLISH)
 
         val formattedDate = date.format(formatter)

@@ -29,6 +29,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.vacation.tripinmind.data.local.model.VacationDto
 import com.vacation.tripinmind.R
+import com.vacation.tripinmind.home.intent.VacationFilter
 import com.vacation.tripinmind.ui.theme.MVIAppTheme
 
 @Composable
@@ -37,6 +38,7 @@ fun VacationItem(
     onItemSelected: (String) -> Unit,
     onDeleteClick: () -> Unit,
     onArchiveClick: () -> Unit,
+    filter: VacationFilter,
     modifier: Modifier = Modifier
 ) {
     val iconRes = when (vacationDto.image) {
@@ -93,39 +95,41 @@ fun VacationItem(
                     color = MaterialTheme.colorScheme.onSurface
                 )
             }
+            if (filter != VacationFilter.SHARED) {
 
-            IconButton(
-                onClick = { onArchiveClick() },
-                modifier = Modifier
-                    .size(44.dp)
-                    .clip(CircleShape)
-                    .background(Color.Transparent)
-                    .testTag("archivedVacationButton")
-            ) {
-                Image(
-                    painter =
-                        if (vacationDto.isArchived)
-                            painterResource(id = R.drawable.unarchived)
-                        else
-                            painterResource(id = R.drawable.archive),
-                    contentDescription = "Archive",
-                    modifier = Modifier.size(24.dp)
-                )
-            }
+                IconButton(
+                    onClick = { onArchiveClick() },
+                    modifier = Modifier
+                        .size(44.dp)
+                        .clip(CircleShape)
+                        .background(Color.Transparent)
+                        .testTag("archivedVacationButton")
+                ) {
+                    Image(
+                        painter =
+                            if (vacationDto.isArchived)
+                                painterResource(id = R.drawable.unarchived)
+                            else
+                                painterResource(id = R.drawable.archive),
+                        contentDescription = "Archive",
+                        modifier = Modifier.size(24.dp)
+                    )
+                }
 
-            IconButton(
-                onClick = { onDeleteClick() },
-                modifier = Modifier
-                    .size(44.dp)
-                    .clip(CircleShape)
-                    .background(Color.Transparent)
-                    .testTag("vacationDeleteButton")
-            ) {
-                Image(
-                    painter = painterResource(id = R.drawable.trash_red),
-                    contentDescription = "Delete",
-                    modifier = Modifier.size(24.dp)
-                )
+                IconButton(
+                    onClick = { onDeleteClick() },
+                    modifier = Modifier
+                        .size(44.dp)
+                        .clip(CircleShape)
+                        .background(Color.Transparent)
+                        .testTag("vacationDeleteButton")
+                ) {
+                    Image(
+                        painter = painterResource(id = R.drawable.trash_red),
+                        contentDescription = "Delete",
+                        modifier = Modifier.size(24.dp)
+                    )
+                }
             }
         }
     }
@@ -151,7 +155,35 @@ fun VacationItemPreview() {
                 ),
                 onItemSelected = {},
                 onDeleteClick = {},
-                onArchiveClick = {}
+                onArchiveClick = {},
+                filter = VacationFilter.PROJECTS
+            )
+        }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun VacationItemSharedPreview() {
+    MVIAppTheme {
+        Box(modifier = Modifier.padding(vertical = 16.dp)) {
+            VacationItem(
+                vacationDto = VacationDto(
+                    id = "1",
+                    name = "Summer in Paris",
+                    startDate = "10/05/2023",
+                    nbrDay = 5,
+                    days = emptyList(),
+                    ideas = emptyList(),
+                    image = "vacation_ico",
+                    isArchived = false,
+                    createdBy = "",
+                    shareWith = listOf()
+                ),
+                onItemSelected = {},
+                onDeleteClick = {},
+                onArchiveClick = {},
+                filter = VacationFilter.SHARED
             )
         }
     }

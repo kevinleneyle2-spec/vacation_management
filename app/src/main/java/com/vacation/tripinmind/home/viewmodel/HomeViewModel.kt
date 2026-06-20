@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.vacation.tripinmind.data.local.model.VacationDto
 import com.vacation.tripinmind.data.repository.UserProfileRepository
 import com.vacation.tripinmind.data.repository.VacationRepository
+import com.vacation.tripinmind.home.intent.VacationFilter
 import com.vacation.tripinmind.home.intent.VacationIntent
 import com.vacation.tripinmind.home.intent.VacationUiViewState
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -52,16 +53,16 @@ class HomeViewModel @Inject constructor(
         }
     }
 
-    private fun toggleShowArchived() {
-        _vacationState.update { it.copy(showArchived = !it.showArchived) }
+    private fun toggleShowArchived(selectedFilter: VacationFilter) {
+        _vacationState.update { it.copy(selectedFilter = selectedFilter) }
     }
 
-    fun handleIntent(vacationIntent: VacationIntent, onNavigate: (String) -> Unit = {}) {
+    fun handleIntent(vacationIntent: VacationIntent) {
         when (vacationIntent) {
             is VacationIntent.LoadData -> loadData()
             is VacationIntent.DeleteVacation -> deleteVacation(vacationIntent.vacationDto)
             is VacationIntent.ArchiveVacation -> archiveVacation(vacationIntent.vacationDto)
-            is VacationIntent.ToggleShowArchived -> toggleShowArchived()
+            is VacationIntent.ToggleShowVacationFilter -> toggleShowArchived(vacationIntent.vacationFilter)
             is VacationIntent.CreateShareCode -> createShareCode()
         }
     }
@@ -83,6 +84,16 @@ class HomeViewModel @Inject constructor(
                         shareCode = code
                     )
                 }
+
+                startListeningSharedVacations()
+            }
+        }
+    }
+
+    private fun startListeningSharedVacations() {
+        viewModelScope.launch {
+            vacationRepository.getSharedVacationsFlow().collect { sharedList ->
+                _vacationState.update { it.copy(sharedVacations = sharedList) }
             }
         }
     }

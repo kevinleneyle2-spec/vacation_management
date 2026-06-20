@@ -21,10 +21,8 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.AccessTime
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -40,6 +38,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -50,20 +49,18 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import coil.compose.AsyncImage
 import com.vacation.tripinmind.R
-import com.vacation.tripinmind.details.model.ActivityUiModel
-import com.vacation.tripinmind.details.model.DayUiModel
+import com.vacation.tripinmind.data.local.model.Activity
+import com.vacation.tripinmind.data.local.model.Day
+import com.vacation.tripinmind.data.local.model.VacationDto
+import com.vacation.tripinmind.details.intent.DetailsIntent
 import com.vacation.tripinmind.details.model.VacationUiModel
 import com.vacation.tripinmind.details.viewmodel.DetailsViewModel
 import com.vacation.tripinmind.navigation.AppDestinations
@@ -73,27 +70,59 @@ import com.vacation.tripinmind.ui.theme.MVIAppTheme
 fun DetailsScreen(
     viewModel: DetailsViewModel,
     onBackClick: () -> Unit = {},
-    onEditClick: (String) -> Unit = {},
-    modifier: Modifier = Modifier
+    onEditClick: (String) -> Unit = {}
 ) {
     val vacation by viewModel.vacation.collectAsState()
+
     DetailsScreenContent(
-        vacation = vacation,
+        vacationModel = vacation,
         onBackClick = onBackClick,
         onEditClick = onEditClick,
-        modifier = modifier
+        sharedVacation = vacation?.isSharedVacation,
+        onIntent = viewModel::handleIntent
     )
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DetailsScreenContent(
-    vacation: VacationUiModel?,
+    vacationModel: VacationUiModel?,
     onBackClick: () -> Unit = {},
     onEditClick: (String) -> Unit = {},
-    modifier: Modifier = Modifier
+    sharedVacation: Boolean? = false,
+    onIntent: (DetailsIntent) -> Unit = {}
 ) {
     var selectedLocation by remember { mutableStateOf<String?>(null) }
+    var showSharedVacationSheet by remember { mutableStateOf(false) }
+
+    val sheetState = rememberModalBottomSheetState(
+        skipPartiallyExpanded = true
+    )
+
+    if (showSharedVacationSheet) {
+        SharedVacationBottomSheet(
+            onDismiss = { showSharedVacationSheet = false },
+            onAddViewer = { newValue ->
+                onIntent(
+                    DetailsIntent.AddViewer(
+                        vacationDto = vacationModel?.vacation,
+                        shareCode = newValue
+                    )
+                )
+            },
+            onClearError = { onIntent(DetailsIntent.ClearError) },
+            onRemoveSharedUser = { index ->
+                onIntent(
+                    DetailsIntent.RemoveViewer(
+                        index = index
+                    )
+                )
+            },
+            vacationModel = vacationModel,
+            error = vacationModel?.error,
+            sheetState = sheetState
+        )
+    }
 
     selectedLocation?.let { location ->
         AlertDialog(
@@ -118,7 +147,8 @@ fun DetailsScreenContent(
             TopAppBar(
                 title = {
                     Text(
-                        text = vacation?.name ?: stringResource(R.string.detailsscreen_error_title),
+                        text = vacationModel?.vacation?.name
+                            ?: stringResource(R.string.detailsscreen_error_title),
                         color = Color.White
                     )
                 },
@@ -138,42 +168,78 @@ fun DetailsScreenContent(
                     containerColor = MaterialTheme.colorScheme.primary
                 )
             )
-        },
-        modifier = modifier
+        }
     ) { paddingValues ->
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(paddingValues)
-                .padding(16.dp),
-            verticalArrangement = Arrangement.Top,
-            horizontalAlignment = Alignment.End
+        if (sharedVacation != true) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(paddingValues)
+                    .padding(16.dp),
+                verticalArrangement = Arrangement.Top,
+                horizontalAlignment = Alignment.End
 
-        ) {
-            Row() {
-                vacation?.let { currentVacation ->
+            ) {
+                Row(
+                    modifier = Modifier.padding(bottom = 8.dp)
+                ) {
+                    vacationModel?.vacation?.let { currentVacation ->
+                        Button(
+                            onClick = { onEditClick(AppDestinations.buildEditRoute(currentVacation.id)) },
+                            modifier = Modifier
+                                .size(24.dp)
+                                .testTag("detailsEditButton"),
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = Color.White
+                            ),
+                            contentPadding = PaddingValues(all = 0.dp)
+                        ) {
+                            Image(
+                                painter = painterResource(id = R.drawable.edit),
+                                contentDescription = "Image Button",
+                                modifier = Modifier.size(18.dp)
+                            )
+                        }
+
+                        Text(
+                            text = stringResource(R.string.detailsscreen_edit_button),
+                            color = MaterialTheme.colorScheme.primary,
+                            modifier = Modifier
+                                .clickable {
+                                    onEditClick(
+                                        AppDestinations.buildEditRoute(
+                                            currentVacation.id
+                                        )
+                                    )
+                                }
+                        )
+                    }
+                }
+
+                Row() {
                     Button(
-                        onClick = { onEditClick(AppDestinations.buildEditRoute(currentVacation.id)) },
+                        onClick = { showSharedVacationSheet = true },
                         modifier = Modifier
                             .size(24.dp)
-                            .testTag("detailsEditButton"),
+                            .testTag("detailsShareButton"),
                         colors = ButtonDefaults.buttonColors(
                             containerColor = Color.White
                         ),
                         contentPadding = PaddingValues(all = 0.dp)
                     ) {
                         Image(
-                            painter = painterResource(id = R.drawable.edit),
+                            painter = painterResource(id = R.drawable.viewer_ico),
                             contentDescription = "Image Button",
-                            modifier = Modifier.size(18.dp)
+                            modifier = Modifier.size(24.dp)
                         )
                     }
 
                     Text(
-                        text = stringResource(R.string.detailsscreen_edit_button),
+                        text = stringResource(R.string.detailsscreen_share_button),
                         color = MaterialTheme.colorScheme.primary,
                         modifier = Modifier
-                            .clickable { onEditClick(AppDestinations.buildEditRoute(currentVacation.id)) }
+                            .padding(start = 4.dp)
+                            .clickable { showSharedVacationSheet = true }
                     )
                 }
             }
@@ -184,7 +250,7 @@ fun DetailsScreenContent(
                 .padding(paddingValues),
             verticalArrangement = Arrangement.Center
         ) {
-            vacation?.let { currentVacation ->
+            vacationModel?.vacation?.let { currentVacation ->
                 if (currentVacation.days.isNotEmpty()) {
                     Row(
                         modifier = Modifier
@@ -319,153 +385,76 @@ fun DetailsScreenContent(
     }
 }
 
-@Composable
-fun DayCard(day: DayUiModel, onLocationClick: (String) -> Unit) {
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(300.dp),
-        shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.tertiary
-        )
-    ) {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(16.dp)
-        ) {
-            Text(
-                text = day.name,
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.primary
-            )
-
-            if (day.additionalInfo.isNotEmpty()) {
-                Text(
-                    text = day.additionalInfo,
-                    style = MaterialTheme.typography.titleMedium,
-                    fontStyle = FontStyle.Italic,
-                    fontWeight = FontWeight.Normal,
-                    color = MaterialTheme.colorScheme.primary.copy(alpha = 0.8f)
-                )
-            }
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            if (day.activities.isNotEmpty()) {
-                LazyColumn(
-                    verticalArrangement = Arrangement.spacedBy(4.dp),
-                    modifier = Modifier.fillMaxSize()
-                ) {
-                    items(day.activities.sortedBy { it.time }) { activity ->
-                        ActivityRow(activity, onLocationClick = onLocationClick)
-                    }
-                }
-            } else {
-                Text(
-                    text = stringResource(R.string.detailsscreen_no_activities),
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-            }
-        }
-    }
-}
-
-@Composable
-fun ActivityRow(activity: ActivityUiModel, onLocationClick: (String) -> Unit) {
-    Row(
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(8.dp),
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 4.dp)
-    ) {
-        Icon(
-            imageVector = Icons.Default.AccessTime,
-            contentDescription = null,
-            modifier = Modifier.size(16.dp),
-            tint = MaterialTheme.colorScheme.secondary
-        )
-        Text(
-            text = activity.time,
-            style = MaterialTheme.typography.bodySmall,
-            fontWeight = FontWeight.SemiBold,
-            color = MaterialTheme.colorScheme.secondary
-        )
-        Text(
-            text = activity.name + " (" + activity.duration + ")",
-            style = MaterialTheme.typography.bodyMedium,
-            textDecoration =
-                if (activity.location.isNotEmpty()) {
-                    TextDecoration.Underline
-                } else {
-                    TextDecoration.None
-                },
-            color = MaterialTheme.colorScheme.onSurface,
-            modifier = Modifier
-                .clickable { onLocationClick(activity.location) }
-        )
-
-        if (activity.location.isNotEmpty()) {
-            IconButton(
-                onClick = { onLocationClick(activity.location) },
-                modifier = Modifier
-                    .size(20.dp)
-                    .clip(CircleShape)
-                    .background(Color.Transparent)
-                    .testTag("addressButton")
-            ) {
-                if (LocalInspectionMode.current) {
-                    Image(
-                        painter = painterResource(R.drawable.map_ico),
-                        contentDescription = null,
-                        modifier = Modifier.size(16.dp)
-                    )
-                } else {
-                    AsyncImage(
-                        model = R.drawable.map_ico,
-                        contentDescription = null,
-                        modifier = Modifier.size(16.dp)
-                    )
-                }
-            }
-        }
-    }
-}
-
 @Preview(showBackground = true)
 @Composable
 fun DetailsScreenPreview() {
     MVIAppTheme {
         Surface {
             DetailsScreenContent(
-                vacation = VacationUiModel(
-                    id = "1",
-                    name = "Paris Trip",
-                    days = listOf(
-                        DayUiModel(
-                            "Lundi 5 mars 2025",
-                            "with my father",
-                            listOf(
-                                ActivityUiModel("Eiffel Tower", "", "11:00", "2h00"),
-                                ActivityUiModel("Eiffel Tower", "test", "10:00", "2h00"),
-                                ActivityUiModel("Louvre Museum", "", "14:30", "2h00")
+                vacationModel = VacationUiModel(
+                    vacation = VacationDto(
+                        id = "1",
+                        name = "Paris Trip",
+                        days = listOf(
+                            Day(
+                                "Lundi 5 mars 2025",
+                                "with my father",
+                                listOf(
+                                    Activity("Eiffel Tower", "01h00", "02h00", ""),
+                                    Activity("Eiffel Tower", "01h00", "02h00", ""),
+                                    Activity("Louvre Museum", "04h30", "02h00", "")
+                                )
+                            ),
+                            Day(
+                                "Day 2",
+                                "mother",
+                                listOf(
+                                    Activity("Notre Dame", "", "09:00", "2h00"),
+                                    Activity("Seine River Cruise", "", "18:00", "2h00")
+                                )
                             )
                         ),
-                        DayUiModel(
-                            "Day 2",
-                            "mother",
-                            listOf(
-                                ActivityUiModel("Notre Dame", "", "09:00", "2h00"),
-                                ActivityUiModel("Seine River Cruise", "", "18:00", "2h00")
+                        ideas = listOf("piscine", "tennis")
+                    )
+                ),
+                onBackClick = {},
+                onEditClick = {},
+                sharedVacation = false,
+                onIntent = {}
+            )
+        }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun DetailsScreenSharedVacationPreview() {
+    MVIAppTheme {
+        Surface {
+            DetailsScreenContent(
+                vacationModel = VacationUiModel(
+                    vacation = VacationDto(
+                        id = "1",
+                        name = "Paris Trip",
+                        days = listOf(
+                            Day(
+                                "Day 1",
+                                "father",
+                                listOf()
+                            ),
+                            Day(
+                                "Day 2",
+                                "mother",
+                                listOf()
                             )
-                        )
-                    ),
-                    ideas = listOf("piscine", "tennis")
-                )
+                        ),
+                        ideas = listOf()
+                    )
+                ),
+                onBackClick = {},
+                onEditClick = {},
+                sharedVacation = true,
+                onIntent = {}
             )
         }
     }
@@ -477,23 +466,29 @@ fun DetailsScreenEmptyPreview() {
     MVIAppTheme {
         Surface {
             DetailsScreenContent(
-                vacation = VacationUiModel(
-                    id = "1",
-                    name = "Paris Trip",
-                    days = listOf(
-                        DayUiModel(
-                            "Day 1",
-                            "father",
-                            listOf()
+                vacationModel = VacationUiModel(
+                    vacation = VacationDto(
+                        id = "1",
+                        name = "Paris Trip",
+                        days = listOf(
+                            Day(
+                                "Day 1",
+                                "father",
+                                listOf()
+                            ),
+                            Day(
+                                "Day 2",
+                                "mother",
+                                listOf()
+                            )
                         ),
-                        DayUiModel(
-                            "Day 2",
-                            "mother",
-                            listOf()
-                        )
-                    ),
-                    ideas = listOf()
-                )
+                        ideas = listOf()
+                    )
+                ),
+                onBackClick = {},
+                onEditClick = {},
+                sharedVacation = false,
+                onIntent = {}
             )
         }
     }

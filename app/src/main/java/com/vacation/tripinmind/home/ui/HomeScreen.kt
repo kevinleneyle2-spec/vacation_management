@@ -60,6 +60,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
 import com.vacation.tripinmind.R
 import com.vacation.tripinmind.data.local.model.VacationDto
+import com.vacation.tripinmind.home.intent.VacationFilter
 import com.vacation.tripinmind.home.intent.VacationIntent
 import com.vacation.tripinmind.home.intent.VacationUiViewState
 import com.vacation.tripinmind.home.viewmodel.HomeViewModel
@@ -135,8 +136,8 @@ fun HomeScreen(
                 archiveMessageResId =
                     if (dto.isArchived) R.string.homescreen_unarchive_message else R.string.homescreen_archive_message
             },
-            onToggleShowArchived = {
-                viewModel.handleIntent(VacationIntent.ToggleShowArchived)
+            onToggleShowFilterVacations = { vacationFilter ->
+                viewModel.handleIntent(VacationIntent.ToggleShowVacationFilter(vacationFilter))
             },
             onNavigate = onNavigate,
             modifier = Modifier.fillMaxSize()
@@ -176,7 +177,7 @@ fun HomeScreenContent(
     vacationUiState: VacationUiViewState,
     onDeleteVacation: (VacationDto) -> Unit,
     onArchiveVacation: (VacationDto) -> Unit,
-    onToggleShowArchived: () -> Unit,
+    onToggleShowFilterVacations: (vacationFilter: VacationFilter) -> Unit,
     onNavigate: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -230,12 +231,61 @@ fun HomeScreenContent(
                     }
                 } else {
                     Column(
-                        modifier = Modifier.fillMaxSize()
+                        modifier = Modifier.fillMaxWidth()
                     ) {
                         Row(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(horizontal = 24.dp, vertical = 16.dp)
+                                .padding(horizontal = 24.dp, vertical = 8.dp)
+                                .height(24.dp),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.Center
+                        ) {
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxHeight()
+                                    .clip(RoundedCornerShape(24.dp))
+                                    .background(
+                                        if (vacationUiState.selectedFilter == VacationFilter.ARCHIVED)
+                                            colorResource(R.color.orange)
+                                        else
+                                            MaterialTheme.colorScheme.primary.copy(alpha = 0.3f)
+                                    )
+                                    .clickable { onToggleShowFilterVacations(VacationFilter.ARCHIVED) }
+                                    .testTag("archivedVacationViewButton"),
+                                contentAlignment = Alignment.Center
+
+                            ) {
+                                Row(
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    horizontalArrangement = Arrangement.Center,
+                                    modifier = Modifier.padding(horizontal = 24.dp)
+
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.Default.Archive,
+                                        contentDescription = null,
+                                        modifier = Modifier
+                                            .size(18.dp),
+                                        tint = Color.White
+                                    )
+
+                                    Spacer(Modifier.width(8.dp))
+
+                                    Text(
+                                        text = stringResource(R.string.homescreen_archives_button),
+                                        color = Color.White,
+                                        fontWeight = if (vacationUiState.selectedFilter == VacationFilter.ARCHIVED) FontWeight.Bold else FontWeight.Normal,
+                                        fontSize = 16.sp
+                                    )
+                                }
+                            }
+                        }
+
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(start = 24.dp, end = 24.dp, bottom = 16.dp, top = 0.dp)
                                 .height(32.dp)
                                 .clip(RoundedCornerShape(24.dp))
                                 .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.3f))
@@ -252,19 +302,23 @@ fun HomeScreenContent(
                                     .fillMaxHeight()
                                     .clip(RoundedCornerShape(24.dp))
                                     .background(
-                                        if (!vacationUiState.showArchived)
+                                        if (vacationUiState.selectedFilter == VacationFilter.PROJECTS)
                                             colorResource(R.color.orange)
                                         else
                                             Color.Transparent
                                     )
-                                    .clickable { if (vacationUiState.showArchived) onToggleShowArchived() }
-                                    .testTag("unarchivedVacationViewButton"),
+                                    .clickable {
+                                        if (vacationUiState.selectedFilter != VacationFilter.PROJECTS) onToggleShowFilterVacations(
+                                            VacationFilter.PROJECTS
+                                        )
+                                    }
+                                    .testTag("vacationViewButton"),
                                 contentAlignment = Alignment.Center
                             ) {
                                 Text(
                                     text = stringResource(R.string.homescreen_projects_button),
                                     color = Color.White,
-                                    fontWeight = if (!vacationUiState.showArchived) FontWeight.Bold else FontWeight.Normal,
+                                    fontWeight = if (vacationUiState.selectedFilter == VacationFilter.PROJECTS) FontWeight.Bold else FontWeight.Normal,
                                     fontSize = 16.sp
                                 )
                             }
@@ -277,35 +331,46 @@ fun HomeScreenContent(
                                     .fillMaxHeight()
                                     .clip(RoundedCornerShape(24.dp))
                                     .background(
-                                        if (vacationUiState.showArchived)
+                                        if (vacationUiState.selectedFilter == VacationFilter.SHARED)
                                             colorResource(R.color.orange)
                                         else
                                             Color.Transparent
                                     )
-                                    .clickable { if (!vacationUiState.showArchived) onToggleShowArchived() }
-                                    .testTag("archivedVacationViewButton"),
+                                    .clickable {
+                                        if (vacationUiState.selectedFilter != VacationFilter.SHARED) onToggleShowFilterVacations(
+                                            VacationFilter.SHARED
+                                        )
+                                    }
+                                    .testTag("sharedVacationViewButton"),
                                 contentAlignment = Alignment.Center
                             ) {
-                                Row(verticalAlignment = Alignment.CenterVertically) {
-                                    Icon(
-                                        imageVector = Icons.Default.Archive,
-                                        contentDescription = null,
-                                        modifier = Modifier.size(18.dp),
-                                        tint = Color.White
-                                    )
-                                    Spacer(Modifier.width(8.dp))
-                                    Text(
-                                        text = stringResource(R.string.homescreen_archives_button),
-                                        color = Color.White,
-                                        fontWeight = if (vacationUiState.showArchived) FontWeight.Bold else FontWeight.Normal,
-                                        fontSize = 16.sp
-                                    )
-                                }
+                                Text(
+                                    text = stringResource(R.string.homescreen_shared_button),
+                                    color = Color.White,
+                                    fontWeight = if (vacationUiState.selectedFilter == VacationFilter.SHARED) FontWeight.Bold else FontWeight.Normal,
+                                    fontSize = 16.sp
+                                )
                             }
                         }
 
-                        val filteredVacations = vacationUiState.vacations.filter {
-                            it.isArchived == vacationUiState.showArchived
+                        var filteredVacations = vacationUiState.vacations
+
+                        when (vacationUiState.selectedFilter) {
+                            VacationFilter.PROJECTS -> {
+                                filteredVacations = vacationUiState.vacations.filter {
+                                    !it.isArchived
+                                }
+                            }
+
+                            VacationFilter.ARCHIVED -> {
+                                filteredVacations = vacationUiState.vacations.filter {
+                                    it.isArchived
+                                }
+                            }
+
+                            VacationFilter.SHARED -> {
+                                filteredVacations = vacationUiState.sharedVacations
+                            }
                         }
 
                         if (filteredVacations.isNotEmpty()) {
@@ -323,9 +388,15 @@ fun HomeScreenContent(
                                         onDeleteClick = { onDeleteVacation(vacation) },
                                         vacationDto = vacation,
                                         onItemSelected = {
-                                            onNavigate(AppDestinations.buildDetailsRoute(vacation.id))
+                                            onNavigate(
+                                                AppDestinations.buildDetailsRoute(
+                                                    vacation.id,
+                                                    filteredVacations == vacationUiState.sharedVacations
+                                                )
+                                            )
                                         },
-                                        onArchiveClick = { onArchiveVacation(vacation) }
+                                        onArchiveClick = { onArchiveVacation(vacation) },
+                                        filter = vacationUiState.selectedFilter
                                     )
                                 }
                             }
@@ -345,10 +416,12 @@ fun HomeScreenContent(
                                     contentAlignment = Alignment.TopCenter
                                 ) {
                                     Text(
-                                        text = if (vacationUiState.showArchived) {
+                                        text = if (vacationUiState.selectedFilter == VacationFilter.ARCHIVED) {
                                             stringResource(id = R.string.homescreen_no_archived_vacation)
-                                        } else {
+                                        } else if (vacationUiState.selectedFilter == VacationFilter.PROJECTS) {
                                             stringResource(id = R.string.homescreen_no_vacation)
+                                        } else {
+                                            stringResource(id = R.string.homescreen_no_shared_vacation)
                                         },
                                         color = MaterialTheme.colorScheme.primary,
                                         fontSize = 18.sp,
@@ -459,11 +532,47 @@ fun HomeScreenPreview() {
                         createdBy = "",
                         shareWith = listOf()
                     )
-                )
+                ),
+                isLoading = false,
+                selectedFilter = VacationFilter.PROJECTS,
+                shareCode = "123-456-123-456"
             ),
             onDeleteVacation = {},
             onArchiveVacation = {},
-            onToggleShowArchived = {},
+            onToggleShowFilterVacations = {},
+            onNavigate = {}
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun HomeScreenSharedPreview() {
+    MVIAppTheme {
+        HomeScreenContent(
+            vacationUiState = VacationUiViewState(
+                vacations = listOf(),
+                sharedVacations = listOf(
+                    VacationDto(
+                        id = "1",
+                        name = "Paris",
+                        startDate = "10/05/2023",
+                        nbrDay = 3,
+                        days = emptyList(),
+                        ideas = emptyList(),
+                        image = "vacation_ico",
+                        isArchived = false,
+                        createdBy = "",
+                        shareWith = listOf()
+                    )
+                ),
+                isLoading = false,
+                selectedFilter = VacationFilter.SHARED,
+                shareCode = "123-456-123-456"
+            ),
+            onDeleteVacation = {},
+            onArchiveVacation = {},
+            onToggleShowFilterVacations = {},
             onNavigate = {}
         )
     }
@@ -476,11 +585,14 @@ fun HomeScreenEmptyPreview() {
         HomeScreenContent(
             vacationUiState = VacationUiViewState(
                 vacations = listOf(
-                )
+                ),
+                isLoading = false,
+                selectedFilter = VacationFilter.PROJECTS,
+                shareCode = "123-456-123-456"
             ),
             onDeleteVacation = {},
             onArchiveVacation = {},
-            onToggleShowArchived = {},
+            onToggleShowFilterVacations = {},
             onNavigate = {}
         )
     }
