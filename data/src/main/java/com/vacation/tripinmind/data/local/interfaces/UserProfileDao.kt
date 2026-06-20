@@ -10,10 +10,10 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface UserProfileDao {
     @Query("SELECT * from user_profile WHERE shareCode = :shareCode")
-    fun getItemByCode(shareCode: String): Flow<UserProfileDto?>
+    suspend fun getItemByCode(shareCode: String): UserProfileDto?
 
     @Query("SELECT * from user_profile WHERE uuid = :uuid")
-    fun getItemById(uuid: String): Flow<UserProfileDto?>
+    suspend fun getItemById(uuid: String): UserProfileDto?
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertItem(item: UserProfileDto)

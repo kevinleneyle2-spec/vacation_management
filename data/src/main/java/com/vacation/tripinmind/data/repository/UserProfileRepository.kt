@@ -6,8 +6,6 @@ import com.vacation.tripinmind.data.local.interfaces.UserProfileDao
 import com.vacation.tripinmind.data.local.interfaces.UserProfileInterface
 import com.vacation.tripinmind.data.local.model.UserProfileDto
 import com.vacation.tripinmind.data.utils.ShareCodeGenerator
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.tasks.await
 
 class UserProfileRepository(
@@ -17,16 +15,30 @@ class UserProfileRepository(
 ) : UserProfileInterface {
     private val shareVacationCollection = firestore.collection("userProfile")
 
-    override fun getItemByCode(shareCode: String): Flow<UserProfileDto?> =
-        userProfileDao.getItemByCode(shareCode)
+    override suspend fun getItemByCode(shareCode: String): UserProfileDto? {
+        val shareCodeVacation = shareVacationCollection
+            .whereEqualTo("shareCode", shareCode)
+            .get()
+            .await()
 
-    override fun getItemById(uuid: String): Flow<UserProfileDto?> =
+        return if (!shareCodeVacation.isEmpty) {
+            val doc = shareCodeVacation.documents.first()
+            val code = doc.getString("shareCode") ?: ""
+            val uid = doc.getString("uuid") ?: ""
+
+            UserProfileDto(uuid = uid, shareCode = code)
+        } else {
+            null
+        }
+    }
+
+    override suspend fun getItemById(uuid: String): UserProfileDto? =
         userProfileDao.getItemById(uuid)
 
     override suspend fun insertItem(): String? {
         val uid = firebaseAuth.currentUser?.uid ?: return null
 
-        val localProfile = userProfileDao.getItemById(uid).first()
+        val localProfile = userProfileDao.getItemById(uid)
         if (localProfile != null) {
             return localProfile.shareCode
         }

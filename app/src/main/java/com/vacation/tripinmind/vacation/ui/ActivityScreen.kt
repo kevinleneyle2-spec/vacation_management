@@ -47,8 +47,7 @@ fun ActivitiesScreen(
     viewModel: InitViewModel,
     vacationId: String? = null,
     onNavigate: (String) -> Unit = {},
-    onBackClick: () -> Unit = {},
-    modifier: Modifier = Modifier
+    onBackClick: () -> Unit = {}
 ) {
     val initState by viewModel.initState.collectAsState()
 
@@ -87,8 +86,7 @@ fun ActivitiesScreen(
         },
         onRemoveIdea = { index ->
             viewModel.handleIntent(InitIntent.RemoveIdea(index))
-        },
-        modifier = modifier
+        }
     )
 }
 
@@ -103,8 +101,7 @@ fun ActivitiesContent(
     onRemoveDayActivities: (Int, Int) -> Unit,
     onAddIdea: (String) -> Unit,
     onRemoveIdea: (Int) -> Unit,
-    onCreateVacation: () -> Unit,
-    modifier: Modifier = Modifier
+    onCreateVacation: () -> Unit
 ) {
     Scaffold(
         topBar = {
@@ -160,8 +157,7 @@ fun ActivitiesContent(
                 }
             }
         },
-        contentWindowInsets = androidx.compose.material3.ScaffoldDefaults.contentWindowInsets,
-        modifier = modifier
+        contentWindowInsets = androidx.compose.material3.ScaffoldDefaults.contentWindowInsets
     ) { paddingValues ->
         LazyColumn(
             modifier = Modifier

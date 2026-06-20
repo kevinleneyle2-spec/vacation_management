@@ -1,21 +1,17 @@
 package com.vacation.tripinmind.details.model
 
+import com.vacation.tripinmind.data.local.model.VacationDto
+
+enum class DetailsError {
+    NOT_FOUND,
+    ALREADY_ADDED,
+    NOT_YOURSELF,
+    TOO_MANY_VIEWERS,
+    SUCCESS
+}
+
 data class VacationUiModel(
-    val id: String,
-    val name: String,
-    val days: List<DayUiModel>,
-    val ideas: List<String>
-)
-
-data class DayUiModel(
-    val name: String,
-    val additionalInfo: String,
-    val activities: List<ActivityUiModel>
-)
-
-data class ActivityUiModel(
-    val name: String,
-    val location: String,
-    val time: String,
-    val duration: String
+    val vacation: VacationDto,
+    val error: DetailsError? = null,
+    val isSharedVacation: Boolean = false
 )

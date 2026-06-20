@@ -6,10 +6,14 @@ import com.vacation.tripinmind.data.local.interfaces.VacationDao
 import com.vacation.tripinmind.data.local.model.VacationDto
 import com.vacation.tripinmind.data.repository.VacationRepository
 import com.google.firebase.firestore.CollectionReference
+import com.google.firebase.firestore.Filter
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.ListenerRegistration
+import com.google.firebase.firestore.Query
 import com.vacation.tripinmind.data.local.interfaces.UserProfileDao
 import com.vacation.tripinmind.data.local.model.UserProfileDto
 import com.vacation.tripinmind.data.repository.UserProfileRepository
+import com.vacation.tripinmind.home.intent.VacationFilter
 import com.vacation.tripinmind.home.intent.VacationIntent
 import com.vacation.tripinmind.home.viewmodel.HomeViewModel
 import kotlinx.coroutines.Dispatchers
@@ -73,8 +77,6 @@ class HomeViewModelTest {
         whenever(mockFirebaseAuth.currentUser).thenReturn(mockFirebaseUser)
         whenever(mockFirebaseUser.uid).thenReturn("12345")
 
-
-
         vacationsFlow.value = listOf(fakeVacation)
 
         fakeVacationDao = object : VacationDao {
@@ -97,18 +99,25 @@ class HomeViewModelTest {
         }
 
         fakeUserProfileDao = object : UserProfileDao {
-            override fun getItemById(uuid: String): Flow<UserProfileDto> =
-                MutableStateFlow(fakeUserProfile)
+            override suspend fun getItemById(uuid: String): UserProfileDto =
+                fakeUserProfile
 
             override suspend fun insertItem(item: UserProfileDto) { }
 
-            override fun getItemByCode(shareCode: String): Flow<UserProfileDto> =
-                MutableStateFlow(fakeUserProfile)
+            override suspend fun getItemByCode(shareCode: String): UserProfileDto =
+                fakeUserProfile
         }
 
         mockFirestore = mock(FirebaseFirestore::class.java)
         val mockCollection = mock(CollectionReference::class.java)
         whenever(mockFirestore.collection(any())).thenReturn(mockCollection)
+        val mockQuery = mock(Query::class.java)
+        val mockRegistration = mock(ListenerRegistration::class.java)
+
+        whenever(mockFirestore.collection(any())).thenReturn(mockCollection)
+        whenever(mockCollection.where(any<Filter>())).thenReturn(mockQuery)
+        whenever(mockQuery.whereEqualTo(any<String>(), any())).thenReturn(mockQuery)
+        whenever(mockQuery.addSnapshotListener(any())).thenReturn(mockRegistration)
 
         vacationRepository = VacationRepository(fakeVacationDao, mockFirestore, mockFirebaseAuth)
         userProfileRepository = UserProfileRepository(fakeUserProfileDao, mockFirestore, mockFirebaseAuth)
@@ -185,21 +194,21 @@ class HomeViewModelTest {
 
         var state = viewModel.vacationState.value
 
-        assertThat(state.showArchived).isFalse()
+        assertThat(state.selectedFilter).isEqualTo(VacationFilter.PROJECTS)
 
-        viewModel.handleIntent(VacationIntent.ToggleShowArchived)
+        viewModel.handleIntent(VacationIntent.ToggleShowVacationFilter(VacationFilter.SHARED))
         advanceUntilIdle()
 
         state = viewModel.vacationState.value
 
-        assertThat(state.showArchived).isTrue()
+        assertThat(state.selectedFilter).isEqualTo(VacationFilter.SHARED)
 
-        viewModel.handleIntent(VacationIntent.ToggleShowArchived)
+        viewModel.handleIntent(VacationIntent.ToggleShowVacationFilter(VacationFilter.ARCHIVED))
         advanceUntilIdle()
 
         state = viewModel.vacationState.value
 
-        assertThat(state.showArchived).isFalse()
+        assertThat(state.selectedFilter).isEqualTo(VacationFilter.ARCHIVED)
     }
 
     @Test

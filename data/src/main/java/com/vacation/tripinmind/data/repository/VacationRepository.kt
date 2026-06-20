@@ -1,12 +1,15 @@
 package com.vacation.tripinmind.data.repository
 
+import androidx.core.util.remove
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.Filter
 import com.google.firebase.firestore.FirebaseFirestore
 import com.vacation.tripinmind.data.local.interfaces.VacationDao
 import com.vacation.tripinmind.data.local.interfaces.VacationInterface
 import com.vacation.tripinmind.data.local.model.VacationDto
+import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.channelFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
@@ -82,5 +85,52 @@ class VacationRepository(
         } catch (e: Exception) {
             e.printStackTrace()
         }
+    }
+
+    fun getVacationById(id: String, sharedVacation: Boolean): Flow<VacationDto?> {
+        return if (sharedVacation) {
+            getSharedVacationById(id)
+        } else {
+            getItemById(id)
+        }
+    }
+
+    private fun getSharedVacationById(id: String): Flow<VacationDto?> = callbackFlow {
+        val subscription = vacationCollection.where(
+            Filter.arrayContains("shareWithUid", firebaseAuth.currentUser?.uid)
+        ).whereEqualTo("id", id)
+            .addSnapshotListener { snapshot, error ->
+                if (error != null) {
+                    close(error)
+                    return@addSnapshotListener
+                }
+
+                if (snapshot != null) {
+                    val vacation = snapshot.toObjects(VacationDto::class.java).firstOrNull()
+                    trySend(vacation)
+                }
+            }
+
+        awaitClose { subscription.remove() }
+    }
+
+    fun getSharedVacationsFlow(): Flow<List<VacationDto>> = callbackFlow {
+        val query = vacationCollection.where(
+            Filter.arrayContains("shareWithUid", firebaseAuth.currentUser?.uid)
+        )
+
+        val subscription = query.addSnapshotListener { snapshot, error ->
+            if (error != null) {
+                close(error)
+                return@addSnapshotListener
+            }
+
+            if (snapshot != null) {
+                val vacations = snapshot.toObjects(VacationDto::class.java)
+                trySend(vacations)
+            }
+        }
+
+        awaitClose { subscription.remove() }
     }
 }

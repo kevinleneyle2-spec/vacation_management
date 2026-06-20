@@ -42,7 +42,7 @@ class UserProfileDatabaseTest {
             shareCode = "123-456-123-456"
         )
         dao.insertItem(userProfile)
-        val result = dao.getItemById("12345").first()
+        val result = dao.getItemById("12345")
         assertThat(result?.shareCode).isEqualTo("123-456-123-456")
     }
 
@@ -53,7 +53,7 @@ class UserProfileDatabaseTest {
             shareCode = "123-456-123-456"
         )
         dao.insertItem(userProfile)
-        val result = dao.getItemById("12345").first()
+        val result = dao.getItemById("12345")
         assertThat(result?.shareCode).isEqualTo("123-456-123-456")
     }
 
@@ -64,7 +64,7 @@ class UserProfileDatabaseTest {
             shareCode = "123-456-123-456"
         )
         dao.insertItem(userProfile)
-        val result = dao.getItemByCode("123-456-123-456").first()
+        val result = dao.getItemByCode("123-456-123-456")
         assertThat(result?.uuid).isEqualTo("12345")
     }
 }

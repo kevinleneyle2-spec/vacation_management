@@ -7,8 +7,8 @@ object AppDestinations {
 
     const val ACTIVITIES_ROUTE = "activities"
 
-    const val DETAILS_ROUTE = "details/{vacationId}"
-    fun buildDetailsRoute(vacationId: String) = "details/$vacationId"
+    const val DETAILS_ROUTE = "details/{vacationId}&sharedVacation={sharedVacation}"
+    fun buildDetailsRoute(vacationId: String, sharedVacation: Boolean) = "details/$vacationId&sharedVacation=$sharedVacation"
 
     fun buildEditRoute(vacationId: String) = "activities/$vacationId"
 }
