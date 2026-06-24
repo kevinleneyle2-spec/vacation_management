@@ -13,15 +13,19 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.vacation.tripinmind.R
+import com.vacation.tripinmind.data.local.model.Activity
 import com.vacation.tripinmind.data.local.model.Day
+import com.vacation.tripinmind.ui.theme.MVIAppTheme
 
 @Composable
 fun DayCard(day: Day, onLocationClick: (String) -> Unit) {
@@ -74,6 +78,25 @@ fun DayCard(day: Day, onLocationClick: (String) -> Unit) {
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
+        }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun DayCardPreview() {
+    MVIAppTheme {
+        Surface {
+            DayCard(
+                day = Day(
+                    nameDay = "Lundi 5 mars 2025",
+                    additionalInfo = "with my father",
+                    activity = listOf(
+                        Activity("Eiffel Tower", "01h00", "02h00", "")
+                    )
+                ),
+                onLocationClick = {}
+            )
         }
     }
 }
