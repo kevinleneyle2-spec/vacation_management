@@ -13,7 +13,7 @@ import com.google.firebase.firestore.Query
 import com.vacation.tripinmind.data.local.interfaces.UserProfileDao
 import com.vacation.tripinmind.data.local.model.UserProfileDto
 import com.vacation.tripinmind.data.repository.UserProfileRepository
-import com.vacation.tripinmind.home.intent.VacationFilter
+import com.vacation.tripinmind.home.model.VacationFilter
 import com.vacation.tripinmind.home.intent.VacationIntent
 import com.vacation.tripinmind.home.viewmodel.HomeViewModel
 import kotlinx.coroutines.Dispatchers

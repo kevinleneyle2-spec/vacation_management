@@ -1,6 +1,7 @@
 package com.vacation.tripinmind.home.intent
 
 import com.vacation.tripinmind.data.local.model.VacationDto
+import com.vacation.tripinmind.home.model.VacationFilter
 
 sealed class VacationIntent {
     object LoadData : VacationIntent()

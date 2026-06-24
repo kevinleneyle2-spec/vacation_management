@@ -39,7 +39,7 @@ import com.vacation.tripinmind.R
 import com.vacation.tripinmind.navigation.AppDestinations
 import com.vacation.tripinmind.ui.theme.MVIAppTheme
 import com.vacation.tripinmind.vacation.intent.InitIntent
-import com.vacation.tripinmind.vacation.intent.VacationState
+import com.vacation.tripinmind.vacation.model.VacationState
 import com.vacation.tripinmind.vacation.viewmodel.InitViewModel
 
 @Composable

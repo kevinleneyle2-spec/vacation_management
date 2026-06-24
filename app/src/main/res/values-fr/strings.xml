@@ -14,7 +14,7 @@
     <string name="homescreen_share_code_text">Ton code de partage est :\ </string>
 
     <string name="detailsscreen_error_title">Ton séjour</string>
-    <string name="detailsscreen_dialog_address_title">Adresse</string>
+    <string name="detailsscreen_dialog_address_title">ADRESSE</string>
     <string name="detailsscreen_error_no_days">Aucun jour n\'a encore été ajouté à ce séjour.</string>
     <string name="detailsscreen_no_activities">Aucune activité prévue pour cette journée.</string>
     <string name="detailsscreen_error_no_idea">Aucune idée pour le moment.</string>

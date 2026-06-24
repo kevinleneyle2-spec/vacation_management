@@ -29,7 +29,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.vacation.tripinmind.data.local.model.VacationDto
 import com.vacation.tripinmind.R
-import com.vacation.tripinmind.home.intent.VacationFilter
+import com.vacation.tripinmind.home.model.VacationFilter
 import com.vacation.tripinmind.ui.theme.MVIAppTheme
 
 @Composable

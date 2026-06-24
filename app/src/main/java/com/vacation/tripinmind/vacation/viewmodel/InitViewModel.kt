@@ -8,7 +8,7 @@ import com.vacation.tripinmind.data.repository.VacationRepository
 import com.vacation.tripinmind.mviapp.util.UiText
 import com.google.firebase.auth.FirebaseAuth
 import com.vacation.tripinmind.vacation.intent.InitIntent
-import com.vacation.tripinmind.vacation.intent.VacationState
+import com.vacation.tripinmind.vacation.model.VacationState
 import com.vacation.tripinmind.vacation.ui.InitViewModelActions
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
