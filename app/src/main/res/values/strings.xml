@@ -14,7 +14,7 @@
     <string name="homescreen_share_code_text">Your share code is :\ </string>
 
     <string name="detailsscreen_error_title">Your vacation</string>
-    <string name="detailsscreen_dialog_address_title">Address</string>
+    <string name="detailsscreen_dialog_address_title">ADDRESS</string>
     <string name="detailsscreen_error_no_days">No days added to this vacation yet.</string>
     <string name="detailsscreen_no_activities">No activities planned for this day.</string>
     <string name="detailsscreen_error_no_idea">No idea for the moment</string>

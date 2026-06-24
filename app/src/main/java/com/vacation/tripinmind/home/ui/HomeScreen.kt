@@ -60,9 +60,9 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
 import com.vacation.tripinmind.R
 import com.vacation.tripinmind.data.local.model.VacationDto
-import com.vacation.tripinmind.home.intent.VacationFilter
+import com.vacation.tripinmind.home.model.VacationFilter
 import com.vacation.tripinmind.home.intent.VacationIntent
-import com.vacation.tripinmind.home.intent.VacationUiViewState
+import com.vacation.tripinmind.home.model.VacationUiViewState
 import com.vacation.tripinmind.home.viewmodel.HomeViewModel
 import com.vacation.tripinmind.navigation.AppDestinations
 import com.vacation.tripinmind.ui.theme.MVIAppTheme

@@ -12,7 +12,7 @@ import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.vacation.tripinmind.data.local.model.VacationDto
-import com.vacation.tripinmind.home.intent.VacationUiViewState
+import com.vacation.tripinmind.home.model.VacationUiViewState
 import com.vacation.tripinmind.home.ui.HomeScreenContent
 import com.vacation.tripinmind.ui.theme.MVIAppTheme
 import org.junit.Assert.assertEquals

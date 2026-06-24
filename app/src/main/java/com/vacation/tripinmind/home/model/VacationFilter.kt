@@ -1,4 +1,4 @@
-package com.vacation.tripinmind.home.intent
+package com.vacation.tripinmind.home.model
 
 enum class VacationFilter {
     PROJECTS,

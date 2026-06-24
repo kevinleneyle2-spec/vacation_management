@@ -59,36 +59,41 @@ class DetailsViewModel @Inject constructor(
             is DetailsIntent.AddViewer -> {
                 addViewer(detailsIntent.vacationDto, detailsIntent.shareCode)
             }
+
             is DetailsIntent.ClearError -> {
                 _error.value = null
             }
+
             is DetailsIntent.RemoveViewer -> {
                 removeViewer(detailsIntent.index)
             }
+
             else -> {}
         }
     }
-    
+
     private fun removeViewer(index: Int) {
         viewModelScope.launch {
             val vacationDto = vacation.value?.vacation
 
             vacationDto?.let { currentVacation ->
-                val newShareWith = currentVacation.shareWith.toMutableList().apply { 
-                    if (index in indices) removeAt(index) 
+                val newShareWith = currentVacation.shareWith.toMutableList().apply {
+                    if (index in indices) removeAt(index)
                 }.toList()
-                val newShareWithUid = currentVacation.shareWithUid.toMutableList().apply { 
-                    if (index in indices) removeAt(index) 
+                val newShareWithUid = currentVacation.shareWithUid.toMutableList().apply {
+                    if (index in indices) removeAt(index)
                 }.toList()
 
-                vacationRepository.updateItem(currentVacation.copy(
-                    shareWith = newShareWith, 
-                    shareWithUid = newShareWithUid
-                ))
+                vacationRepository.updateItem(
+                    currentVacation.copy(
+                        shareWith = newShareWith,
+                        shareWithUid = newShareWithUid
+                    )
+                )
             }
         }
     }
-    
+
     private fun addViewer(vacationDto: VacationDto?, shareCode: String?) {
         _error.value = null
 
@@ -103,7 +108,8 @@ class DetailsViewModel @Inject constructor(
                 }
 
                 if (vacationDto != null && userProfile != null) {
-                    val shareWithAlreadyAdded = vacationDto.shareWith.any { it == userProfile.shareCode }
+                    val shareWithAlreadyAdded =
+                        vacationDto.shareWith.any { it == userProfile.shareCode }
 
                     if (vacationDto.shareWith.size >= 5) {
                         _error.value = DetailsError.TOO_MANY_VIEWERS
@@ -116,7 +122,12 @@ class DetailsViewModel @Inject constructor(
                         val shareWith = vacationDto.shareWith + userProfile.shareCode
                         val shareWithUid = vacationDto.shareWithUid + userProfile.uuid
 
-                        vacationRepository.updateItem(vacationDto.copy(shareWith = shareWith, shareWithUid = shareWithUid))
+                        vacationRepository.updateItem(
+                            vacationDto.copy(
+                                shareWith = shareWith,
+                                shareWithUid = shareWithUid
+                            )
+                        )
                         _error.value = DetailsError.SUCCESS
                     }
                 } else {

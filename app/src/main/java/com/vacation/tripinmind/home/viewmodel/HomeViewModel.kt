@@ -5,9 +5,9 @@ import androidx.lifecycle.viewModelScope
 import com.vacation.tripinmind.data.local.model.VacationDto
 import com.vacation.tripinmind.data.repository.UserProfileRepository
 import com.vacation.tripinmind.data.repository.VacationRepository
-import com.vacation.tripinmind.home.intent.VacationFilter
+import com.vacation.tripinmind.home.model.VacationFilter
 import com.vacation.tripinmind.home.intent.VacationIntent
-import com.vacation.tripinmind.home.intent.VacationUiViewState
+import com.vacation.tripinmind.home.model.VacationUiViewState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow

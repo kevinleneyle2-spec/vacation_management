@@ -394,7 +394,7 @@ fun ActivitiesItem(
                                 value = addressActivityValue,
                                 onValueChange = { newValue ->
                                     val truncated =
-                                        if (newValue.length > 25) newValue.take(25) else newValue
+                                        if (newValue.length > 50) newValue.take(50) else newValue
                                     if (!truncated.contains("\n")) {
                                         addressActivityValue = truncated
                                     }

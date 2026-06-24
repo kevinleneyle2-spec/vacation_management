@@ -1,5 +1,8 @@
 package com.vacation.tripinmind.details.ui
 
+import android.content.Intent
+import android.net.Uri
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -49,6 +52,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -56,11 +60,13 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.core.net.toUri
 import com.vacation.tripinmind.R
 import com.vacation.tripinmind.data.local.model.Activity
 import com.vacation.tripinmind.data.local.model.Day
 import com.vacation.tripinmind.data.local.model.VacationDto
 import com.vacation.tripinmind.details.intent.DetailsIntent
+import com.vacation.tripinmind.details.model.NavigationAppEnum
 import com.vacation.tripinmind.details.model.VacationUiModel
 import com.vacation.tripinmind.details.viewmodel.DetailsViewModel
 import com.vacation.tripinmind.navigation.AppDestinations
@@ -95,6 +101,27 @@ fun DetailsScreenContent(
     var selectedLocation by remember { mutableStateOf<String?>(null) }
     var showSharedVacationSheet by remember { mutableStateOf(false) }
 
+    val context = LocalContext.current
+    val packageManager = context.packageManager
+    
+    val isGoogleMapsInstalled = remember {
+        try {
+            packageManager.getPackageInfo("com.google.android.apps.maps", 0)
+            true
+        } catch (e: Exception) {
+            false
+        }
+    }
+
+    val isWazeInstalled = remember {
+        try {
+            packageManager.getPackageInfo("com.waze", 0)
+            true
+        } catch (e: Exception) {
+            false
+        }
+    }
+
     val sheetState = rememberModalBottomSheetState(
         skipPartiallyExpanded = true
     )
@@ -125,20 +152,36 @@ fun DetailsScreenContent(
     }
 
     selectedLocation?.let { location ->
-        AlertDialog(
-            onDismissRequest = { selectedLocation = null },
-            confirmButton = {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.Center
-                ) {
-                    TextButton(onClick = { selectedLocation = null }) {
-                        Text(stringResource(R.string.common_ok_button))
+        LocationBottomSheet(
+            onDismiss = { },
+            location = location,
+            isGoogleMapsInstalled = isGoogleMapsInstalled,
+            isWazeInstalled = isWazeInstalled,
+            onItineraryClick = { navigationAppEnum ->
+                when (navigationAppEnum) {
+                    NavigationAppEnum.WAZE -> {
+                        val address = Uri.encode(location)
+
+                        val intent = Intent(
+                            Intent.ACTION_VIEW,
+                            "https://waze.com/ul?q=$address&navigate=yes".toUri()
+                        )
+
+                        context.startActivity(intent)
+                    }
+                    NavigationAppEnum.GOOGLE_MAP -> {
+                        val uri = "google.navigation:q=${Uri.encode(location)}".toUri()
+
+                        val intent = Intent(Intent.ACTION_VIEW, uri)
+                        intent.setPackage("com.google.android.apps.maps")
+
+                        if (intent.resolveActivity(packageManager) != null) {
+                            context.startActivity(intent)
+                        }
                     }
                 }
             },
-            title = { Text(stringResource(R.string.detailsscreen_dialog_address_title)) },
-            text = { Text(location) }
+            sheetState = sheetState
         )
     }
 

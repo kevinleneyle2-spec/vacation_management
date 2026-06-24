@@ -1,4 +1,4 @@
-package com.vacation.tripinmind.vacation.intent
+package com.vacation.tripinmind.vacation.model
 
 import com.vacation.tripinmind.data.local.model.Day
 import com.vacation.tripinmind.data.local.model.VacationDto
