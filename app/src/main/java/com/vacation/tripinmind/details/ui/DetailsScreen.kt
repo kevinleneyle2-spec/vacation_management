@@ -2,7 +2,6 @@ package com.vacation.tripinmind.details.ui
 
 import android.content.Intent
 import android.net.Uri
-import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -12,25 +11,19 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -38,7 +31,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberModalBottomSheetState
@@ -56,8 +48,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
@@ -103,7 +93,7 @@ fun DetailsScreenContent(
 
     val context = LocalContext.current
     val packageManager = context.packageManager
-    
+
     val isGoogleMapsInstalled = remember {
         try {
             packageManager.getPackageInfo("com.google.android.apps.maps", 0)
@@ -169,6 +159,7 @@ fun DetailsScreenContent(
 
                         context.startActivity(intent)
                     }
+
                     NavigationAppEnum.GOOGLE_MAP -> {
                         val uri = "google.navigation:q=${Uri.encode(location)}".toUri()
 
@@ -358,68 +349,10 @@ fun DetailsScreenContent(
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                Card(
-                    modifier = Modifier
-                        .align(Alignment.CenterHorizontally)
-                        .fillMaxWidth(0.7f)
-                        .fillMaxHeight(0.7f)
-                        .padding(16.dp),
-
-                    colors = CardDefaults.cardColors(
-                        containerColor = MaterialTheme.colorScheme.secondary
-                    )
-                ) {
-                    if (currentVacation.ideas.isNotEmpty()) {
-                        Text(
-                            text = stringResource(R.string.detailsscreen_idea_title),
-                            fontWeight = FontWeight.Bold,
-                            modifier = Modifier
-                                .padding(start = 32.dp, top = 16.dp, end = 32.dp)
-                                .align(Alignment.CenterHorizontally),
-                        )
-
-                        Spacer(modifier = Modifier.height(16.dp))
-
-                        LazyColumn(
-                            modifier = Modifier.fillMaxSize()
-                        ) {
-                            items(currentVacation.ideas) { idea ->
-                                Row(
-                                    modifier = Modifier
-                                        .fillMaxWidth(),
-                                    horizontalArrangement = Arrangement.Center
-                                ) {
-                                    Text(
-                                        text = "- $idea",
-                                        color = Color.White,
-                                        textAlign = TextAlign.Center
-                                    )
-                                }
-                            }
-                        }
-
-                        Spacer(modifier = Modifier.height(16.dp))
-                    } else {
-                        Row(
-                            modifier = Modifier
-                                .fillMaxSize()
-                                .fillMaxHeight(1f),
-                            horizontalArrangement = Arrangement.Center,
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Text(
-                                text = stringResource(R.string.detailsscreen_error_no_idea),
-                                textAlign = TextAlign.Center,
-                                style = MaterialTheme.typography.bodyLarge,
-                                color = Color.White,
-                                modifier = Modifier
-                                    .padding(all = 16.dp)
-
-                            )
-                        }
-                    }
-                }
-
+                IdeaCard(
+                    currentVacation.ideas,
+                    modifier = Modifier.align(Alignment.CenterHorizontally)
+                )
 
             } ?: Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                 Text(text = stringResource(R.string.detailsscreen_loading_vacation))
