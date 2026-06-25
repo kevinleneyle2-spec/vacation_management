@@ -2,6 +2,8 @@ package com.vacation.tripinmind.home.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.vacation.tripinmind.data.local.model.VacationDto
 import com.vacation.tripinmind.data.repository.UserProfileRepository
 import com.vacation.tripinmind.data.repository.VacationRepository
@@ -83,6 +85,11 @@ class HomeViewModel @Inject constructor(
                     it.copy(
                         shareCode = code
                     )
+                }
+
+                // Init Crashlytics
+                FirebaseAuth.getInstance().uid?.let {
+                    FirebaseCrashlytics.getInstance().setUserId(it)
                 }
 
                 startListeningSharedVacations()
