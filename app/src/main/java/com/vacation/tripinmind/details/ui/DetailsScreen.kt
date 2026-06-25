@@ -90,6 +90,7 @@ fun DetailsScreenContent(
 ) {
     var selectedLocation by remember { mutableStateOf<String?>(null) }
     var showSharedVacationSheet by remember { mutableStateOf(false) }
+    var showLocationSheet by remember { mutableStateOf(false) }
 
     val context = LocalContext.current
     val packageManager = context.packageManager
@@ -141,39 +142,41 @@ fun DetailsScreenContent(
         )
     }
 
-    selectedLocation?.let { location ->
-        LocationBottomSheet(
-            onDismiss = { },
-            location = location,
-            isGoogleMapsInstalled = isGoogleMapsInstalled,
-            isWazeInstalled = isWazeInstalled,
-            onItineraryClick = { navigationAppEnum ->
-                when (navigationAppEnum) {
-                    NavigationAppEnum.WAZE -> {
-                        val address = Uri.encode(location)
+    if (showLocationSheet) {
+        selectedLocation?.let { location ->
+            LocationBottomSheet(
+                onDismiss = { showLocationSheet = false },
+                location = location,
+                isGoogleMapsInstalled = isGoogleMapsInstalled,
+                isWazeInstalled = isWazeInstalled,
+                onItineraryClick = { navigationAppEnum ->
+                    when (navigationAppEnum) {
+                        NavigationAppEnum.WAZE -> {
+                            val address = Uri.encode(location)
 
-                        val intent = Intent(
-                            Intent.ACTION_VIEW,
-                            "https://waze.com/ul?q=$address&navigate=yes".toUri()
-                        )
+                            val intent = Intent(
+                                Intent.ACTION_VIEW,
+                                "https://waze.com/ul?q=$address&navigate=yes".toUri()
+                            )
 
-                        context.startActivity(intent)
-                    }
-
-                    NavigationAppEnum.GOOGLE_MAP -> {
-                        val uri = "google.navigation:q=${Uri.encode(location)}".toUri()
-
-                        val intent = Intent(Intent.ACTION_VIEW, uri)
-                        intent.setPackage("com.google.android.apps.maps")
-
-                        if (intent.resolveActivity(packageManager) != null) {
                             context.startActivity(intent)
                         }
+
+                        NavigationAppEnum.GOOGLE_MAP -> {
+                            val uri = "google.navigation:q=${Uri.encode(location)}".toUri()
+
+                            val intent = Intent(Intent.ACTION_VIEW, uri)
+                            intent.setPackage("com.google.android.apps.maps")
+
+                            if (intent.resolveActivity(packageManager) != null) {
+                                context.startActivity(intent)
+                            }
+                        }
                     }
-                }
-            },
-            sheetState = sheetState
-        )
+                },
+                sheetState = sheetState
+            )
+        }
     }
 
     Scaffold(
@@ -313,7 +316,10 @@ fun DetailsScreenContent(
                     ) { page ->
                         DayCard(
                             day = currentVacation.days[page],
-                            onLocationClick = { location -> selectedLocation = location }
+                            onLocationClick = { location ->
+                                selectedLocation = location
+                                showLocationSheet = true
+                            }
                         )
                     }
 

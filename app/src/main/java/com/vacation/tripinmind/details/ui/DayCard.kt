@@ -28,7 +28,10 @@ import com.vacation.tripinmind.data.local.model.Day
 import com.vacation.tripinmind.ui.theme.MVIAppTheme
 
 @Composable
-fun DayCard(day: Day, onLocationClick: (String) -> Unit) {
+fun DayCard(
+    day: Day,
+    onLocationClick: (String) -> Unit
+) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -95,7 +98,7 @@ fun DayCardPreview() {
                         Activity("Eiffel Tower", "01h00", "02h00", "")
                     )
                 ),
-                onLocationClick = {}
+                onLocationClick = { }
             )
         }
     }
