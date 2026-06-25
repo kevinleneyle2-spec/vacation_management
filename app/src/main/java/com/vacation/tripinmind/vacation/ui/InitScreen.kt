@@ -19,6 +19,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DatePickerDefaults
@@ -192,6 +193,17 @@ fun InitScreen(
                     focusedLabelColor = colorResource(R.color.orange),
                     unfocusedLabelColor = colorResource(R.color.orange)
                 ),
+                trailingIcon = {
+                    if (initState.vacationName.isNotEmpty()) {
+                        IconButton(onClick = { viewModel.handleIntent(InitIntent.UpdateName("")) }) {
+                            Icon(
+                                imageVector = Icons.Default.Clear,
+                                contentDescription = "Clear vacation name",
+                                tint = colorResource(R.color.orange)
+                            )
+                        }
+                    }
+                },
                 label = {
                     Text(
                         stringResource(R.string.initscreen_name_description),
