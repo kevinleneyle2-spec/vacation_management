@@ -4,6 +4,8 @@ import android.content.Context
 import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.auth
+import com.google.firebase.crashlytics.FirebaseCrashlytics
+import com.google.firebase.crashlytics.crashlytics
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.firestore
 import com.vacation.tripinmind.data.local.database.UserProfileDatabase
@@ -30,6 +32,10 @@ object DataModule {
     @Provides
     @Singleton
     fun provideFirestore(): FirebaseFirestore = Firebase.firestore
+
+    @Provides
+    @Singleton
+    fun provideFirebaseCrashlytics(): FirebaseCrashlytics = Firebase.crashlytics
 
     @Provides
     @Singleton

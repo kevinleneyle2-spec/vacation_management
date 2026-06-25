@@ -2,6 +2,7 @@ package com.vacation.tripinmind
 
 import com.google.common.truth.Truth.assertThat
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.vacation.tripinmind.data.local.interfaces.VacationDao
 import com.vacation.tripinmind.data.local.model.VacationDto
 import com.vacation.tripinmind.data.repository.VacationRepository
@@ -30,6 +31,7 @@ import org.junit.Before
 import org.junit.Test
 import org.mockito.Mockito.mock
 import org.mockito.kotlin.any
+import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -43,6 +45,7 @@ class HomeViewModelTest {
     private lateinit var mockFirestore: FirebaseFirestore
 
     private lateinit var mockFirebaseAuth: FirebaseAuth
+    private lateinit var mockFirebaseCrashlytics: FirebaseCrashlytics
     private lateinit var vacationRepository: VacationRepository
     private lateinit var userProfileRepository: UserProfileRepository
 
@@ -71,6 +74,7 @@ class HomeViewModelTest {
         Dispatchers.setMain(testDispatcher)
 
         mockFirebaseAuth = mock(FirebaseAuth::class.java)
+        mockFirebaseCrashlytics = mock(FirebaseCrashlytics::class.java)
         val mockFirebaseUser = mock(com.google.firebase.auth.FirebaseUser::class.java)
 
         whenever(mockFirebaseAuth.uid).thenReturn("12345")
@@ -122,12 +126,20 @@ class HomeViewModelTest {
         vacationRepository = VacationRepository(fakeVacationDao, mockFirestore, mockFirebaseAuth)
         userProfileRepository = UserProfileRepository(fakeUserProfileDao, mockFirestore, mockFirebaseAuth)
 
-        viewModel = HomeViewModel(vacationRepository, userProfileRepository)
+        viewModel = HomeViewModel(vacationRepository, userProfileRepository, mockFirebaseAuth, mockFirebaseCrashlytics)
     }
 
     @After
     fun tearDown() {
         Dispatchers.resetMain()
+    }
+
+    @Test
+    fun `create share code should set crashlytics user id`() = runTest(testDispatcher) {
+        viewModel.handleIntent(VacationIntent.CreateShareCode)
+        advanceUntilIdle()
+
+        verify(mockFirebaseCrashlytics).setUserId("12345")
     }
 
     @Test

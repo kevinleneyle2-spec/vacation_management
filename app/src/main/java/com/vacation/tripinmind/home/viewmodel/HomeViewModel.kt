@@ -2,6 +2,8 @@ package com.vacation.tripinmind.home.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.vacation.tripinmind.data.local.model.VacationDto
 import com.vacation.tripinmind.data.repository.UserProfileRepository
 import com.vacation.tripinmind.data.repository.VacationRepository
@@ -18,7 +20,9 @@ import javax.inject.Inject
 @HiltViewModel
 class HomeViewModel @Inject constructor(
     private val vacationRepository: VacationRepository,
-    private val userProfileRepository: UserProfileRepository
+    private val userProfileRepository: UserProfileRepository,
+    private val firebaseAuth: FirebaseAuth,
+    private val crashlytics: FirebaseCrashlytics
 ) : ViewModel() {
     private val _vacationState = MutableStateFlow(VacationUiViewState())
     val vacationState: StateFlow<VacationUiViewState> = _vacationState
@@ -83,6 +87,11 @@ class HomeViewModel @Inject constructor(
                     it.copy(
                         shareCode = code
                     )
+                }
+
+                // Init Crashlytics
+                firebaseAuth.uid?.let {
+                    crashlytics.setUserId(it)
                 }
 
                 startListeningSharedVacations()
