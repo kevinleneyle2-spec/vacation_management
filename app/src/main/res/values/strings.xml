@@ -1,9 +1,9 @@
 <resources>
     <string name="app_name">TripInMind</string>
     <string name="homescreen_next_button">PREPARE YOUR NEXT VACATION</string>
-    <string name="homescreen_projects_button">My vacations</string>
-    <string name="homescreen_archives_button">Archives</string>
-    <string name="homescreen_shared_button">Shared</string>
+    <string name="homescreen_projects_button">My vacations (%1$d)</string>
+    <string name="homescreen_archives_button">Archives (%1$d)</string>
+    <string name="homescreen_shared_button">Shared (%1$d)</string>
     <string name="homescreen_no_vacation">No vacation planned</string>
     <string name="homescreen_no_archived_vacation">No vacations archived</string>
     <string name="homescreen_no_shared_vacation">No vacations shared</string>

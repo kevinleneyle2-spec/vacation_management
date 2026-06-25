@@ -149,10 +149,10 @@ class ActivityScreenTest {
 
         composeTestRule.onAllNodesWithTag("activitiesAddButton")[0].performClick()
 
-        val longName = "A".repeat(30)
+        val longName = "A".repeat(51)
         composeTestRule.onNodeWithTag("activityAddressTextField").performTextInput(longName)
 
-        composeTestRule.onNodeWithTag("activityAddressTextField").assert(hasText("A".repeat(25)))
+        composeTestRule.onNodeWithTag("activityAddressTextField").assert(hasText("A".repeat(50)))
     }
 
     @Test

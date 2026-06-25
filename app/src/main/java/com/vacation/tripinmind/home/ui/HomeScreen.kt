@@ -60,8 +60,8 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
 import com.vacation.tripinmind.R
 import com.vacation.tripinmind.data.local.model.VacationDto
-import com.vacation.tripinmind.home.model.VacationFilter
 import com.vacation.tripinmind.home.intent.VacationIntent
+import com.vacation.tripinmind.home.model.VacationFilter
 import com.vacation.tripinmind.home.model.VacationUiViewState
 import com.vacation.tripinmind.home.viewmodel.HomeViewModel
 import com.vacation.tripinmind.navigation.AppDestinations
@@ -80,12 +80,13 @@ fun HomeScreen(
 
     LaunchedEffect(archiveMessageResId) {
         if (archiveMessageResId != null) {
-            delay(2000)
-            archiveMessageResId = null
-        }
 
-        viewModel.handleIntent(VacationIntent.CreateShareCode)
+        }
+        delay(2000)
+        archiveMessageResId = null
     }
+
+    viewModel.handleIntent(VacationIntent.CreateShareCode)
 
     if (vacationToDelete != null) {
         AlertDialog(
@@ -181,6 +182,26 @@ fun HomeScreenContent(
     onNavigate: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
+    fun getSizeVacationFilter(vacationFilter: VacationFilter): Int {
+        return when (vacationFilter) {
+            VacationFilter.PROJECTS -> {
+                vacationUiState.vacations.filter {
+                    !it.isArchived
+                }.size
+            }
+
+            VacationFilter.ARCHIVED -> {
+                vacationUiState.vacations.filter {
+                    it.isArchived
+                }.size
+            }
+
+            VacationFilter.SHARED -> {
+                vacationUiState.sharedVacations.size
+            }
+        }
+    }
+
     Box(modifier = modifier.fillMaxSize()) {
         if (LocalInspectionMode.current) {
             Image(
@@ -273,7 +294,9 @@ fun HomeScreenContent(
                                     Spacer(Modifier.width(8.dp))
 
                                     Text(
-                                        text = stringResource(R.string.homescreen_archives_button),
+                                        text = stringResource(R.string.homescreen_archives_button,
+                                            getSizeVacationFilter(VacationFilter.ARCHIVED)
+                                        ),
                                         color = Color.White,
                                         fontWeight = if (vacationUiState.selectedFilter == VacationFilter.ARCHIVED) FontWeight.Bold else FontWeight.Normal,
                                         fontSize = 16.sp
@@ -316,7 +339,10 @@ fun HomeScreenContent(
                                 contentAlignment = Alignment.Center
                             ) {
                                 Text(
-                                    text = stringResource(R.string.homescreen_projects_button),
+                                    text = stringResource(
+                                        R.string.homescreen_projects_button,
+                                        getSizeVacationFilter(VacationFilter.PROJECTS)
+                                    ),
                                     color = Color.White,
                                     fontWeight = if (vacationUiState.selectedFilter == VacationFilter.PROJECTS) FontWeight.Bold else FontWeight.Normal,
                                     fontSize = 16.sp
@@ -345,7 +371,9 @@ fun HomeScreenContent(
                                 contentAlignment = Alignment.Center
                             ) {
                                 Text(
-                                    text = stringResource(R.string.homescreen_shared_button),
+                                    text = stringResource(R.string.homescreen_shared_button,
+                                        getSizeVacationFilter(VacationFilter.SHARED)
+                                    ),
                                     color = Color.White,
                                     fontWeight = if (vacationUiState.selectedFilter == VacationFilter.SHARED) FontWeight.Bold else FontWeight.Normal,
                                     fontSize = 16.sp
