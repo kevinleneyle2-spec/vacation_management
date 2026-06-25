@@ -20,11 +20,15 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material3.BottomSheetDefaults
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedTextField
@@ -60,6 +64,7 @@ import com.vacation.tripinmind.details.model.DetailsError
 import com.vacation.tripinmind.details.model.VacationUiModel
 import com.vacation.tripinmind.ui.theme.MVIAppTheme
 import com.vacation.tripinmind.util.ShareCodeVisualTransformation
+import com.vacation.tripinmind.vacation.intent.InitIntent
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -210,6 +215,17 @@ fun SharedVacationBottomSheet(
                                         alpha = 0.5f
                                     )
                                 ),
+                                trailingIcon = {
+                                    if (newViewerValue.isNotEmpty()) {
+                                        IconButton(onClick = { newViewerValue = "" }) {
+                                            Icon(
+                                                imageVector = Icons.Default.Clear,
+                                                contentDescription = "Clear share code",
+                                                tint = MaterialTheme.colorScheme.primary
+                                            )
+                                        }
+                                    }
+                                },
                                 label = { Text(stringResource(R.string.detailsscreen_share_bottomsheet_add_viewer_text)) },
                                 modifier = Modifier.fillMaxWidth(),
                                 singleLine = true

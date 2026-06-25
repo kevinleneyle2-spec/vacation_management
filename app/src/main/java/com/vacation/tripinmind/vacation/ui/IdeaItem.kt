@@ -19,6 +19,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -258,6 +259,17 @@ fun IdeaItem(
                                 onValueChange = { newValue ->
                                     if (newValue.length <= 25 && !newValue.contains("\n")) {
                                         newIdeaValue = newValue
+                                    }
+                                },
+                                trailingIcon = {
+                                    if (newIdeaValue.isNotEmpty()) {
+                                        IconButton(onClick = { newIdeaValue = "" }) {
+                                            Icon(
+                                                imageVector = Icons.Default.Clear,
+                                                contentDescription = "Clear new idea value",
+                                                tint = MaterialTheme.colorScheme.primary
+                                            )
+                                        }
                                     }
                                 },
                                 label = { Text(stringResource(R.string.activitiesscreen_ideas_description)) },

@@ -16,8 +16,15 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.vacation.tripinmind.data.local.model.Activity
+import com.vacation.tripinmind.ui.theme.MVIAppTheme
+import com.vacation.tripinmind.vacation.intent.InitIntent
+import com.vacation.tripinmind.vacation.model.VacationState
+import com.vacation.tripinmind.vacation.ui.InitScreen
+import com.vacation.tripinmind.vacation.ui.InitViewModelActions
+import kotlinx.coroutines.flow.MutableStateFlow
 
 @Composable
 fun ActivityRow(activity: Activity, onLocationClick: (String) -> Unit) {
@@ -55,6 +62,22 @@ fun ActivityRow(activity: Activity, onLocationClick: (String) -> Unit) {
                     if (activity.activityLocation.isNotEmpty())
                         onLocationClick(activity.activityLocation)
                 }
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun ActivityRowPreview() {
+    MVIAppTheme {
+        ActivityRow(
+            activity = Activity(
+                activityName = "Eiffel Tower",
+                activityTime = "01h00",
+                activityDuration = "02h00",
+                activityLocation = "Paris"
+            ),
+            onLocationClick = {}
         )
     }
 }

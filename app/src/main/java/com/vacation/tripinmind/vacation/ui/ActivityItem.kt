@@ -22,6 +22,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccessTime
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ButtonDefaults
@@ -63,6 +64,7 @@ import com.vacation.tripinmind.data.local.model.Activity
 import com.vacation.tripinmind.data.local.model.Day
 import com.vacation.tripinmind.R
 import com.vacation.tripinmind.ui.theme.MVIAppTheme
+import com.vacation.tripinmind.vacation.intent.InitIntent
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -220,6 +222,17 @@ fun ActivitiesItem(
                         focusedLabelColor = MaterialTheme.colorScheme.primary,
                         unfocusedLabelColor = MaterialTheme.colorScheme.primary
                     ),
+                    trailingIcon = {
+                        if (day.additionalInfo.isNotEmpty()) {
+                            IconButton(onClick = { onAddInfo("") }) {
+                                Icon(
+                                    imageVector = Icons.Default.Clear,
+                                    contentDescription = "Clear additional info",
+                                    tint = MaterialTheme.colorScheme.primary
+                                )
+                            }
+                        }
+                    },
                     label = { Text(stringResource(R.string.activitiesscreen_additional_info_description)) },
                     modifier = Modifier
                         .fillMaxWidth()
@@ -381,6 +394,17 @@ fun ActivitiesItem(
                                         nameActivityValue = truncated
                                     }
                                 },
+                                trailingIcon = {
+                                    if (nameActivityValue.isNotEmpty()) {
+                                        IconButton(onClick = { nameActivityValue = "" }) {
+                                            Icon(
+                                                imageVector = Icons.Default.Clear,
+                                                contentDescription = "Clear activity name",
+                                                tint = MaterialTheme.colorScheme.primary
+                                            )
+                                        }
+                                    }
+                                },
                                 label = { Text(stringResource(R.string.activitiesscreen_activities_description)) },
                                 modifier = Modifier
                                     .fillMaxWidth()
@@ -397,6 +421,17 @@ fun ActivitiesItem(
                                         if (newValue.length > 50) newValue.take(50) else newValue
                                     if (!truncated.contains("\n")) {
                                         addressActivityValue = truncated
+                                    }
+                                },
+                                trailingIcon = {
+                                    if (addressActivityValue.isNotEmpty()) {
+                                        IconButton(onClick = { addressActivityValue = "" }) {
+                                            Icon(
+                                                imageVector = Icons.Default.Clear,
+                                                contentDescription = "Clear address activity",
+                                                tint = MaterialTheme.colorScheme.primary
+                                            )
+                                        }
                                     }
                                 },
                                 label = { Text(stringResource(R.string.activitiesscreen_address_activities)) },
