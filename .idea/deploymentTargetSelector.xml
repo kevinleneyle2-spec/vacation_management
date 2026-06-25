@@ -16,10 +16,19 @@
       <SelectionState runConfigName="data">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
-      <SelectionState runConfigName="Tests in 'com.vacation.tripinmind.data'">
+      <SelectionState runConfigName="Tests in 'com.vacation.tripinmind'">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
-      <SelectionState runConfigName="UserProfileDatabaseTest">
+      <SelectionState runConfigName="details_screen_works()">
+        <option name="selectionMode" value="DROPDOWN" />
+      </SelectionState>
+      <SelectionState runConfigName="DetailsScreenTest">
+        <option name="selectionMode" value="DROPDOWN" />
+      </SelectionState>
+      <SelectionState runConfigName="ActivityScreenTest">
+        <option name="selectionMode" value="DROPDOWN" />
+      </SelectionState>
+      <SelectionState runConfigName="activities_address_too_long()">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
     </selectionStates>
