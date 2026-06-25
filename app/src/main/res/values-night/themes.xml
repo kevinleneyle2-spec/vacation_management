@@ -4,12 +4,12 @@
 
     <style name="Theme.App.Starting" parent="Theme.SplashScreen">
         <!-- Un blanc crème (nuance d'orange très pâle) -->
-        <item name="windowSplashScreenBackground">@color/white</item>
+        <item name="windowSplashScreenBackground">@color/dark_pure</item>
 
         <item name="windowSplashScreenAnimatedIcon">@drawable/ic_launcher_foreground</item>
 
-        <item name="android:statusBarColor">@color/white</item>
-        <item name="android:navigationBarColor">@color/white</item>
+        <item name="android:statusBarColor">@color/dark_pure</item>
+        <item name="android:navigationBarColor">@color/dark_pure</item>
 
         <!-- Force les icônes en noir sur le fond clair -->
         <item name="android:windowLightStatusBar">true</item>

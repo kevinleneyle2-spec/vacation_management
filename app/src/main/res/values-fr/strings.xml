@@ -23,13 +23,13 @@
     <string name="detailsscreen_edit_button">Modifier</string>
     <string name="detailsscreen_share_bottomsheet_title">PARTAGE TON SEJOUR</string>
     <string name="detailsscreen_share_button">Partager</string>
-    <string name="detailsscreen_share_bottomsheet_text">Autoriser d\'autres personnes à consulter cette planification de voyage</string>
-    <string name="detailsscreen_share_bottomsheet_text_2">Les personnes disposant d\'un accès peuvent voi l\'itinéraire, les activités et les informations, mais ne peuvent rien modifier.</string>
+    <string name="detailsscreen_share_bottomsheet_text">Autoriser jusqu\'à 5 personnes à consulter cette planification de voyage</string>
+    <string name="detailsscreen_share_bottomsheet_text_2">Les personnes disposant d\'un accès peuvent voir l\'itinéraire, les activités et les informations, mais ne peuvent rien modifier.</string>
     <string name="detailsscreen_share_bottomsheet_add_viewer_title">Ajouter un observateur</string>
     <string name="detailsscreen_share_bottomsheet_add_viewer_button">INVITER</string>
-    <string name="detailsscreen_share_bottomsheet_add_viewer_description">Demandez aux observateurs leur code. Il est disponible sur leur écran d\'accueil</string>
+    <string name="detailsscreen_share_bottomsheet_add_viewer_description">Demande aux observateurs leur code. Il est disponible sur leur écran d\'accueil</string>
     <string name="detailsscreen_share_bottomsheet_access_text">Personnes ayant accès :\ </string>
-    <string name="detailsscreen_share_bottomsheet_add_viewer_text">Entre le code de partage (5 max)</string>
+    <string name="detailsscreen_share_bottomsheet_add_viewer_text">Entre le code de partage</string>
     <string name="detailsscreen_share_bottomsheet_placeholder">ABC-123-ABC-123</string>
     <string name="detailsscreen_share_error_not_found">Utlisateur non trouvé avec ce code.</string>
     <string name="detailsscreen_share_error_already_added">Cet utilisateur est déjà un observateur.</string>
@@ -70,5 +70,5 @@
     <string name="common_delete_button">Supprimer</string>
     <string name="common_cancel_button">Annuler</string>
     <string name="common_ok_button">OK</string>
-    <string name="common_error_auth_message">une erreur est apparu pendant l\'authentification.</string>">
+    <string name="common_error_auth_message">une erreur est apparu pendant l\'authentification.</string>
 </resources>

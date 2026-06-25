@@ -23,13 +23,13 @@
     <string name="detailsscreen_edit_button">Edit</string>
     <string name="detailsscreen_share_button">Share</string>
     <string name="detailsscreen_share_bottomsheet_title">SHARE YOUR VACATION</string>
-    <string name="detailsscreen_share_bottomsheet_text">Allow other people to view this vacation planning</string>
+    <string name="detailsscreen_share_bottomsheet_text">Allow up to 5 people to access this vacation planning</string>
     <string name="detailsscreen_share_bottomsheet_text_2">Viewers can see the itinerary, activities and information but cannot modify anything</string>
     <string name="detailsscreen_share_bottomsheet_add_viewer_title">Add a viewer</string>
     <string name="detailsscreen_share_bottomsheet_add_viewer_button">ADD VIEWER</string>
     <string name="detailsscreen_share_bottomsheet_add_viewer_description">Ask the viewers for their code. It can be found on their home screen</string>
     <string name="detailsscreen_share_bottomsheet_access_text">People with access :\ </string>
-    <string name="detailsscreen_share_bottomsheet_add_viewer_text">Enter the share code (5 max)</string>
+    <string name="detailsscreen_share_bottomsheet_add_viewer_text">Enter the share code</string>
     <string name="detailsscreen_share_bottomsheet_placeholder">ABC-123-ABC-123</string>
     <string name="detailsscreen_share_error_not_found">User not found with this code.</string>
     <string name="detailsscreen_share_error_already_added">This user is already a viewer.</string>

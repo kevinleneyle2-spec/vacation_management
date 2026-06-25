@@ -4,6 +4,7 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.focusable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -47,8 +48,11 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
@@ -64,7 +68,6 @@ import com.vacation.tripinmind.details.model.DetailsError
 import com.vacation.tripinmind.details.model.VacationUiModel
 import com.vacation.tripinmind.ui.theme.MVIAppTheme
 import com.vacation.tripinmind.util.ShareCodeVisualTransformation
-import com.vacation.tripinmind.vacation.intent.InitIntent
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -77,6 +80,9 @@ fun SharedVacationBottomSheet(
     onRemoveSharedUser: (Int) -> Unit,
     sheetState: SheetState
 ) {
+    val keyboardController = LocalSoftwareKeyboardController.current
+    val dummyFocusRequester = remember { FocusRequester() }
+
     var newViewerValue by remember { mutableStateOf("") }
     val isButtonEnabled = newViewerValue.length == 12
 
@@ -188,7 +194,9 @@ fun SharedVacationBottomSheet(
                             OutlinedTextField(
                                 value = newViewerValue,
                                 onValueChange = { newValue ->
-                                    onClearError()
+                                    if (error != null)
+                                        onClearError()
+
                                     val filtered =
                                         newValue.filter { it.isLetterOrDigit() }.uppercase()
                                     if (filtered.length <= 12) {
@@ -198,6 +206,9 @@ fun SharedVacationBottomSheet(
                                 keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
                                 keyboardActions = KeyboardActions(
                                     onDone = {
+                                        dummyFocusRequester.requestFocus()
+                                        keyboardController?.hide()
+
                                         if (isButtonEnabled) {
                                             onAddViewer(newViewerValue)
                                         }
@@ -236,6 +247,8 @@ fun SharedVacationBottomSheet(
                                     .fillMaxWidth()
                                     .height(20.dp)
                                     .padding(top = 4.dp)
+                                    .focusRequester(dummyFocusRequester)
+                                    .focusable()
                             ) {
                                 if (error != null && error != DetailsError.SUCCESS) {
                                     Text(
@@ -271,6 +284,8 @@ fun SharedVacationBottomSheet(
                                         if (isButtonEnabled) {
                                             Modifier.clickable {
                                                 onAddViewer(newViewerValue)
+                                                dummyFocusRequester.requestFocus()
+                                                keyboardController?.hide()
                                             }
                                         } else
                                             Modifier
