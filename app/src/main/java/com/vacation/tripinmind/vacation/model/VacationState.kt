@@ -7,8 +7,8 @@ import com.vacation.tripinmind.mviapp.util.UiText
 data class VacationState(
     val id: String = "",
     val vacationName: String = "",
-    val startDate: String = "",
-    val numDays: Int = 0,
+    val startDate: Long = 0L,
+    val endDate: Long = 0L,
     val days: List<Day> = emptyList(),
     val ideas: List<String> = emptyList(),
     val image: String = "vacation_ico",
@@ -18,11 +18,18 @@ data class VacationState(
     val shareWithUid: List<String> = listOf(),
     val errorMessage: UiText? = null
 ) {
+    val numDays: Int
+        get() = if (startDate > 0L && endDate >= startDate) {
+            ((endDate - startDate) / (1000 * 60 * 60 * 24)).toInt() + 1
+        } else {
+            days.size
+        }
+
     fun toVacationDto() = VacationDto(
         id = id,
         name = vacationName,
         startDate = startDate,
-        nbrDay = numDays,
+        endDate = endDate,
         days = days,
         ideas = ideas,
         image = image,

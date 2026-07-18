@@ -6,8 +6,8 @@ import com.vacation.tripinmind.data.local.model.VacationDto
 sealed class InitIntent {
     data class UpdateName(val name: String) : InitIntent()
 
-    data class UpdateStartDate(val date: String) : InitIntent()
-    data class UpdateDays(val days: String) : InitIntent()
+    data class UpdateStartDate(val date: Long) : InitIntent()
+    data class UpdateEndDate(val date: Long) : InitIntent()
 
     data class UpdateAddInfo(val index: Int, val additionalInfo: String) : InitIntent()
 

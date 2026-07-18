@@ -21,6 +21,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.resetMain
@@ -39,6 +40,7 @@ class HomeViewModelTest {
     private val testDispatcher = StandardTestDispatcher()
 
     private val vacationsFlow = MutableStateFlow<List<VacationDto>>(emptyList())
+    private val sharedVacationsFlow = MutableStateFlow<List<VacationDto>>(emptyList())
 
     private lateinit var fakeVacationDao: VacationDao
     private lateinit var fakeUserProfileDao: UserProfileDao
@@ -54,8 +56,8 @@ class HomeViewModelTest {
     private val fakeVacation = VacationDto(
         id = "1",
         name = "Paris",
-        startDate = "2023-06-01",
-        nbrDay = 5,
+        startDate = 1685577600000L,
+        endDate = 1685923200000L,
         days = emptyList(),
         ideas = emptyList(),
         image = "",
@@ -82,6 +84,7 @@ class HomeViewModelTest {
         whenever(mockFirebaseUser.uid).thenReturn("12345")
 
         vacationsFlow.value = listOf(fakeVacation)
+        sharedVacationsFlow.value = emptyList()
 
         fakeVacationDao = object : VacationDao {
             override fun getItemById(id: String): Flow<VacationDto> =
@@ -123,8 +126,11 @@ class HomeViewModelTest {
         whenever(mockQuery.whereEqualTo(any<String>(), any())).thenReturn(mockQuery)
         whenever(mockQuery.addSnapshotListener(any())).thenReturn(mockRegistration)
 
-        vacationRepository = VacationRepository(fakeVacationDao, mockFirestore, mockFirebaseAuth)
-        userProfileRepository = UserProfileRepository(fakeUserProfileDao, mockFirestore, mockFirebaseAuth)
+        vacationRepository = mock(VacationRepository::class.java)
+        whenever(vacationRepository.getAllItems()).thenReturn(vacationsFlow)
+        whenever(vacationRepository.getSharedVacationsFlow()).thenReturn(sharedVacationsFlow)
+
+        userProfileRepository = mock(UserProfileRepository::class.java)
 
         viewModel = HomeViewModel(vacationRepository, userProfileRepository, mockFirebaseAuth, mockFirebaseCrashlytics)
     }
@@ -136,6 +142,9 @@ class HomeViewModelTest {
 
     @Test
     fun `create share code should set crashlytics user id`() = runTest(testDispatcher) {
+        backgroundScope.launch { viewModel.vacationState.collect {} }
+        whenever(userProfileRepository.insertItem()).thenReturn("123-456-123-456")
+        
         viewModel.handleIntent(VacationIntent.CreateShareCode)
         advanceUntilIdle()
 
@@ -144,8 +153,7 @@ class HomeViewModelTest {
 
     @Test
     fun `loads vacation and emits non-empty list`() = runTest(testDispatcher) {
-        viewModel.handleIntent(VacationIntent.LoadData)
-
+        backgroundScope.launch { viewModel.vacationState.collect {} }
         advanceUntilIdle()
 
         val state = viewModel.vacationState.value
@@ -157,7 +165,7 @@ class HomeViewModelTest {
 
     @Test
     fun `delete vacation and emits empty list`() = runTest(testDispatcher) {
-        viewModel.handleIntent(VacationIntent.LoadData)
+        backgroundScope.launch { viewModel.vacationState.collect {} }
         advanceUntilIdle()
 
         assertThat(viewModel.vacationState.value.vacations).hasSize(1)
@@ -165,43 +173,26 @@ class HomeViewModelTest {
         viewModel.handleIntent(VacationIntent.DeleteVacation(fakeVacation))
         advanceUntilIdle()
 
-        val state = viewModel.vacationState.value
-        assertThat(state.isLoading).isFalse()
-        assertThat(state.vacations).isEmpty()
+        verify(vacationRepository).deleteItem(fakeVacation)
     }
 
     @Test
     fun `archive vacation and change isArchived value`() = runTest(testDispatcher) {
-        viewModel.handleIntent(VacationIntent.LoadData)
+        backgroundScope.launch { viewModel.vacationState.collect {} }
         advanceUntilIdle()
 
-        var state = viewModel.vacationState.value
-
+        val state = viewModel.vacationState.value
         assertThat(state.vacations).hasSize(1)
-        assertThat(state.vacations[0].isArchived).isFalse()
 
         viewModel.handleIntent(VacationIntent.ArchiveVacation(fakeVacation))
         advanceUntilIdle()
 
-        state = viewModel.vacationState.value
-
-        assertThat(state.isLoading).isFalse()
-        assertThat(state.vacations).isNotEmpty()
-        assertThat(state.vacations[0].isArchived).isTrue()
-
-        viewModel.handleIntent(VacationIntent.ArchiveVacation(fakeVacation.copy(isArchived = true)))
-        advanceUntilIdle()
-
-        state = viewModel.vacationState.value
-
-        assertThat(state.isLoading).isFalse()
-        assertThat(state.vacations).isNotEmpty()
-        assertThat(state.vacations[0].isArchived).isFalse()
+        verify(vacationRepository).updateItem(fakeVacation.copy(isArchived = true))
     }
 
     @Test
     fun `toggle show archived changes view to show archived vacations`() = runTest(testDispatcher) {
-        viewModel.handleIntent(VacationIntent.LoadData)
+        backgroundScope.launch { viewModel.vacationState.collect {} }
         advanceUntilIdle()
 
         var state = viewModel.vacationState.value
@@ -225,6 +216,9 @@ class HomeViewModelTest {
 
     @Test
     fun `create share code and emits share code`() = runTest(testDispatcher) {
+        backgroundScope.launch { viewModel.vacationState.collect {} }
+        whenever(userProfileRepository.insertItem()).thenReturn("123-456-123-456")
+
         var state = viewModel.vacationState.value
         assertThat(state.shareCode).isEmpty()
 

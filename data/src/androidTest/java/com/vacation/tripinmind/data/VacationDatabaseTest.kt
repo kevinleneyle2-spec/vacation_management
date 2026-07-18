@@ -37,8 +37,8 @@ class VacationDatabaseTest {
         val vacation = VacationDto(
             id = "1",
             name = "Test",
-            startDate = "2023-06-01",
-            nbrDay = 5,
+            startDate = 1685577600000L,
+            endDate = 1685923200000L,
             days = emptyList(),
             ideas = emptyList(),
             image = "",
@@ -56,8 +56,8 @@ class VacationDatabaseTest {
         val vacation = VacationDto(
             id = "1",
             name = "Test",
-            startDate = "2023-06-01",
-            nbrDay = 5,
+            startDate = 1685577600000L,
+            endDate = 1685923200000L,
             days = emptyList(),
             ideas = emptyList(),
             image = "",
@@ -77,8 +77,8 @@ class VacationDatabaseTest {
         val vacation = VacationDto(
             id = "1",
             name = "Test",
-            startDate = "2023-06-01",
-            nbrDay = 5,
+            startDate = 1685577600000L,
+            endDate = 1685923200000L,
             days = emptyList(),
             ideas = emptyList(),
             image = "",
@@ -97,8 +97,8 @@ class VacationDatabaseTest {
         val vacation = VacationDto(
             id = "1",
             name = "Test",
-            startDate = "2023-06-01",
-            nbrDay = 5,
+            startDate = 1685577600000L,
+            endDate = 1685923200000L,
             days = emptyList(),
             ideas = emptyList(),
             image = "",
@@ -113,12 +113,12 @@ class VacationDatabaseTest {
     }
 
     @Test
-    fun readAllVacations() = runBlocking {
-        val vacation = VacationDto(
+    fun readAllVacationsOrderedByStartDate() = runBlocking {
+        val vacationLater = VacationDto(
             id = "1",
-            name = "Test",
-            startDate = "2023-06-01",
-            nbrDay = 5,
+            name = "Later Trip",
+            startDate = 1700000000000L,
+            endDate = 1685923200000L,
             days = emptyList(),
             ideas = emptyList(),
             image = "",
@@ -126,11 +126,23 @@ class VacationDatabaseTest {
             createdBy = "12345",
             shareWith = listOf()
         )
-        dao.insertItem(vacation)
-        dao.insertItem(vacation.copy(id = "2", name = "Test2"))
+        val vacationEarlier = VacationDto(
+            id = "2",
+            name = "Earlier Trip",
+            startDate = 1600000000000L,
+            endDate = 1685923200000L,
+            days = emptyList(),
+            ideas = emptyList(),
+            image = "",
+            isArchived = false,
+            createdBy = "12345",
+            shareWith = listOf()
+        )
+        dao.insertItem(vacationLater)
+        dao.insertItem(vacationEarlier)
 
-        val result = dao.getAllItems()
-        assertThat(result.first()[0].name).isEqualTo("Test")
-        assertThat(result.first()[1].name).isEqualTo("Test2")
+        val result = dao.getAllItems().first()
+        assertThat(result[0].name).isEqualTo("Earlier Trip")
+        assertThat(result[1].name).isEqualTo("Later Trip")
     }
 }

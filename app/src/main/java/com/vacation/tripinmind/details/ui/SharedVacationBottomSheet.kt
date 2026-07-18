@@ -8,10 +8,12 @@ import androidx.compose.foundation.focusable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -32,6 +34,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.SheetState
@@ -55,6 +58,7 @@ import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
@@ -84,6 +88,7 @@ fun SharedVacationBottomSheet(
     val dummyFocusRequester = remember { FocusRequester() }
 
     var newViewerValue by remember { mutableStateOf("") }
+    var scannerVisible by remember { mutableStateOf(false) }
     val isButtonEnabled = newViewerValue.length == 12
 
     LaunchedEffect(error) {
@@ -113,13 +118,13 @@ fun SharedVacationBottomSheet(
                     shape = BottomSheetDefaults.ExpandedShape
                 )
         ) {
-            Column(
+            Box(
                 modifier = Modifier
                     .fillMaxWidth()
                     .fillMaxHeight(0.9f)
             ) {
                 BottomSheetDefaults.DragHandle(
-                    modifier = Modifier.align(Alignment.CenterHorizontally)
+                    modifier = Modifier.align(Alignment.TopCenter)
                 )
 
                 Column(
@@ -134,7 +139,7 @@ fun SharedVacationBottomSheet(
                         textAlign = TextAlign.Center,
                         color = MaterialTheme.colorScheme.primary,
                         modifier = Modifier
-                            .padding(bottom = 24.dp)
+                            .padding(bottom = 12.dp, top = 12.dp)
                             .fillMaxWidth()
                     )
 
@@ -143,22 +148,39 @@ fun SharedVacationBottomSheet(
                         style = MaterialTheme.typography.bodyMedium,
                         fontWeight = FontWeight.Medium,
                         color = MaterialTheme.colorScheme.onSurface,
-                        modifier = Modifier.padding(bottom = 8.dp)
+                        modifier = Modifier.padding(bottom = 12.dp)
                     )
 
-                    Text(
-                        text = stringResource(R.string.detailsscreen_share_bottomsheet_text_2),
-                        style = MaterialTheme.typography.bodyMedium,
-                        fontWeight = FontWeight.Medium,
-                        color = MaterialTheme.colorScheme.onSurface,
-                        modifier = Modifier.padding(bottom = 16.dp)
-                    )
+                    OutlinedButton(
+                        onClick = { scannerVisible = true },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(bottom = 8.dp),
+                        shape = RoundedCornerShape(24.dp),
+                        border = BorderStroke(1.dp, MaterialTheme.colorScheme.primary),
+                        colors = ButtonDefaults.outlinedButtonColors(
+                            contentColor = MaterialTheme.colorScheme.primary
+                        )
+                    ) {
+                        Icon(
+                            painter = painterResource(id = R.drawable.qrcode_ico),
+                            contentDescription = "Scan QR Code",
+                            modifier = Modifier.size(20.dp),
+                            tint = MaterialTheme.colorScheme.primary
+                        )
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text(
+                            text = stringResource(R.string.detailsscreen_share_bottomsheet_scan_qr_button),
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 14.sp
+                        )
+                    }
 
                     Card(
                         modifier = Modifier
                             .align(Alignment.CenterHorizontally)
                             .fillMaxWidth()
-                            .padding(vertical = 16.dp),
+                            .padding(vertical = 12.dp),
                         border = BorderStroke(
                             width = 1.dp,
                             color = MaterialTheme.colorScheme.outlineVariant
@@ -227,13 +249,23 @@ fun SharedVacationBottomSheet(
                                     )
                                 ),
                                 trailingIcon = {
-                                    if (newViewerValue.isNotEmpty()) {
-                                        IconButton(onClick = { newViewerValue = "" }) {
+                                    Row(verticalAlignment = Alignment.CenterVertically) {
+                                        IconButton(onClick = { scannerVisible = true }) {
                                             Icon(
-                                                imageVector = Icons.Default.Clear,
-                                                contentDescription = "Clear share code",
-                                                tint = MaterialTheme.colorScheme.primary
+                                                painter = painterResource(id = R.drawable.qrcode_ico),
+                                                contentDescription = "Scan QR Code",
+                                                tint = MaterialTheme.colorScheme.primary,
+                                                modifier = Modifier.size(20.dp)
                                             )
+                                        }
+                                        if (newViewerValue.isNotEmpty()) {
+                                            IconButton(onClick = { newViewerValue = "" }) {
+                                                Icon(
+                                                    imageVector = Icons.Default.Clear,
+                                                    contentDescription = "Clear share code",
+                                                    tint = MaterialTheme.colorScheme.primary
+                                                )
+                                            }
                                         }
                                     }
                                 },
@@ -357,7 +389,7 @@ fun SharedVacationBottomSheet(
                                     colors = ButtonDefaults.buttonColors(
                                         containerColor = Color.Transparent
                                     ),
-                                    contentPadding = androidx.compose.foundation.layout.PaddingValues(
+                                    contentPadding = PaddingValues(
                                         0.dp
                                     )
                                 ) {
@@ -368,6 +400,42 @@ fun SharedVacationBottomSheet(
                                     )
                                 }
                             }
+                        }
+                    }
+                }
+
+                if (scannerVisible) {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .background(Color.White)
+                            .padding(24.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Text(
+                            text = stringResource(R.string.detailsscreen_share_bottomsheet_scan_qr_button),
+                            style = MaterialTheme.typography.titleLarge,
+                            color = MaterialTheme.colorScheme.primary,
+                            fontWeight = FontWeight.Bold,
+                            modifier = Modifier.padding(bottom = 16.dp)
+                        )
+
+                        QrCodeScanner(
+                            onQrCodeScanned = { scannedValue ->
+                                newViewerValue = scannedValue
+                                    .filter { it.isLetterOrDigit() }
+                                    .uppercase()
+                                    .take(12)
+                                scannerVisible = false
+                                onClearError()
+                            },
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .weight(1f)
+                        )
+
+                        TextButton(onClick = { scannerVisible = false }) {
+                            Text(stringResource(R.string.common_cancel_button))
                         }
                     }
                 }

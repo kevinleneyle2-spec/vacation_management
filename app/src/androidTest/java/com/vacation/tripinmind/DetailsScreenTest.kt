@@ -51,7 +51,7 @@ class DetailsScreenTest {
         composeTestRule.onAllNodesWithTag("vacationCard")[0].performClick()
 
         composeTestRule.onNodeWithText("Paris").assertIsDisplayed()
-        composeTestRule.onNodeWithText("No idea for the moment").assertIsDisplayed()
+        composeTestRule.onNodeWithText("No ideas for the moment").assertIsDisplayed()
 
         composeTestRule.onNodeWithTag("detailsBackButton").performClick()
 

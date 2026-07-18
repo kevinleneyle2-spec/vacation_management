@@ -12,7 +12,10 @@ import com.vacation.tripinmind.home.intent.VacationIntent
 import com.vacation.tripinmind.home.model.VacationUiViewState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -24,26 +27,35 @@ class HomeViewModel @Inject constructor(
     private val firebaseAuth: FirebaseAuth,
     private val crashlytics: FirebaseCrashlytics
 ) : ViewModel() {
-    private val _vacationState = MutableStateFlow(VacationUiViewState())
-    val vacationState: StateFlow<VacationUiViewState> = _vacationState
 
+    private val _internalState = MutableStateFlow(VacationUiViewState())
+
+    private val _isLoggedIn = MutableStateFlow(firebaseAuth.currentUser != null)
+    val isLoggedIn: StateFlow<Boolean> = _isLoggedIn
+
+    private val authStateListener = FirebaseAuth.AuthStateListener { auth ->
+        _isLoggedIn.value = auth.currentUser != null
+    }
 
     init {
-        handleIntent(VacationIntent.LoadData)
+        firebaseAuth.addAuthStateListener(authStateListener)
     }
 
-    private fun findAllVacation() {
-        viewModelScope.launch {
-            vacationRepository.getAllItems().collect { vacations ->
-                _vacationState.update {
-                    it.copy(
-                        isLoading = false,
-                        vacations = vacations
-                    )
-                }
-            }
-        }
-    }
+    val vacationState: StateFlow<VacationUiViewState> = combine(
+        vacationRepository.getAllItems(),
+        vacationRepository.getSharedVacationsFlow(),
+        _internalState
+    ) { vacations, sharedVacations, internalState ->
+        internalState.copy(
+            isLoading = false,
+            vacations = vacations,
+            sharedVacations = sharedVacations
+        )
+    }.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5000),
+        initialValue = VacationUiViewState(isLoading = true)
+    )
 
     private fun deleteVacation(vacationDto: VacationDto) {
         viewModelScope.launch {
@@ -58,23 +70,15 @@ class HomeViewModel @Inject constructor(
     }
 
     private fun toggleShowArchived(selectedFilter: VacationFilter) {
-        _vacationState.update { it.copy(selectedFilter = selectedFilter) }
+        _internalState.update { it.copy(selectedFilter = selectedFilter) }
     }
 
     fun handleIntent(vacationIntent: VacationIntent) {
         when (vacationIntent) {
-            is VacationIntent.LoadData -> loadData()
             is VacationIntent.DeleteVacation -> deleteVacation(vacationIntent.vacationDto)
             is VacationIntent.ArchiveVacation -> archiveVacation(vacationIntent.vacationDto)
             is VacationIntent.ToggleShowVacationFilter -> toggleShowArchived(vacationIntent.vacationFilter)
             is VacationIntent.CreateShareCode -> createShareCode()
-        }
-    }
-
-    private fun loadData() {
-        _vacationState.update { it.copy(isLoading = true) }
-        viewModelScope.launch {
-            findAllVacation()
         }
     }
 
@@ -83,7 +87,7 @@ class HomeViewModel @Inject constructor(
             val shareCode = userProfileRepository.insertItem()
 
             shareCode?.let { code ->
-                _vacationState.update {
+                _internalState.update {
                     it.copy(
                         shareCode = code
                     )
@@ -93,17 +97,12 @@ class HomeViewModel @Inject constructor(
                 firebaseAuth.uid?.let {
                     crashlytics.setUserId(it)
                 }
-
-                startListeningSharedVacations()
             }
         }
     }
 
-    private fun startListeningSharedVacations() {
-        viewModelScope.launch {
-            vacationRepository.getSharedVacationsFlow().collect { sharedList ->
-                _vacationState.update { it.copy(sharedVacations = sharedList) }
-            }
-        }
+    override fun onCleared() {
+        firebaseAuth.removeAuthStateListener(authStateListener)
+        super.onCleared()
     }
 }

@@ -6,25 +6,49 @@ import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
 class Converters {
-    private val json = Json { ignoreUnknownKeys = true }
-
-    @TypeConverter
-    fun fromDayList(value: List<Day>): String {
-        return json.encodeToString(value)
+    private val json = Json {
+        ignoreUnknownKeys = true
+        coerceInputValues = true
+        isLenient = true
     }
 
     @TypeConverter
-    fun toDayList(value: String): List<Day> {
-        return json.decodeFromString(value)
+    fun fromDayList(value: List<Day>?): String {
+        if (value == null) return "[]"
+        return try {
+            json.encodeToString(value)
+        } catch (e: Exception) {
+            "[]"
+        }
     }
 
     @TypeConverter
-    fun fromStringList(value: List<String>): String {
-        return json.encodeToString(value)
+    fun toDayList(value: String?): List<Day> {
+        if (value.isNullOrBlank()) return emptyList()
+        return try {
+            json.decodeFromString(value)
+        } catch (e: Exception) {
+            emptyList()
+        }
     }
 
     @TypeConverter
-    fun toStringList(value: String): List<String> {
-        return json.decodeFromString(value)
+    fun fromStringList(value: List<String>?): String {
+        if (value == null) return "[]"
+        return try {
+            json.encodeToString(value)
+        } catch (e: Exception) {
+            "[]"
+        }
+    }
+
+    @TypeConverter
+    fun toStringList(value: String?): List<String> {
+        if (value.isNullOrBlank()) return emptyList()
+        return try {
+            json.decodeFromString(value)
+        } catch (e: Exception) {
+            emptyList()
+        }
     }
 }

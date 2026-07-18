@@ -28,7 +28,7 @@ android {
             isMinifyEnabled = false
         }
         release {
-            isMinifyEnabled = false
+            isMinifyEnabled = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
@@ -62,6 +62,7 @@ dependencies {
     implementation(libs.androidx.lifecycle.viewmodel.compose)
     implementation(libs.androidx.activity.compose)
     implementation(platform(libs.androidx.compose.bom))
+    implementation(libs.androidx.compose.runtime)
     implementation(libs.androidx.compose.ui)
     implementation(libs.androidx.ui.tooling)
     implementation(libs.androidx.compose.ui.graphics)
@@ -82,6 +83,19 @@ dependencies {
     
     // Coil
     implementation(libs.coil.compose)
+
+    // Camera
+    implementation(libs.androidx.camera2)
+    implementation(libs.androidx.camera.lifecycle)
+    implementation(libs.androidx.camera.view)
+
+    // MlKit
+    implementation(libs.mlkit.barcode.scanning)
+    implementation(libs.mlkit.text.recognition)
+    implementation(libs.mlkit.face.detection)
+    
+    // ZXing
+    implementation(libs.zxing.core)
 
     // Test
     testImplementation(libs.junit)

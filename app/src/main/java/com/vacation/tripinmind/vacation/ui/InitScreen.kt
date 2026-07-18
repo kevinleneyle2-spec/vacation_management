@@ -16,14 +16,13 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.DateRange
-import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DatePickerDefaults
 import androidx.compose.material3.DatePickerDialog
+import androidx.compose.material3.DateRangePicker
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -31,14 +30,16 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SelectableDates
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
-import androidx.compose.material3.rememberDatePickerState
+import androidx.compose.material3.rememberDateRangePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -51,8 +52,6 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.input.ImeAction
-import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -91,8 +90,10 @@ fun InitScreen(
         }
     }
 
-    var showDatePicker by remember { mutableStateOf(false) }
-    val datePickerState = rememberDatePickerState()
+    var showStartDatePicker by remember { mutableStateOf(false) }
+    var showEndDatePicker by remember { mutableStateOf(false) }
+
+    val isEndDateEnabled = initState.startDate > 0L
 
     val icons = listOf(
         "vacation_ico" to R.drawable.vacation_ico,
@@ -102,40 +103,136 @@ fun InitScreen(
         "plane_ico" to R.drawable.plane_ico
     )
 
-    if (showDatePicker) {
+    if (showStartDatePicker) {
+        val startDateRangePickerState = key(showStartDatePicker) {
+            rememberDateRangePickerState(
+                initialSelectedStartDateMillis = if (initState.startDate > 0L) initState.startDate else null,
+                initialSelectedEndDateMillis = if (initState.endDate > 0L) initState.endDate else null
+            )
+        }
+
+        LaunchedEffect(
+            startDateRangePickerState.selectedStartDateMillis,
+            startDateRangePickerState.selectedEndDateMillis
+        ) {
+            val curStart = startDateRangePickerState.selectedStartDateMillis
+            val curEnd = startDateRangePickerState.selectedEndDateMillis
+
+            if (initState.endDate > 0L && curStart != null && curEnd == null && curStart != initState.startDate) {
+                if (curStart <= initState.endDate) {
+                    startDateRangePickerState.setSelection(curStart, initState.endDate)
+                } else {
+                    startDateRangePickerState.setSelection(curStart, curStart)
+                }
+            }
+        }
+
         DatePickerDialog(
-            onDismissRequest = { showDatePicker = false },
+            onDismissRequest = { showStartDatePicker = false },
             confirmButton = {
                 TextButton(
                     onClick = {
-                        datePickerState.selectedDateMillis?.let { millis ->
-                            val sdf = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
-                            sdf.timeZone = TimeZone.getTimeZone("UTC")
-                            val dateString = sdf.format(Date(millis))
-                            viewModel.handleIntent(InitIntent.UpdateStartDate(dateString))
+                        val start = startDateRangePickerState.selectedStartDateMillis
+                        val end = startDateRangePickerState.selectedEndDateMillis
+                        if (start != null) {
+                            viewModel.handleIntent(InitIntent.UpdateStartDate(start))
                         }
-                        showDatePicker = false
+                        if (end != null) {
+                            viewModel.handleIntent(InitIntent.UpdateEndDate(end))
+                        }
+                        showStartDatePicker = false
                     }
                 ) {
                     Text("OK")
                 }
             },
             dismissButton = {
-                TextButton(onClick = { showDatePicker = false }) {
-                    Text("Cancel")
+                TextButton(onClick = { showStartDatePicker = false }) {
+                    Text(stringResource(R.string.common_cancel_button))
                 }
             }
         ) {
-            DatePicker(
-                state = datePickerState,
+            DateRangePicker(
+                state = startDateRangePickerState,
                 colors = DatePickerDefaults.colors(
                     selectedDayContainerColor = colorResource(R.color.orange),
                     selectedDayContentColor = Color.White,
+                    dayInSelectionRangeContainerColor = colorResource(R.color.orange).copy(alpha = 0.2f),
+                    dayInSelectionRangeContentColor = colorResource(R.color.orange),
                     selectedYearContainerColor = colorResource(R.color.orange),
                     selectedYearContentColor = Color.White,
                     todayContentColor = colorResource(R.color.orange),
                     todayDateBorderColor = colorResource(R.color.orange)
-                )
+                ),
+                modifier = Modifier.weight(1f)
+            )
+        }
+    }
+
+    if (showEndDatePicker && isEndDateEnabled) {
+        val endDateRangePickerState = key(showEndDatePicker) {
+            rememberDateRangePickerState(
+                initialSelectedStartDateMillis = initState.startDate,
+                initialSelectedEndDateMillis = if (initState.endDate > 0L) initState.endDate else initState.startDate,
+                initialDisplayedMonthMillis = initState.startDate,
+                selectableDates = object : SelectableDates {
+                    override fun isSelectableDate(utcTimeMillis: Long): Boolean {
+                        return utcTimeMillis >= initState.startDate
+                    }
+                }
+            )
+        }
+
+        LaunchedEffect(
+            endDateRangePickerState.selectedStartDateMillis,
+            endDateRangePickerState.selectedEndDateMillis
+        ) {
+            val curStart = endDateRangePickerState.selectedStartDateMillis
+            val curEnd = endDateRangePickerState.selectedEndDateMillis
+
+            if (curStart != null && curEnd == null && curStart != initState.startDate) {
+                if (curStart >= initState.startDate) {
+                    endDateRangePickerState.setSelection(initState.startDate, curStart)
+                } else {
+                    endDateRangePickerState.setSelection(initState.startDate, initState.startDate)
+                }
+            }
+        }
+
+        DatePickerDialog(
+            onDismissRequest = { showEndDatePicker = false },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        val end = endDateRangePickerState.selectedEndDateMillis
+                            ?: endDateRangePickerState.selectedStartDateMillis
+                            ?: initState.startDate
+                        viewModel.handleIntent(InitIntent.UpdateEndDate(end))
+                        showEndDatePicker = false
+                    }
+                ) {
+                    Text("OK")
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showEndDatePicker = false }) {
+                    Text(stringResource(R.string.common_cancel_button))
+                }
+            }
+        ) {
+            DateRangePicker(
+                state = endDateRangePickerState,
+                colors = DatePickerDefaults.colors(
+                    selectedDayContainerColor = colorResource(R.color.orange),
+                    selectedDayContentColor = Color.White,
+                    dayInSelectionRangeContainerColor = colorResource(R.color.orange).copy(alpha = 0.2f),
+                    dayInSelectionRangeContentColor = colorResource(R.color.orange),
+                    selectedYearContainerColor = colorResource(R.color.orange),
+                    selectedYearContentColor = Color.White,
+                    todayContentColor = colorResource(R.color.orange),
+                    todayDateBorderColor = colorResource(R.color.orange)
+                ),
+                modifier = Modifier.weight(1f)
             )
         }
     }
@@ -223,12 +320,18 @@ fun InitScreen(
                 color = colorResource(R.color.orange),
                 modifier = Modifier.align(Alignment.Start)
             )
+            val formattedStartDate = if (initState.startDate > 0L) {
+                val sdf = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+                sdf.timeZone = TimeZone.getTimeZone("UTC")
+                sdf.format(Date(initState.startDate))
+            } else ""
+
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .clickable { showDatePicker = true }) {
+                    .clickable { showStartDatePicker = true }) {
                 OutlinedTextField(
-                    value = initState.startDate,
+                    value = formattedStartDate,
                     onValueChange = { },
                     readOnly = true,
                     enabled = false,
@@ -247,17 +350,17 @@ fun InitScreen(
                         )
                     },
                     trailingIcon = {
-                        IconButton(onClick = { showDatePicker = true }) {
+                        IconButton(onClick = { showStartDatePicker = true }) {
                             Icon(
                                 imageVector = Icons.Default.DateRange,
-                                contentDescription = "Select Date",
+                                contentDescription = "Select Start Date",
                                 tint = colorResource(R.color.orange)
                             )
                         }
                     },
                     modifier = Modifier
                         .fillMaxWidth()
-                        .clickable { showDatePicker = true }
+                        .clickable { showStartDatePicker = true }
                         .testTag("initDateTextField"),
                     singleLine = true
                 )
@@ -265,37 +368,69 @@ fun InitScreen(
 
             Spacer(modifier = Modifier.height(32.dp))
 
+            val orangeColor = colorResource(R.color.orange)
+            val endFieldColor = if (isEndDateEnabled) orangeColor else orangeColor.copy(alpha = 0.4f)
+
             Text(
-                text = stringResource(R.string.initscreen_day_title),
-                color = colorResource(R.color.orange),
+                text = stringResource(R.string.initscreen_end_date_title),
+                color = endFieldColor,
                 modifier = Modifier.align(Alignment.Start)
             )
-            OutlinedTextField(
-                value = if (initState.numDays == 0) "" else initState.numDays.toString(),
-                onValueChange = { newValue ->
-                    viewModel.handleIntent(InitIntent.UpdateDays(newValue))
-                },
-                colors = OutlinedTextFieldDefaults.colors(
-                    cursorColor = colorResource(R.color.orange),
-                    focusedBorderColor = colorResource(R.color.orange),
-                    unfocusedBorderColor = colorResource(R.color.orange),
-                    focusedLabelColor = colorResource(R.color.orange),
-                    unfocusedLabelColor = colorResource(R.color.orange)
-                ),
-                label = {
-                    Text(
-                        stringResource(R.string.initscreen_day_description),
-                        color = colorResource(R.color.orange)
-                    )
-                },
+            val formattedEndDate = if (initState.endDate > 0L) {
+                val sdf = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+                sdf.timeZone = TimeZone.getTimeZone("UTC")
+                sdf.format(Date(initState.endDate))
+            } else ""
+
+            Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .testTag("initNumDayTextField"),
-                keyboardOptions = KeyboardOptions(
-                    keyboardType = KeyboardType.Number,
-                    imeAction = ImeAction.Done
-                ),
-            )
+                    .then(
+                        if (isEndDateEnabled) Modifier.clickable { showEndDatePicker = true }
+                        else Modifier
+                    )
+            ) {
+                OutlinedTextField(
+                    value = formattedEndDate,
+                    onValueChange = { },
+                    readOnly = true,
+                    enabled = false,
+                    colors = OutlinedTextFieldDefaults.colors(
+                        disabledTextColor = if (isEndDateEnabled) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f),
+                        disabledBorderColor = endFieldColor,
+                        disabledLabelColor = endFieldColor,
+                        disabledTrailingIconColor = endFieldColor,
+                        disabledPlaceholderColor = endFieldColor,
+                        disabledContainerColor = Color.Transparent
+                    ),
+                    label = {
+                        Text(
+                            stringResource(R.string.initscreen_end_date_description),
+                            color = endFieldColor
+                        )
+                    },
+                    trailingIcon = {
+                        IconButton(
+                            onClick = { if (isEndDateEnabled) showEndDatePicker = true },
+                            enabled = isEndDateEnabled
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.DateRange,
+                                contentDescription = "Select End Date",
+                                tint = endFieldColor
+                            )
+                        }
+                    },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .then(
+                            if (isEndDateEnabled) Modifier.clickable { showEndDatePicker = true }
+                            else Modifier
+                        )
+                        .testTag("initEndDateTextField"),
+                    singleLine = true
+                )
+            }
 
             Spacer(modifier = Modifier.height(32.dp))
 
@@ -344,7 +479,6 @@ fun InitScreen(
 
             Spacer(modifier = Modifier.height(32.dp))
 
-
             TextButton(
                 onClick = {
                     onNavigate("activities")
@@ -372,7 +506,7 @@ fun InitScreen(
 fun InitScreenPreview() {
     val mockActions = object : InitViewModelActions {
         override val initState = MutableStateFlow(
-            VacationState(vacationName = "Summer Trip", numDays = 5)
+            VacationState(vacationName = "Summer Trip", startDate = 1683705600000L, endDate = 1684051200000L)
         )
         override val initValidation = MutableStateFlow(true)
         override fun handleIntent(intent: InitIntent) {}

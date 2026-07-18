@@ -8,8 +8,8 @@ import androidx.room.PrimaryKey
 data class VacationDto(
     @PrimaryKey val id: String = "",
     @ColumnInfo val name: String = "",
-    @ColumnInfo val startDate: String = "",
-    @ColumnInfo val nbrDay: Int = 0,
+    @ColumnInfo val startDate: Long = 0L,
+    @ColumnInfo val endDate: Long = 0L,
     @ColumnInfo val days: List<Day> = listOf(),
     @ColumnInfo val ideas: List<String> = listOf(),
     @ColumnInfo val image: String = "",
@@ -17,4 +17,11 @@ data class VacationDto(
     @ColumnInfo val createdBy: String = "",
     @ColumnInfo val shareWith: List<String> = listOf(),
     @ColumnInfo val shareWithUid: List<String> = listOf()
-)
+) {
+    val nbrDay: Int
+        get() = if (startDate > 0L && endDate >= startDate) {
+            ((endDate - startDate) / (1000 * 60 * 60 * 24)).toInt() + 1
+        } else {
+            days.size
+        }
+}

@@ -7,6 +7,8 @@ interface VacationInterface {
 
     fun getAllItems(): Flow<List<VacationDto>>
 
+    fun getLocalItems(): Flow<List<VacationDto>>
+
     fun getItemById(id: String): Flow<VacationDto?>
 
     suspend fun insertItem(item: VacationDto)

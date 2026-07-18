@@ -5,6 +5,7 @@ import com.vacation.tripinmind.data.local.model.Activity
 import com.vacation.tripinmind.data.local.model.Day
 import com.vacation.tripinmind.data.local.model.VacationDto
 import com.vacation.tripinmind.data.repository.VacationRepository
+import com.vacation.tripinmind.mviapp.util.UiText
 import com.vacation.tripinmind.vacation.intent.InitIntent
 import com.vacation.tripinmind.vacation.viewmodel.InitViewModel
 import com.google.common.truth.Truth.assertThat
@@ -47,8 +48,8 @@ class InitViewModelTest {
     private val fakeVacation = VacationDto(
         id = "1",
         name = "Paris",
-        startDate = "2023-06-01",
-        nbrDay = 5,
+        startDate = 1685577600000L,
+        endDate = 1685923200000L,
         days = listOf(
             Day(
                 nameDay = "Day 1",
@@ -146,29 +147,29 @@ class InitViewModelTest {
 
         var state = viewModel.initState.value
 
-        assertThat(state.startDate).isEqualTo("2023-06-01")
+        assertThat(state.startDate).isEqualTo(1685577600000L)
 
-        viewModel.handleIntent(InitIntent.UpdateStartDate("2023-07-02"))
+        viewModel.handleIntent(InitIntent.UpdateStartDate(1688256000000L))
         advanceUntilIdle()
 
         state = viewModel.initState.value
-        assertThat(state.startDate).isEqualTo("2023-07-02")
+        assertThat(state.startDate).isEqualTo(1688256000000L)
     }
 
     @Test
-    fun `update vacation number of days`() = runTest(testDispatcher) {
+    fun `update vacation end date`() = runTest(testDispatcher) {
         viewModel.handleIntent(InitIntent.LoadVacation("1"))
         advanceUntilIdle()
 
         var state = viewModel.initState.value
 
-        assertThat(state.numDays).isEqualTo(5)
+        assertThat(state.endDate).isEqualTo(1685923200000L)
 
-        viewModel.handleIntent(InitIntent.UpdateDays("10"))
+        viewModel.handleIntent(InitIntent.UpdateEndDate(1686355200000L))
         advanceUntilIdle()
 
         state = viewModel.initState.value
-        assertThat(state.numDays).isEqualTo(10)
+        assertThat(state.endDate).isEqualTo(1686355200000L)
     }
 
     @Test
@@ -284,6 +285,22 @@ class InitViewModelTest {
     }
 
     @Test
+    fun `remove idea with out of bounds index does not crash`() = runTest(testDispatcher) {
+        viewModel.handleIntent(InitIntent.LoadVacation("1"))
+        advanceUntilIdle()
+
+        var state = viewModel.initState.value
+        assertThat(state.ideas.size).isEqualTo(1)
+
+        viewModel.handleIntent(InitIntent.RemoveIdea(99))
+        viewModel.handleIntent(InitIntent.RemoveIdea(-1))
+        advanceUntilIdle()
+
+        state = viewModel.initState.value
+        assertThat(state.ideas.size).isEqualTo(1)
+    }
+
+    @Test
     fun `update image`() = runTest(testDispatcher) {
         viewModel.handleIntent(InitIntent.LoadVacation("1"))
         advanceUntilIdle()
@@ -299,23 +316,28 @@ class InitViewModelTest {
     }
 
     @Test
-    fun `create vacation persists to repository`() = runTest(testDispatcher) {
-        val newVacation = fakeVacation.copy(id = "2", name = "London Trip")
+    fun `create vacation attaches current user uid and persists to repository`() = runTest(testDispatcher) {
+        val newVacation = fakeVacation.copy(id = "2", name = "London Trip", createdBy = "initial_id")
 
         viewModel.handleIntent(InitIntent.CreateVacation(newVacation))
         advanceUntilIdle()
 
-        assertThat(vacationsFlow.value).contains(newVacation)
+        val expectedVacation = newVacation.copy(createdBy = "12345")
+        assertThat(vacationsFlow.value).contains(expectedVacation)
+        assertThat(viewModel.initState.value.errorMessage).isNull()
     }
 
     @Test
-    fun `create vacation with wrong createdBy fails`() = runTest(testDispatcher) {
-        val newVacation = fakeVacation.copy(id = "2", name = "London Trip", createdBy = "wrongUser")
+    fun `create vacation when user is unauthenticated sets error message`() = runTest(testDispatcher) {
+        whenever(mockFirebaseAuth.uid).thenReturn(null)
+        val newVacation = fakeVacation.copy(id = "3", name = "Tokyo Trip")
 
         viewModel.handleIntent(InitIntent.CreateVacation(newVacation))
         advanceUntilIdle()
 
-        assertThat(vacationsFlow.value).contains(fakeVacation)
+        assertThat(vacationsFlow.value).doesNotContain(newVacation)
+        val errorMessage = viewModel.initState.value.errorMessage as? UiText.StringResource
+        assertThat(errorMessage?.resId).isEqualTo(R.string.common_error_auth_message)
     }
 
     @Test

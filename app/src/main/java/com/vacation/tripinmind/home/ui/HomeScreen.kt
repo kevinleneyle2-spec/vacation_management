@@ -29,10 +29,12 @@ import androidx.compose.material.icons.filled.Archive
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -68,6 +70,7 @@ import com.vacation.tripinmind.navigation.AppDestinations
 import com.vacation.tripinmind.ui.theme.MVIAppTheme
 import kotlinx.coroutines.delay
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
     viewModel: HomeViewModel,
@@ -75,17 +78,33 @@ fun HomeScreen(
     modifier: Modifier = Modifier
 ) {
     val vacationUiState by viewModel.vacationState.collectAsStateWithLifecycle()
+    val isLoggedIn by viewModel.isLoggedIn.collectAsStateWithLifecycle()
     var vacationToDelete by remember { mutableStateOf<VacationDto?>(null) }
     var archiveMessageResId by remember { mutableStateOf<Int?>(null) }
+    var showQrcodeSheet by remember { mutableStateOf(false) }
 
-    LaunchedEffect(Unit) {
-        viewModel.handleIntent(VacationIntent.CreateShareCode)
+    LaunchedEffect(isLoggedIn) {
+        if (isLoggedIn) {
+            viewModel.handleIntent(VacationIntent.CreateShareCode)
+        }
     }
     LaunchedEffect(archiveMessageResId) {
         if (archiveMessageResId != null) {
             delay(2000)
             archiveMessageResId = null
         }
+    }
+
+    val sheetState = rememberModalBottomSheetState(
+        skipPartiallyExpanded = true
+    )
+
+    if (showQrcodeSheet) {
+        QrcodeBottomSheet(
+            onDismiss = { showQrcodeSheet = false },
+            qrcode = vacationUiState.shareCode,
+            sheetState = sheetState
+        )
     }
 
     if (vacationToDelete != null) {
@@ -141,6 +160,7 @@ fun HomeScreen(
                 viewModel.handleIntent(VacationIntent.ToggleShowVacationFilter(vacationFilter))
             },
             onNavigate = onNavigate,
+            onShowQrcode = { showQrcodeSheet = true },
             modifier = Modifier.fillMaxSize()
         )
 
@@ -179,26 +199,27 @@ fun HomeScreenContent(
     onDeleteVacation: (VacationDto) -> Unit,
     onArchiveVacation: (VacationDto) -> Unit,
     onToggleShowFilterVacations: (vacationFilter: VacationFilter) -> Unit,
+    onShowQrcode: () -> Unit,
     onNavigate: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val projectsSize = remember(vacationUiState.vacations) {
+        vacationUiState.vacations.count { !it.isArchived }
+    }
+
+    val archivedSize = remember(vacationUiState.vacations) {
+        vacationUiState.vacations.count { it.isArchived }
+    }
+
+    val sharedSize = remember(vacationUiState.sharedVacations) {
+        vacationUiState.sharedVacations.size
+    }
+
     fun getSizeVacationFilter(vacationFilter: VacationFilter): Int {
         return when (vacationFilter) {
-            VacationFilter.PROJECTS -> {
-                vacationUiState.vacations.filter {
-                    !it.isArchived
-                }.size
-            }
-
-            VacationFilter.ARCHIVED -> {
-                vacationUiState.vacations.filter {
-                    it.isArchived
-                }.size
-            }
-
-            VacationFilter.SHARED -> {
-                vacationUiState.sharedVacations.size
-            }
+            VacationFilter.PROJECTS -> projectsSize
+            VacationFilter.ARCHIVED -> archivedSize
+            VacationFilter.SHARED -> sharedSize
         }
     }
 
@@ -294,7 +315,8 @@ fun HomeScreenContent(
                                     Spacer(Modifier.width(8.dp))
 
                                     Text(
-                                        text = stringResource(R.string.homescreen_archives_button,
+                                        text = stringResource(
+                                            R.string.homescreen_archives_button,
                                             getSizeVacationFilter(VacationFilter.ARCHIVED)
                                         ),
                                         color = Color.White,
@@ -371,7 +393,8 @@ fun HomeScreenContent(
                                 contentAlignment = Alignment.Center
                             ) {
                                 Text(
-                                    text = stringResource(R.string.homescreen_shared_button,
+                                    text = stringResource(
+                                        R.string.homescreen_shared_button,
                                         getSizeVacationFilter(VacationFilter.SHARED)
                                     ),
                                     color = Color.White,
@@ -521,18 +544,36 @@ fun HomeScreenContent(
                         }
 
                         Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.Center,
                             modifier = Modifier.fillMaxWidth()
                         ) {
-                            Text(
-                                text = stringResource(R.string.homescreen_share_code_text) + vacationUiState.shareCode,
-                                style = MaterialTheme.typography.titleMedium,
-                                fontWeight = FontWeight.Bold,
-                                color = Color.White,
-                                textAlign = TextAlign.Center,
+                            TextButton(
+                                onClick = { onShowQrcode() }
+                            ) {
+                                Text(
+                                    text = stringResource(R.string.homescreen_share_code_text) + vacationUiState.shareCode,
+                                    style = MaterialTheme.typography.titleMedium,
+                                    fontWeight = FontWeight.Bold,
+                                    color = Color.White,
+                                    textAlign = TextAlign.Center
+                                )
+                            }
+
+                            IconButton(
+                                onClick = { onShowQrcode() },
+                                enabled = vacationUiState.shareCode.isNotBlank(),
                                 modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(bottom = 16.dp)
-                            )
+                                    .size(56.dp)
+                                    .background(Color.Transparent)
+                                    .testTag("qrcodeButton")
+                            ) {
+                                Image(
+                                    painter = painterResource(id = R.drawable.qrcode_ico),
+                                    contentDescription = "qrcode",
+                                    modifier = Modifier.size(40.dp)
+                                )
+                            }
                         }
                     }
                 }
@@ -551,8 +592,8 @@ fun HomeScreenPreview() {
                     VacationDto(
                         id = "1",
                         name = "Paris",
-                        startDate = "10/05/2023",
-                        nbrDay = 3,
+                        startDate = 1683705600000L,
+                        endDate = 1683964800000L,
                         days = emptyList(),
                         ideas = emptyList(),
                         image = "vacation_ico",
@@ -568,6 +609,7 @@ fun HomeScreenPreview() {
             onDeleteVacation = {},
             onArchiveVacation = {},
             onToggleShowFilterVacations = {},
+            onShowQrcode = {},
             onNavigate = {}
         )
     }
@@ -584,8 +626,8 @@ fun HomeScreenSharedPreview() {
                     VacationDto(
                         id = "1",
                         name = "Paris",
-                        startDate = "10/05/2023",
-                        nbrDay = 3,
+                        startDate = 1683705600000L,
+                        endDate = 1683964800000L,
                         days = emptyList(),
                         ideas = emptyList(),
                         image = "vacation_ico",
@@ -601,6 +643,7 @@ fun HomeScreenSharedPreview() {
             onDeleteVacation = {},
             onArchiveVacation = {},
             onToggleShowFilterVacations = {},
+            onShowQrcode = {},
             onNavigate = {}
         )
     }
@@ -621,6 +664,7 @@ fun HomeScreenEmptyPreview() {
             onDeleteVacation = {},
             onArchiveVacation = {},
             onToggleShowFilterVacations = {},
+            onShowQrcode = {},
             onNavigate = {}
         )
     }

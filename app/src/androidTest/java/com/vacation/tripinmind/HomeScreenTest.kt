@@ -29,8 +29,8 @@ class HomeScreenTest {
     private val fakeVacation = VacationDto(
         id = "1",
         name = "Paris",
-        startDate = "10/05/2023",
-        nbrDay = 3,
+        startDate = 1683705600000L,
+        endDate = 1683964800000L,
         days = emptyList(),
         ideas = emptyList(),
         image = "vacation_ico",
@@ -54,7 +54,8 @@ class HomeScreenTest {
                     vacationUiState = VacationUiViewState(),
                     onDeleteVacation = {}, onArchiveVacation = {},
                     onToggleShowFilterVacations = {},
-                    onNavigate = { navigated = true }
+                    onNavigate = { navigated = true },
+                    onShowQrcode = {}
                 )
             }
         }
@@ -75,7 +76,8 @@ class HomeScreenTest {
                     onToggleShowFilterVacations = {},
                     onNavigate = { route ->
                         if (route.contains("1")) clickedId = 1
-                    }
+                    },
+                    onShowQrcode = {}
                 )
             }
         }
@@ -106,7 +108,8 @@ class HomeScreenTest {
                     onToggleShowFilterVacations = { selectFilter ->
                         uiState.value = uiState.value.copy(selectedFilter = selectFilter)
                     },
-                    onNavigate = {}
+                    onNavigate = {},
+                    onShowQrcode = {}
                 )
             }
         }
@@ -157,7 +160,8 @@ class HomeScreenTest {
                     onToggleShowFilterVacations = { selectFilter ->
                         uiState.value = uiState.value.copy(selectedFilter = selectFilter)
                     },
-                    onNavigate = {}
+                    onNavigate = {},
+                    onShowQrcode = {}
                 )
             }
         }
@@ -180,7 +184,8 @@ class HomeScreenTest {
                     onDeleteVacation = { uiState.value = VacationUiViewState() },
                     onArchiveVacation = {},
                     onToggleShowFilterVacations = {},
-                    onNavigate = {}
+                    onNavigate = {},
+                    onShowQrcode = {}
                 )
             }
         }

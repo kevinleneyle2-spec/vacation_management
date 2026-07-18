@@ -19,8 +19,6 @@ kotlinStdlib = "2.3.10"
 kotlinTest = "2.3.10"
 runner = "1.5.2"
 core = "1.5.0"
-retrofit = "2.11.0"
-okhttp = "4.12.0"
 kotlinCoroutinesTest = "1.10.2"
 kotlinxSerializationJson = "1.7.3"
 mockito = "5.12.0"
@@ -34,8 +32,13 @@ googleServices = "4.5.0"
 firebase = "34.15.0"
 crashlytics = "3.0.7"
 splashscreen = "1.2.0"
+mlkit-barcode-scanning = "17.3.0"
+mlkit-text-recognition = "16.0.1"
+mlkit-face-detection = "16.1.7"
 kotlinxCoroutinesPlayServices = "1.10.2"
 playServicesBase = "18.5.0"
+zxing = "3.5.3"
+cameraxVersion = "1.4.2"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -53,6 +56,7 @@ androidx-compose-ui-test-manifest = { group = "androidx.compose.ui", name = "ui-
 androidx-compose-ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-test-junit4" }
 androidx-compose-material3 = { group = "androidx.compose.material3", name = "material3" }
 androidx-compose-material-icons-extended = { group = "androidx.compose.material", name = "material-icons-extended" }
+androidx-compose-runtime = { group = "androidx.compose.runtime", name = "runtime" }
 play-services-base = { group = "com.google.android.gms", name = "play-services-base", version.ref = "playServicesBase" }
 androidx-core-splashscreen = { group = "androidx.core", name = "core-splashscreen", version.ref = "splashscreen" }
 
@@ -77,9 +81,6 @@ androidx-runner = { group = "androidx.test", name = "runner", version.ref = "run
 androidx-core = { group = "androidx.test", name = "core", version.ref = "core" }
 
 # Network
-retrofit-core = { group = "com.squareup.retrofit2", name = "retrofit", version.ref = "retrofit" }
-retrofit-kotlin-serialization = { group = "com.squareup.retrofit2", name = "converter-kotlinx-serialization", version.ref = "retrofit" }
-okhttp-logging = { group = "com.squareup.okhttp3", name = "logging-interceptor", version.ref = "okhttp" }
 kotlin-serialization-json = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-json", version.ref = "kotlinxSerializationJson" }
 
 # Testing
@@ -96,8 +97,21 @@ firebase-auth = { group = "com.google.firebase", name = "firebase-auth" }
 firebase-firestore = { group = "com.google.firebase", name = "firebase-firestore" }
 firebase-crashlytics = { group = "com.google.firebase", name = "firebase-crashlytics" }
 
+# Camera
+androidx-camera2 = { group = "androidx.camera", name = "camera-camera2", version.ref = "cameraxVersion" }
+androidx-camera-lifecycle = { group = "androidx.camera", name = "camera-lifecycle", version.ref = "cameraxVersion" }
+androidx-camera-view = { group = "androidx.camera", name = "camera-view", version.ref = "cameraxVersion" }
+
+# ML Kit
+mlkit-barcode-scanning = { group = "com.google.mlkit", name = "barcode-scanning", version.ref = "mlkit-barcode-scanning" }
+mlkit-text-recognition = { group = "com.google.mlkit", name = "text-recognition", version.ref = "mlkit-text-recognition" }
+mlkit-face-detection = { group = "com.google.mlkit", name = "face-detection", version.ref = "mlkit-face-detection" }
+
 # Coroutines Play Services
 kotlinx-coroutines-play-services = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-play-services", version.ref = "kotlinxCoroutinesPlayServices" }
+
+# ZXing
+zxing-core = { group = "com.google.zxing", name = "core", version.ref = "zxing" }
 
 # Test
 junit = { group = "junit", name = "junit", version.ref = "junit" }
@@ -117,8 +131,6 @@ parcelize = { id = "org.jetbrains.kotlin.plugin.parcelize", version.ref = "kotli
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 dagger-hilt = { id = "com.google.dagger.hilt.android", version.ref = "dagger" }
 kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
-kotlin-multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
-android-kotlin-multiplatform-library = { id = "com.android.kotlin.multiplatform.library", version.ref = "agp" }
 android-lint = { id = "com.android.lint", version.ref = "agp" }
 google-services = { id = "com.google.gms.google-services", version.ref = "googleServices" }
 firebase-crashlytics = { id = "com.google.firebase.crashlytics", version.ref = "crashlytics" }

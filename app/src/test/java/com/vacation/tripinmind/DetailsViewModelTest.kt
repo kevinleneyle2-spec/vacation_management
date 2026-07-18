@@ -59,8 +59,8 @@ class DetailsViewModelTest {
     private val fakeVacation = VacationDto(
         id = "1",
         name = "Paris Trip",
-        startDate = "2024-05-01",
-        nbrDay = 1,
+        startDate = 1714521600000L,
+        endDate = 1714521600000L,
         days = listOf(
             Day(
                 nameDay = "Jour 1",

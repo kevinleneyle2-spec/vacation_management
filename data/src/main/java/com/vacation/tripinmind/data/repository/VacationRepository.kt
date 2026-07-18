@@ -7,6 +7,8 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.vacation.tripinmind.data.local.interfaces.VacationDao
 import com.vacation.tripinmind.data.local.interfaces.VacationInterface
 import com.vacation.tripinmind.data.local.model.VacationDto
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
@@ -22,36 +24,60 @@ class VacationRepository(
 
     private val vacationCollection = firestore.collection("vacation")
 
-    override fun getAllItems(): Flow<List<VacationDto>> = channelFlow {
-        launch {
-            try {
-                val currentUserId = firebaseAuth.uid
+    override fun getAllItems(): Flow<List<VacationDto>> {
+        syncRemoteVacations()
+        return vacationDao.getAllItems()
+    }
 
+    private fun syncRemoteVacations() {
+        val currentUserId = firebaseAuth.uid ?: return
+
+        GlobalScope.launch(Dispatchers.IO) {
+            try {
                 val vacations = vacationCollection.where(
                     Filter.equalTo("createdBy", currentUserId)
                 ).get().await()
 
-                val vacationsMap = vacations.toObjects(VacationDto::class.java)
-                    .associateBy { it.id }
+                val remoteVacations = vacations.toObjects(VacationDto::class.java)
 
-                for (vacation in vacationsMap) {
-                    val result = vacationDao.insertItem(vacation.value)
+                remoteVacations.forEach { vacation ->
+                    val result = vacationDao.insertItem(vacation)
                     if (result == -1L) {
-                        vacationDao.updateItem(vacation.value)
+                        vacationDao.updateItem(vacation)
                     }
                 }
             } catch (e: Exception) {
                 e.printStackTrace()
             }
         }
-
-        vacationDao.getAllItems().collect { localItems ->
-            send(localItems)
-        }
     }
 
-    override fun getItemById(id: String): Flow<VacationDto?> =
-        vacationDao.getItemById(id)
+    override fun getLocalItems(): Flow<List<VacationDto>> = vacationDao.getAllItems()
+
+    override fun getItemById(id: String): Flow<VacationDto?> {
+        syncRemoteVacationById(id)
+
+        return vacationDao.getItemById(id)
+    }
+
+    private fun syncRemoteVacationById(id: String) {
+        @OptIn(kotlinx.coroutines.DelicateCoroutinesApi::class)
+        GlobalScope.launch(Dispatchers.IO) {
+            try {
+                val snapshot = vacationCollection.document(id).get().await()
+                val remoteVacation = snapshot.toObject(VacationDto::class.java)
+
+                if (remoteVacation != null) {
+                    val result = vacationDao.insertItem(remoteVacation)
+                    if (result == -1L) {
+                        vacationDao.updateItem(remoteVacation)
+                    }
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }
+    }
 
     override suspend fun insertItem(item: VacationDto) {
         val finalItem = if (item.id.isEmpty()) {

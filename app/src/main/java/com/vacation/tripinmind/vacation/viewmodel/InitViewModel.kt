@@ -7,16 +7,19 @@ import com.vacation.tripinmind.data.local.model.VacationDto
 import com.vacation.tripinmind.data.repository.VacationRepository
 import com.vacation.tripinmind.mviapp.util.UiText
 import com.google.firebase.auth.FirebaseAuth
+import com.vacation.tripinmind.R
 import com.vacation.tripinmind.vacation.intent.InitIntent
 import com.vacation.tripinmind.vacation.model.VacationState
 import com.vacation.tripinmind.vacation.ui.InitViewModelActions
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Calendar
+import java.util.Date
 import java.util.Locale
 import java.util.TimeZone
 import javax.inject.Inject
@@ -33,13 +36,11 @@ class InitViewModel @Inject constructor(
     private val _initValidation = MutableStateFlow(false)
     override val initValidation: StateFlow<Boolean> = _initValidation
 
-    private val inputSdf = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).apply {
-        timeZone = TimeZone.getTimeZone("UTC")
-    }
-
     private val outputSdf = SimpleDateFormat("EEEE d MMMM yyyy", Locale.getDefault()).apply {
         timeZone = TimeZone.getTimeZone("UTC")
     }
+
+    private var loadVacationJob: Job? = null
 
     private fun createVacation(vacationDto: VacationDto) {
         viewModelScope.launch {
@@ -55,27 +56,24 @@ class InitViewModel @Inject constructor(
 
     private fun updateValidation() {
         val state = _initState.value
-        val isValid =
-            state.vacationName.isNotBlank() && state.numDays > 0 && state.startDate.isNotBlank()
+        val isValid = state.vacationName.isNotBlank() &&
+                state.startDate > 0L &&
+                state.endDate >= state.startDate
         _initValidation.value = isValid
     }
 
-    private fun calculateDays(startDate: String, count: Int, currentDays: List<Day>): List<Day> {
-        val baseDate = try {
-            if (startDate.isNotBlank()) inputSdf.parse(startDate) else null
-        } catch (e: Exception) {
-            null
-        }
+    private fun calculateDays(startDate: Long, endDate: Long, currentDays: List<Day>): List<Day> {
+        if (startDate <= 0L || endDate < startDate) return emptyList()
+
+        val count = ((endDate - startDate) / (1000 * 60 * 60 * 24)).toInt() + 1
+        val baseDate = Date(startDate)
 
         return List(count) { index ->
-            val dayName = if (baseDate != null) {
-                val calendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"))
-                calendar.time = baseDate
-                calendar.add(Calendar.DAY_OF_YEAR, index)
-                outputSdf.format(calendar.time).replaceFirstChar { it.uppercase() }
-            } else {
-                currentDays.getOrNull(index)?.nameDay ?: ""
+            val calendar = Calendar.getInstance(TimeZone.getTimeZone("UTC")).apply {
+                time = baseDate
+                add(Calendar.DAY_OF_YEAR, index)
             }
+            val dayName = outputSdf.format(calendar.time).replaceFirstChar { it.uppercase() }
 
             val existingDay = currentDays.getOrNull(index)
             Day(
@@ -95,26 +93,22 @@ class InitViewModel @Inject constructor(
 
             is InitIntent.UpdateStartDate -> {
                 _initState.update { currentState ->
-                    val newDays =
-                        calculateDays(intent.date, currentState.numDays, currentState.days)
-                    currentState.copy(startDate = intent.date, days = newDays)
+                    val updatedEndDate = if (currentState.endDate > 0L && currentState.endDate < intent.date) {
+                        intent.date
+                    } else {
+                        currentState.endDate
+                    }
+                    val newDays = calculateDays(intent.date, updatedEndDate, currentState.days)
+                    currentState.copy(startDate = intent.date, endDate = updatedEndDate, days = newDays)
                 }
                 updateValidation()
             }
 
-            is InitIntent.UpdateDays -> {
-                val input = intent.days
-                if (input.isEmpty()) {
-                    _initState.update { it.copy(numDays = 0, days = emptyList()) }
-                } else {
-                    val number = input.toIntOrNull()
-                    if (number != null && number in 1..15) {
-                        _initState.update { currentState ->
-                            val newDays =
-                                calculateDays(currentState.startDate, number, currentState.days)
-                            currentState.copy(numDays = number, days = newDays)
-                        }
-                    }
+            is InitIntent.UpdateEndDate -> {
+                _initState.update { currentState ->
+                    val validEndDate = if (intent.date >= currentState.startDate) intent.date else currentState.startDate
+                    val newDays = calculateDays(currentState.startDate, validEndDate, currentState.days)
+                    currentState.copy(endDate = validEndDate, days = newDays)
                 }
                 updateValidation()
             }
@@ -174,8 +168,10 @@ class InitViewModel @Inject constructor(
 
             is InitIntent.RemoveIdea -> {
                 val currentIdeas = _initState.value.ideas.toMutableList()
-                currentIdeas.removeAt(intent.index)
-                _initState.update { it.copy(ideas = currentIdeas) }
+                if (intent.index in currentIdeas.indices) {
+                    currentIdeas.removeAt(intent.index)
+                    _initState.update { it.copy(ideas = currentIdeas) }
+                }
             }
 
             is InitIntent.UpdateImage -> {
@@ -188,14 +184,15 @@ class InitViewModel @Inject constructor(
                     _initState.update { it.copy(errorMessage = null) }
                     createVacation(intent.vacationDto.copy(createdBy = uid))
                 } else {
-                    _initState.update { it.copy(errorMessage = UiText.StringResource(com.vacation.tripinmind.R.string.common_error_auth_message)) }
+                    _initState.update { it.copy(errorMessage = UiText.StringResource(R.string.common_error_auth_message)) }
                 }
             }
 
             is InitIntent.UpdateVacation -> updateVacation(intent.vacationDto)
 
             is InitIntent.LoadVacation -> {
-                viewModelScope.launch {
+                loadVacationJob?.cancel()
+                loadVacationJob = viewModelScope.launch {
                     vacationRepository.getItemById(intent.id).collect { vacation ->
                         vacation?.let {
                             _initState.update { currentState ->
@@ -203,7 +200,7 @@ class InitViewModel @Inject constructor(
                                     id = it.id,
                                     vacationName = it.name,
                                     startDate = it.startDate,
-                                    numDays = it.nbrDay,
+                                    endDate = it.endDate,
                                     days = it.days,
                                     ideas = it.ideas,
                                     image = it.image,

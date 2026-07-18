@@ -35,7 +35,7 @@ import com.vacation.tripinmind.ui.theme.MVIAppTheme
 @Composable
 fun VacationItem(
     vacationDto: VacationDto,
-    onItemSelected: (String) -> Unit,
+    onItemSelected: () -> Unit,
     onDeleteClick: () -> Unit,
     onArchiveClick: () -> Unit,
     filter: VacationFilter,
@@ -55,7 +55,7 @@ fun VacationItem(
             .height(80.dp)
             .padding(horizontal = 16.dp)
             .testTag("vacationCard"),
-        onClick = { onItemSelected(vacationDto.name) },
+        onClick = { onItemSelected() },
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.tertiary.copy(alpha = 0.8f)
         ),
@@ -144,8 +144,8 @@ fun VacationItemPreview() {
                 vacationDto = VacationDto(
                     id = "1",
                     name = "Summer in Paris",
-                    startDate = "10/05/2023",
-                    nbrDay = 5,
+                    startDate = 1683705600000L,
+                    endDate = 1684051200000L,
                     days = emptyList(),
                     ideas = emptyList(),
                     image = "vacation_ico",
@@ -171,8 +171,8 @@ fun VacationItemSharedPreview() {
                 vacationDto = VacationDto(
                     id = "1",
                     name = "Summer in Paris",
-                    startDate = "10/05/2023",
-                    nbrDay = 5,
+                    startDate = 1683705600000L,
+                    endDate = 1684051200000L,
                     days = emptyList(),
                     ideas = emptyList(),
                     image = "vacation_ico",

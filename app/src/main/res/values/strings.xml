@@ -1,6 +1,6 @@
 <resources>
     <string name="app_name">TripInMind</string>
-    <string name="homescreen_next_button">PREPARE YOUR NEXT VACATION</string>
+    <string name="homescreen_next_button">PLAN YOUR NEXT VACATION</string>
     <string name="homescreen_projects_button">My vacations (%1$d)</string>
     <string name="homescreen_archives_button">Archives (%1$d)</string>
     <string name="homescreen_shared_button">Shared (%1$d)</string>
@@ -12,25 +12,27 @@
     <string name="homescreen_archive_message">Vacation archived!</string>
     <string name="homescreen_unarchive_message">Vacation unarchived!</string>
     <string name="homescreen_share_code_text">Your share code is :\ </string>
+    <string name="homescreen_dialog_qrcode_title">QR CODE</string>
 
     <string name="detailsscreen_error_title">Your vacation</string>
     <string name="detailsscreen_dialog_address_title">ADDRESS</string>
     <string name="detailsscreen_error_no_days">No days added to this vacation yet.</string>
     <string name="detailsscreen_no_activities">No activities planned for this day.</string>
-    <string name="detailsscreen_error_no_idea">No idea for the moment</string>
-    <string name="detailsscreen_idea_title">Some other ideas :</string>
+    <string name="detailsscreen_error_no_idea">No ideas for the moment</string>
+    <string name="detailsscreen_idea_title">Some ideas :</string>
     <string name="detailsscreen_loading_vacation">Loading vacation details...</string>
     <string name="detailsscreen_edit_button">Edit</string>
     <string name="detailsscreen_share_button">Share</string>
     <string name="detailsscreen_share_bottomsheet_title">SHARE YOUR VACATION</string>
-    <string name="detailsscreen_share_bottomsheet_text">Allow up to 5 people to access this vacation planning</string>
-    <string name="detailsscreen_share_bottomsheet_text_2">Viewers can see the itinerary, activities and information but cannot modify anything</string>
+    <string name="detailsscreen_share_bottomsheet_text">Allow up to 5 people to view this vacation plan in read-only mode.</string>
+    <string name="detailsscreen_share_bottomsheet_scan_qr_button">SCAN QR CODE</string>
     <string name="detailsscreen_share_bottomsheet_add_viewer_title">Add a viewer</string>
     <string name="detailsscreen_share_bottomsheet_add_viewer_button">ADD VIEWER</string>
-    <string name="detailsscreen_share_bottomsheet_add_viewer_description">Ask the viewers for their code. It can be found on their home screen</string>
-    <string name="detailsscreen_share_bottomsheet_access_text">People with access :\ </string>
+    <string name="detailsscreen_share_bottomsheet_add_viewer_description">Ask the viewers for their code. It can be found on their home screen.</string>
+    <string name="detailsscreen_share_bottomsheet_access_text">People with access : </string>
     <string name="detailsscreen_share_bottomsheet_add_viewer_text">Enter the share code</string>
     <string name="detailsscreen_share_bottomsheet_placeholder">ABC-123-ABC-123</string>
+    <string name="detailsscreen_share_bottomsheet_unauthorize_scan">Camera permission is required</string>
     <string name="detailsscreen_share_error_not_found">User not found with this code.</string>
     <string name="detailsscreen_share_error_already_added">This user is already a viewer.</string>
     <string name="detailsscreen_share_error_not_yourself">You can\'t add yourself.</string>
@@ -38,13 +40,13 @@
 
     <string name="initscreen_title">Your vacation</string>
     <string name="initscreen_name_title">Name of your vacation</string>
-    <string name="initscreen_day_title">Number of days</string>
     <string name="initscreen_name_description">Enter name</string>
-    <string name="initscreen_day_description">Enter number between 1-15</string>
     <string name="initscreen_choose_icon_text">Choose an icon</string>
     <string name="initscreen_next_button">NEXT</string>
     <string name="initscreen_date_title">Start date</string>
-    <string name="initscreen_date_description">Select date</string>
+    <string name="initscreen_date_description">Select start date</string>
+    <string name="initscreen_end_date_title">End date</string>
+    <string name="initscreen_end_date_description">Select end date</string>
 
     <string name="activitiesscreen_title">What have you planned?</string>
     <string name="activitiesscreen_finish_button">FINISH</string>
@@ -52,19 +54,19 @@
     <string name="activitiesscreen_additional_info_description">With whom? Where? ...</string>
     <string name="activitiesscreen_activities_title">Activities</string>
     <string name="activitiesscreen_ideas_list_title">Ideas</string>
-    <string name="activitiesscreen_ideas_title">Do you have other ideas ?</string>
+    <string name="activitiesscreen_ideas_title">Do you have any other ideas ?</string>
     <string name="activitiesscreen_activities_description">Enter your activity</string>
     <string name="activitiesscreen_address_activities">Enter the address</string>
     <string name="activitiesscreen_ideas_description">Enter your idea</string>
     <string name="activitiesscreen_activities_add_title">New activity</string>
     <string name="activitiesscreen_ideas_add_title">New idea</string>
-    <string name="activitiesscreen_activities_max_text">Sorry, you have created too many activities for this day</string>
+    <string name="activitiesscreen_activities_max_text">Sorry, you have created too many activities for this day.</string>
     <string name="activitiesscreen_add_button">ADD</string>
     <string name="activitiesscreen_time_title">Time</string>
     <string name="activitiesscreen_duration_title">Duration</string>
     <string name="activitiesscreen_activities_empty">No activity planned yet.</string>
     <string name="activitiesscreen_ideas_empty">No ideas yet.</string>
-    <string name="activitiesscreen_ideas_max_text">Sorry, you have created too many ideas for this vacation</string>
+    <string name="activitiesscreen_ideas_max_text">Sorry, you have created too many ideas for this vacation.</string>
 
     <string name="common_error_title">Error</string>
     <string name="common_delete_button">Delete</string>
