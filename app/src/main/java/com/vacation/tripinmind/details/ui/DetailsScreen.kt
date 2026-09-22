@@ -35,7 +35,6 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -62,6 +61,7 @@ import com.vacation.tripinmind.details.model.VacationUiModel
 import com.vacation.tripinmind.details.viewmodel.DetailsViewModel
 import com.vacation.tripinmind.navigation.AppDestinations
 import com.vacation.tripinmind.ui.theme.MVIAppTheme
+import java.util.Calendar
 
 @Composable
 fun DetailsScreen(
@@ -222,6 +222,7 @@ fun DetailsScreenContent(
                     modifier = Modifier.padding(bottom = 8.dp)
                 ) {
                     vacationModel?.vacation?.let { currentVacation ->
+
                         Button(
                             onClick = { onEditClick(AppDestinations.buildEditRoute(currentVacation.id)) },
                             modifier = Modifier
@@ -305,7 +306,13 @@ fun DetailsScreenContent(
 
                     Spacer(modifier = Modifier.width(10.dp))
 
-                    val pagerState = rememberPagerState(pageCount = { currentVacation.days.size })
+                    val initialPage = remember(currentVacation.days) {
+                        findTodayPageIndex(currentVacation.days)
+                    }
+                    val pagerState = rememberPagerState(
+                        initialPage = initialPage,
+                        pageCount = { currentVacation.days.size }
+                    )
 
                     HorizontalPager(
                         state = pagerState,
@@ -368,6 +375,21 @@ fun DetailsScreenContent(
     }
 }
 
+private fun findTodayPageIndex(days: List<Day>): Int {
+    val today = Calendar.getInstance()
+
+    return days.indexOfFirst { day ->
+        val dayCalendar = Calendar.getInstance().apply {
+            timeInMillis = day.date
+        }
+
+        today.get(Calendar.YEAR) == dayCalendar.get(Calendar.YEAR) &&
+                today.get(Calendar.DAY_OF_YEAR) == dayCalendar.get(Calendar.DAY_OF_YEAR)
+    }.let { index ->
+        if (index >= 0) index else 0
+    }
+}
+
 @Preview(showBackground = true)
 @Composable
 fun DetailsScreenPreview() {
@@ -380,7 +402,8 @@ fun DetailsScreenPreview() {
                         name = "Paris Trip",
                         days = listOf(
                             Day(
-                                "Lundi 5 mars 2025",
+                                date = 1789862400000,
+                                "Mercredi 5 mars 2025",
                                 "with my father",
                                 listOf(
                                     Activity("Eiffel Tower", "01h00", "02h00", ""),
@@ -389,6 +412,7 @@ fun DetailsScreenPreview() {
                                 )
                             ),
                             Day(
+                                date = 1789862400000,
                                 "Day 2",
                                 "mother",
                                 listOf(
@@ -421,11 +445,13 @@ fun DetailsScreenSharedVacationPreview() {
                         name = "Paris Trip",
                         days = listOf(
                             Day(
+                                date = 1789862400000,
                                 "Day 1",
                                 "father",
                                 listOf()
                             ),
                             Day(
+                                date = 1789862400000,
                                 "Day 2",
                                 "mother",
                                 listOf()
@@ -455,11 +481,13 @@ fun DetailsScreenEmptyPreview() {
                         name = "Paris Trip",
                         days = listOf(
                             Day(
+                                date = 1789862400000,
                                 "Day 1",
                                 "father",
                                 listOf()
                             ),
                             Day(
+                                date = 1789862400000,
                                 "Day 2",
                                 "mother",
                                 listOf()

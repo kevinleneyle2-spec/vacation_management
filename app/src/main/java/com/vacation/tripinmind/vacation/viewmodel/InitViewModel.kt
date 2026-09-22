@@ -77,6 +77,7 @@ class InitViewModel @Inject constructor(
 
             val existingDay = currentDays.getOrNull(index)
             Day(
+                date = calendar.timeInMillis,
                 nameDay = dayName,
                 additionalInfo = existingDay?.additionalInfo ?: "",
                 activity = existingDay?.activity ?: emptyList()

@@ -63,6 +63,7 @@ class DetailsViewModelTest {
         endDate = 1714521600000L,
         days = listOf(
             Day(
+                date = 1789862400000,
                 nameDay = "Jour 1",
                 additionalInfo = "Info",
                 activity = listOf(fakeActivity)

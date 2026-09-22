@@ -92,6 +92,7 @@ fun DayCardPreview() {
         Surface {
             DayCard(
                 day = Day(
+                    date = 1789862400000,
                     nameDay = "Lundi 5 mars 2025",
                     additionalInfo = "with my father",
                     activity = listOf(

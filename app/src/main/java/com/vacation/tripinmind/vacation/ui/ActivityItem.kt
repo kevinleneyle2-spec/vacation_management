@@ -638,6 +638,7 @@ fun ActivitiesItem(
 fun ActivitiesItemPreview() {
     MVIAppTheme {
         val mockDay = Day(
+            date = 1789862400000,
             nameDay = "Lundi 5 mai 2025",
             additionalInfo = "Additional info",
             activity = listOf(

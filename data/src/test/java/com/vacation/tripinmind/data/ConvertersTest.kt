@@ -29,7 +29,7 @@ class ConvertersTest {
 
     @Test
     fun `fromDayList and toDayList serialization roundtrip works`() {
-        val days = listOf(Day(nameDay = "Jour 1", additionalInfo = "Info"))
+        val days = listOf(Day(date = 1789862400000,nameDay = "Jour 1", additionalInfo = "Info"))
         val json = converters.fromDayList(days)
         val result = converters.toDayList(json)
 

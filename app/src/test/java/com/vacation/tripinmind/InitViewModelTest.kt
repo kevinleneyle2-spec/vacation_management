@@ -52,6 +52,7 @@ class InitViewModelTest {
         endDate = 1685923200000L,
         days = listOf(
             Day(
+                date = 1789862400000,
                 nameDay = "Day 1",
                 additionalInfo = "Info",
                 activity = listOf(
