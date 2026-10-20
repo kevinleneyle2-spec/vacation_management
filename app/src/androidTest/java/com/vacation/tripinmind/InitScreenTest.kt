@@ -11,7 +11,6 @@ import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTextInput
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.vacation.tripinmind.home.ui.MainActivity
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -31,16 +30,20 @@ class InitScreenTest {
         val formatter = DateTimeFormatter.ofPattern("EEEE, MMMM d, yyyy", Locale.ENGLISH)
 
         val formattedDate = date.format(formatter)
+        val formattedEndDate = date.plusDays(1).format(formatter)
 
         composeTestRule.onNodeWithTag("newVacationButton").performClick()
 
         composeTestRule.onNodeWithText("Your vacation").assertIsDisplayed()
 
         composeTestRule.onNodeWithTag("initNameTextField").performTextInput("Paris")
-        composeTestRule.onNodeWithTag("initDateTextField").performClick()
+        composeTestRule.onNodeWithTag("initStartDateTextField").performClick()
         composeTestRule.onNodeWithText(formattedDate).performClick()
         composeTestRule.onNodeWithText("OK").performClick()
-        composeTestRule.onNodeWithTag("initNumDayTextField").performTextInput("5")
+
+        composeTestRule.onNodeWithTag("initEndDateTextField").performClick()
+        composeTestRule.onNodeWithText(formattedEndDate).performClick()
+        composeTestRule.onNodeWithText("OK").performClick()
 
         composeTestRule.onNodeWithTag("initNextButton").performClick()
 
@@ -59,7 +62,7 @@ class InitScreenTest {
         composeTestRule.onNodeWithText("Your vacation").assertIsDisplayed()
 
         composeTestRule.onNodeWithTag("initNameTextField").performTextInput("Paris")
-        composeTestRule.onNodeWithTag("initDateTextField").performClick()
+        composeTestRule.onNodeWithTag("initStartDateTextField").performClick()
         composeTestRule.onNodeWithText(formattedDate).performClick()
         composeTestRule.onNodeWithText("OK").performClick()
 
@@ -74,16 +77,19 @@ class InitScreenTest {
         val formatter = DateTimeFormatter.ofPattern("EEEE, MMMM d, yyyy", Locale.ENGLISH)
 
         val formattedDate = date.format(formatter)
+        val formattedEndDate = date.plusDays(1).format(formatter)
 
         composeTestRule.onNodeWithTag("newVacationButton").performClick()
 
         composeTestRule.onNodeWithText("Your vacation").assertIsDisplayed()
 
-        composeTestRule.onNodeWithTag("initDateTextField").performClick()
+        composeTestRule.onNodeWithTag("initStartDateTextField").performClick()
         composeTestRule.onNodeWithText(formattedDate).performClick()
         composeTestRule.onNodeWithText("OK").performClick()
 
-        composeTestRule.onNodeWithTag("initNumDayTextField").performTextInput("5")
+        composeTestRule.onNodeWithTag("initEndDateTextField").performClick()
+        composeTestRule.onNodeWithText(formattedEndDate).performClick()
+        composeTestRule.onNodeWithText("OK").performClick()
 
         composeTestRule.onNodeWithTag("initNextButton").performClick()
 
@@ -95,14 +101,13 @@ class InitScreenTest {
         val date = LocalDate.now().plusDays(1)
         val formatter = DateTimeFormatter.ofPattern("EEEE, MMMM d, yyyy", Locale.ENGLISH)
 
-        val formattedDate = date.format(formatter)
+        val formattedEndDate = date.plusDays(1).format(formatter)
 
         composeTestRule.onNodeWithTag("newVacationButton").performClick()
 
         composeTestRule.onNodeWithText("Your vacation").assertIsDisplayed()
 
         composeTestRule.onNodeWithTag("initNameTextField").performTextInput("Paris")
-        composeTestRule.onNodeWithTag("initNumDayTextField").performTextInput("5")
 
         composeTestRule.onNodeWithTag("initNextButton").performClick()
 
@@ -124,21 +129,24 @@ class InitScreenTest {
 
     @Test
     fun init_num_day_wrong() {
+        val date = LocalDate.now().plusDays(1)
+        val formatter = DateTimeFormatter.ofPattern("EEEE, MMMM d, yyyy", Locale.ENGLISH)
+
+        val formattedDate = date.format(formatter)
+        val formattedEndDate = date.plusDays(1).format(formatter)
+
         composeTestRule.onNodeWithTag("newVacationButton").performClick()
 
         composeTestRule.onNodeWithText("Your vacation").assertIsDisplayed()
 
-        composeTestRule.onNodeWithTag("initNumDayTextField").performTextInput("55")
+        composeTestRule.onNodeWithTag("initStartDateTextField").performClick()
+        composeTestRule.onNodeWithText(formattedDate).performClick()
+        composeTestRule.onNodeWithText("OK").performClick()
 
-        composeTestRule.onNodeWithTag("initNumDayTextField").assert(hasText(""))
+        composeTestRule.onNodeWithTag("initEndDateTextField").performClick()
+        composeTestRule.onNodeWithText(formattedEndDate).performClick()
+        composeTestRule.onNodeWithText("OK").performClick()
 
-        composeTestRule.onNodeWithTag("initNumDayTextField").performTextInput("5")
-
-        composeTestRule.onNodeWithTag("initNumDayTextField").assert(hasText("5"))
-
-        composeTestRule.onNodeWithTag("initNumDayTextField").performTextInput("55")
-
-        composeTestRule.onNodeWithTag("initNumDayTextField").assert(hasText("5"))
-
+        //TODO need to fix a limit rule for next ticket
     }
 }

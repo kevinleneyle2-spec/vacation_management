@@ -1,7 +1,7 @@
 package com.vacation.tripinmind.vacation.model
 
-import com.vacation.tripinmind.data.local.model.Day
-import com.vacation.tripinmind.data.local.model.VacationDto
+import com.vacation.tripinmind.model.Day
+import com.vacation.tripinmind.model.Vacation
 import com.vacation.tripinmind.mviapp.util.UiText
 
 data class VacationState(
@@ -15,8 +15,7 @@ data class VacationState(
     val isArchived: Boolean = false,
     val createdBy: String = "",
     val shareWith: List<String> = listOf(),
-    val shareWithUid: List<String> = listOf(),
-    val errorMessage: UiText? = null
+    val shareWithUid: List<String> = listOf()
 ) {
     val numDays: Int
         get() = if (startDate > 0L && endDate >= startDate) {
@@ -25,7 +24,7 @@ data class VacationState(
             days.size
         }
 
-    fun toVacationDto() = VacationDto(
+    fun toVacation() = Vacation(
         id = id,
         name = vacationName,
         startDate = startDate,

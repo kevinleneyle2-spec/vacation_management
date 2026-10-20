@@ -8,7 +8,7 @@ plugins {
 
 android {
     namespace = "com.vacation.tripinmind.data"
-    compileSdk = 36
+    compileSdk = 37
 
     defaultConfig {
         minSdk = 24
@@ -43,6 +43,7 @@ kotlin {
 }
 
 dependencies {
+    implementation(project(":domain"))
     implementation(libs.room.runtime)
     implementation(libs.room.ktx)
     ksp(libs.room.compiler)

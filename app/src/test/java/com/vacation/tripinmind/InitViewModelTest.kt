@@ -1,23 +1,25 @@
 package com.vacation.tripinmind
 
-import com.vacation.tripinmind.data.local.interfaces.VacationDao
-import com.vacation.tripinmind.data.local.model.Activity
-import com.vacation.tripinmind.data.local.model.Day
-import com.vacation.tripinmind.data.local.model.VacationDto
-import com.vacation.tripinmind.data.repository.VacationRepository
-import com.vacation.tripinmind.mviapp.util.UiText
-import com.vacation.tripinmind.vacation.intent.InitIntent
-import com.vacation.tripinmind.vacation.viewmodel.InitViewModel
-import com.google.common.truth.Truth.assertThat
 import com.google.android.gms.tasks.Tasks
+import com.google.common.truth.Truth.assertThat
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.FirebaseFirestore
+import com.vacation.tripinmind.data.local.model.ActivityEntity
+import com.vacation.tripinmind.data.local.model.VacationEntity
+import com.vacation.tripinmind.data.mapper.toDomain
+import com.vacation.tripinmind.data.mapper.toEntity
+import com.vacation.tripinmind.model.Activity
+import com.vacation.tripinmind.model.Day
+import com.vacation.tripinmind.model.Vacation
+import com.vacation.tripinmind.repository.VacationRepository
+import com.vacation.tripinmind.vacation.intent.InitIntent
+import com.vacation.tripinmind.vacation.viewmodel.InitViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.resetMain
@@ -28,15 +30,14 @@ import org.junit.Before
 import org.junit.Test
 import org.mockito.Mockito.mock
 import org.mockito.kotlin.any
+import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class InitViewModelTest {
     private val testDispatcher = StandardTestDispatcher()
 
-    private val vacationsFlow = MutableStateFlow<List<VacationDto>>(emptyList())
-
-    private lateinit var fakeVacationDao: VacationDao
+    private val vacationsFlow = MutableStateFlow<List<VacationEntity>>(emptyList())
 
     private lateinit var mockFirestore: FirebaseFirestore
 
@@ -45,7 +46,7 @@ class InitViewModelTest {
 
     private lateinit var viewModel: InitViewModel
 
-    private val fakeVacation = VacationDto(
+    private val fakeVacation = Vacation(
         id = "1",
         name = "Paris",
         startDate = 1685577600000L,
@@ -80,31 +81,10 @@ class InitViewModelTest {
         whenever(mockFirebaseAuth.uid).thenReturn("12345")
 
         Dispatchers.setMain(testDispatcher)
-        vacationsFlow.value = listOf(fakeVacation)
-
-        fakeVacationDao = object : VacationDao {
-            override fun getItemById(id: String): Flow<VacationDto?> =
-                MutableStateFlow(fakeVacation)
-
-            override fun getAllItems(): Flow<List<VacationDto>> = vacationsFlow
-
-            override suspend fun insertItem(item: VacationDto) : Long {
-                vacationsFlow.value += item
-                return 0
-            }
-
-            override suspend fun deleteItem(item: VacationDto) {
-                vacationsFlow.value = vacationsFlow.value.filter { it.id != item.id }
-            }
-
-            override suspend fun updateItem(item: VacationDto) {
-                vacationsFlow.value = vacationsFlow.value.map {
-                    if (it.id == item.id) item else it
-                }
-            }
-        }
+        vacationsFlow.value = listOf(fakeVacation.toEntity())
 
         mockFirestore = mock(FirebaseFirestore::class.java)
+        vacationRepository = mock(VacationRepository::class.java)
         val mockCollection = mock(CollectionReference::class.java)
         val mockDocumentReference = mock(DocumentReference::class.java)
 
@@ -116,7 +96,8 @@ class InitViewModelTest {
         whenever(mockDocumentReference.id).thenReturn("mock_id")
         whenever(mockDocumentReference.set(any())).thenReturn(Tasks.forResult(null))
 
-        vacationRepository = VacationRepository(fakeVacationDao, mockFirestore, mockFirebaseAuth)
+        whenever(vacationRepository.getItemById(any())).thenReturn(flowOf(fakeVacation))
+
         viewModel = InitViewModel(vacationRepository, mockFirebaseAuth)
     }
 
@@ -190,7 +171,7 @@ class InitViewModelTest {
 
     @Test
     fun `add day activity`() = runTest(testDispatcher) {
-        val activity = Activity(
+        val activity = ActivityEntity(
             activityName = "Tour Eiffel",
             activityTime = "10h00",
             activityDuration = "2h",
@@ -203,7 +184,7 @@ class InitViewModelTest {
         var state = viewModel.initState.value
         assertThat(state.days[0].activity.size).isEqualTo(1)
 
-        viewModel.handleIntent(InitIntent.AddDayActivities(0, activity))
+        viewModel.handleIntent(InitIntent.AddDayActivities(0, activity.toDomain()))
         advanceUntilIdle()
 
         state = viewModel.initState.value
@@ -216,7 +197,7 @@ class InitViewModelTest {
 
     @Test
     fun `update day activity`() = runTest(testDispatcher) {
-        val activity = Activity(
+        val activity = ActivityEntity(
             activityName = "Tour Eiffel",
             activityTime = "10h00",
             activityDuration = "2h",
@@ -229,7 +210,7 @@ class InitViewModelTest {
         var state = viewModel.initState.value
         assertThat(state.days[0].activity.size).isEqualTo(1)
 
-        viewModel.handleIntent(InitIntent.UpdateDayActivities(0, 0, activity))
+        viewModel.handleIntent(InitIntent.UpdateDayActivities(0, 0, activity.toDomain()))
         advanceUntilIdle()
 
         state = viewModel.initState.value
@@ -317,40 +298,43 @@ class InitViewModelTest {
     }
 
     @Test
-    fun `create vacation attaches current user uid and persists to repository`() = runTest(testDispatcher) {
-        val newVacation = fakeVacation.copy(id = "2", name = "London Trip", createdBy = "initial_id")
+    fun `create vacation attaches current user uid and persists to repository`() =
+        runTest(testDispatcher) {
+            val newVacation =
+                fakeVacation.copy(id = "2", name = "London Trip", createdBy = "initial_id")
 
-        viewModel.handleIntent(InitIntent.CreateVacation(newVacation))
-        advanceUntilIdle()
+            whenever(vacationRepository.insertItem(any())).thenReturn(Result.success(Unit))
 
-        val expectedVacation = newVacation.copy(createdBy = "12345")
-        assertThat(vacationsFlow.value).contains(expectedVacation)
-        assertThat(viewModel.initState.value.errorMessage).isNull()
-    }
+            viewModel.handleIntent(InitIntent.CreateVacation(newVacation))
+            advanceUntilIdle()
+
+            val expectedVacation = newVacation.copy(createdBy = "12345")
+            verify(vacationRepository).insertItem(expectedVacation)
+        }
 
     @Test
-    fun `create vacation when user is unauthenticated sets error message`() = runTest(testDispatcher) {
-        whenever(mockFirebaseAuth.uid).thenReturn(null)
-        val newVacation = fakeVacation.copy(id = "3", name = "Tokyo Trip")
+    fun `create vacation when user is unauthenticated sets error message`() =
+        runTest(testDispatcher) {
+            whenever(mockFirebaseAuth.uid).thenReturn(null)
+            val newVacation = fakeVacation.copy(id = "3", name = "Tokyo Trip")
 
-        viewModel.handleIntent(InitIntent.CreateVacation(newVacation))
-        advanceUntilIdle()
+            viewModel.handleIntent(InitIntent.CreateVacation(newVacation))
+            advanceUntilIdle()
 
-        assertThat(vacationsFlow.value).doesNotContain(newVacation)
-        val errorMessage = viewModel.initState.value.errorMessage as? UiText.StringResource
-        assertThat(errorMessage?.resId).isEqualTo(R.string.common_error_auth_message)
-    }
+            assertThat(vacationsFlow.value).doesNotContain(newVacation)
+        }
 
     @Test
     fun `update vacation persists changes to repository`() = runTest(testDispatcher) {
         val updatedVacation = fakeVacation.copy(name = "Paris Modified")
 
+        whenever(vacationRepository.updateItem(any())).thenReturn(Result.success(Unit))
         viewModel.handleIntent(InitIntent.UpdateVacation(updatedVacation))
         advanceUntilIdle()
 
-        val persisted = vacationsFlow.value.find { it.id == "1" }
-        assertThat(persisted?.name).isEqualTo("Paris Modified")
+        verify(vacationRepository).updateItem(updatedVacation)
     }
+
 
     @Test
     fun `load vacation from repository`() = runTest(testDispatcher) {

@@ -6,7 +6,7 @@ import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.vacation.tripinmind.data.local.database.VacationDatabase
 import com.vacation.tripinmind.data.local.interfaces.VacationDao
-import com.vacation.tripinmind.data.local.model.VacationDto
+import com.vacation.tripinmind.data.local.model.VacationEntity
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
@@ -34,7 +34,7 @@ class VacationDatabaseTest {
 
     @Test
     fun insertAndReadVacation() = runBlocking {
-        val vacation = VacationDto(
+        val vacation = VacationEntity(
             id = "1",
             name = "Test",
             startDate = 1685577600000L,
@@ -53,7 +53,7 @@ class VacationDatabaseTest {
 
     @Test
     fun deleteAndReadVacation() = runBlocking {
-        val vacation = VacationDto(
+        val vacation = VacationEntity(
             id = "1",
             name = "Test",
             startDate = 1685577600000L,
@@ -74,7 +74,7 @@ class VacationDatabaseTest {
 
     @Test
     fun updateAndReadVacation() = runBlocking {
-        val vacation = VacationDto(
+        val vacation = VacationEntity(
             id = "1",
             name = "Test",
             startDate = 1685577600000L,
@@ -94,7 +94,7 @@ class VacationDatabaseTest {
 
     @Test
     fun readVacation() = runBlocking {
-        val vacation = VacationDto(
+        val vacation = VacationEntity(
             id = "1",
             name = "Test",
             startDate = 1685577600000L,
@@ -114,7 +114,7 @@ class VacationDatabaseTest {
 
     @Test
     fun readAllVacationsOrderedByStartDate() = runBlocking {
-        val vacationLater = VacationDto(
+        val vacationLater = VacationEntity(
             id = "1",
             name = "Later Trip",
             startDate = 1700000000000L,
@@ -126,7 +126,7 @@ class VacationDatabaseTest {
             createdBy = "12345",
             shareWith = listOf()
         )
-        val vacationEarlier = VacationDto(
+        val vacationEarlier = VacationEntity(
             id = "2",
             name = "Earlier Trip",
             startDate = 1600000000000L,

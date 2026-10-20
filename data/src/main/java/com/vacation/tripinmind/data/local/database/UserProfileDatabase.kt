@@ -5,9 +5,9 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import com.vacation.tripinmind.data.local.interfaces.UserProfileDao
-import com.vacation.tripinmind.data.local.model.UserProfileDto
+import com.vacation.tripinmind.data.local.model.UserProfileEntity
 
-@Database(entities = [UserProfileDto::class], version = 1, exportSchema = false)
+@Database(entities = [UserProfileEntity::class], version = 1, exportSchema = false)
 abstract class UserProfileDatabase : RoomDatabase() {
 
     abstract fun userProfileDao(): UserProfileDao

@@ -5,11 +5,11 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
-import com.vacation.tripinmind.data.local.Converters
+import com.vacation.tripinmind.data.utils.Converters
 import com.vacation.tripinmind.data.local.interfaces.VacationDao
-import com.vacation.tripinmind.data.local.model.VacationDto
+import com.vacation.tripinmind.data.local.model.VacationEntity
 
-@Database(entities = [VacationDto::class], version = 1, exportSchema = false)
+@Database(entities = [VacationEntity::class], version = 1, exportSchema = false)
 @TypeConverters(Converters::class)
 abstract class VacationDatabase : RoomDatabase() {
 

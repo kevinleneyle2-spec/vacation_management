@@ -4,14 +4,10 @@ import android.content.Context
 import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.vacation.tripinmind.data.local.database.VacationDatabase
-import com.vacation.tripinmind.data.local.interfaces.VacationDao
-import com.vacation.tripinmind.data.local.model.VacationDto
 import com.google.common.truth.Truth.assertThat
 import com.vacation.tripinmind.data.local.database.UserProfileDatabase
 import com.vacation.tripinmind.data.local.interfaces.UserProfileDao
-import com.vacation.tripinmind.data.local.model.UserProfileDto
-import kotlinx.coroutines.flow.first
+import com.vacation.tripinmind.data.local.model.UserProfileEntity
 import kotlinx.coroutines.runBlocking
 import org.junit.After
 import org.junit.Before
@@ -37,7 +33,7 @@ class UserProfileDatabaseTest {
 
     @Test
     fun insertAndReadUserProfile() = runBlocking {
-        val userProfile = UserProfileDto(
+        val userProfile = UserProfileEntity(
             uuid = "12345",
             shareCode = "123-456-123-456"
         )
@@ -48,7 +44,7 @@ class UserProfileDatabaseTest {
 
     @Test
     fun readUserProfileByUid() = runBlocking {
-        val userProfile = UserProfileDto(
+        val userProfile = UserProfileEntity(
             uuid = "12345",
             shareCode = "123-456-123-456"
         )
@@ -59,7 +55,7 @@ class UserProfileDatabaseTest {
 
     @Test
     fun readUserProfileByShareCode() = runBlocking {
-        val userProfile = UserProfileDto(
+        val userProfile = UserProfileEntity(
             uuid = "12345",
             shareCode = "123-456-123-456"
         )

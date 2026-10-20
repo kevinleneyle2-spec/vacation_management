@@ -3,7 +3,7 @@ package com.vacation.tripinmind.data.local.model
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class Activity(
+data class ActivityEntity(
     val activityName: String = "",
     val activityTime: String = "",
     val activityDuration: String = "",

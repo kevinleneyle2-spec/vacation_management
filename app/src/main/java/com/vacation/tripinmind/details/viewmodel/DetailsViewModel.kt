@@ -4,12 +4,12 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.auth.FirebaseAuth
-import com.vacation.tripinmind.data.local.model.VacationDto
-import com.vacation.tripinmind.data.repository.UserProfileRepository
-import com.vacation.tripinmind.data.repository.VacationRepository
 import com.vacation.tripinmind.details.intent.DetailsIntent
 import com.vacation.tripinmind.details.model.DetailsError
 import com.vacation.tripinmind.details.model.VacationUiModel
+import com.vacation.tripinmind.model.Vacation
+import com.vacation.tripinmind.repository.UserProfileRepository
+import com.vacation.tripinmind.repository.VacationRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -57,7 +57,7 @@ class DetailsViewModel @Inject constructor(
     fun handleIntent(detailsIntent: DetailsIntent) {
         when (detailsIntent) {
             is DetailsIntent.AddViewer -> {
-                addViewer(detailsIntent.vacationDto, detailsIntent.shareCode)
+                addViewer(detailsIntent.vacation, detailsIntent.shareCode)
             }
 
             is DetailsIntent.ClearError -> {
@@ -74,9 +74,9 @@ class DetailsViewModel @Inject constructor(
 
     private fun removeViewer(index: Int) {
         viewModelScope.launch {
-            val vacationDto = vacation.value?.vacation
+            val vacation = vacation.value?.vacation
 
-            vacationDto?.let { currentVacation ->
+            vacation?.let { currentVacation ->
                 val newShareWith = currentVacation.shareWith.toMutableList().apply {
                     if (index in indices) removeAt(index)
                 }.toList()
@@ -89,50 +89,63 @@ class DetailsViewModel @Inject constructor(
                         shareWith = newShareWith,
                         shareWithUid = newShareWithUid
                     )
-                )
+                ).onFailure {
+                    it.message?.let { message ->
+                        _error.value = DetailsError.NOT_FOUND
+                    }
+                }
             }
         }
     }
 
-    private fun addViewer(vacationDto: VacationDto?, shareCode: String?) {
+    private fun addViewer(vacation: Vacation?, shareCode: String?) {
         _error.value = null
 
         viewModelScope.launch {
             shareCode?.let { userShareCode ->
                 val formattedCode = userShareCode.chunked(3).joinToString("-")
-                val userProfile = userProfileRepository.getItemByCode(formattedCode)
+                userProfileRepository.getItemByCode(formattedCode)
+                    .onSuccess { userProfile ->
+                        if (userProfile?.uuid == firebaseAuth.uid) {
+                            _error.value = DetailsError.NOT_YOURSELF
+                            return@launch
+                        }
 
-                if (userProfile?.uuid == firebaseAuth.uid) {
-                    _error.value = DetailsError.NOT_YOURSELF
-                    return@launch
-                }
+                        if (vacation != null && userProfile != null) {
+                            val shareWithAlreadyAdded =
+                                vacation.shareWith.any { it == userProfile.shareCode }
 
-                if (vacationDto != null && userProfile != null) {
-                    val shareWithAlreadyAdded =
-                        vacationDto.shareWith.any { it == userProfile.shareCode }
+                            if (vacation.shareWith.size >= 5) {
+                                _error.value = DetailsError.TOO_MANY_VIEWERS
+                                return@launch
+                            }
 
-                    if (vacationDto.shareWith.size >= 5) {
-                        _error.value = DetailsError.TOO_MANY_VIEWERS
-                        return@launch
+                            if (shareWithAlreadyAdded) {
+                                _error.value = DetailsError.ALREADY_ADDED
+                            } else {
+                                val shareWith = vacation.shareWith + userProfile.shareCode
+                                val shareWithUid = vacation.shareWithUid + userProfile.uuid
+
+                                vacationRepository.updateItem(
+                                    vacation.copy(
+                                        shareWith = shareWith,
+                                        shareWithUid = shareWithUid
+                                    )
+                                ).onFailure {
+                                    it.message?.let { message ->
+                                        _error.value = DetailsError.NOT_FOUND
+                                    }
+                                }.onSuccess {
+                                    _error.value = DetailsError.SUCCESS
+                                }
+                            }
+                        } else {
+                            _error.value = DetailsError.NOT_FOUND
+                        }
                     }
-
-                    if (shareWithAlreadyAdded) {
-                        _error.value = DetailsError.ALREADY_ADDED
-                    } else {
-                        val shareWith = vacationDto.shareWith + userProfile.shareCode
-                        val shareWithUid = vacationDto.shareWithUid + userProfile.uuid
-
-                        vacationRepository.updateItem(
-                            vacationDto.copy(
-                                shareWith = shareWith,
-                                shareWithUid = shareWithUid
-                            )
-                        )
-                        _error.value = DetailsError.SUCCESS
+                    .onFailure {
+                        _error.value = DetailsError.NOT_FOUND
                     }
-                } else {
-                    _error.value = DetailsError.NOT_FOUND
-                }
             }
         }
     }

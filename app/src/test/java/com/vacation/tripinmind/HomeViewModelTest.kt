@@ -3,24 +3,27 @@ package com.vacation.tripinmind
 import com.google.common.truth.Truth.assertThat
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.crashlytics.FirebaseCrashlytics
-import com.vacation.tripinmind.data.local.interfaces.VacationDao
-import com.vacation.tripinmind.data.local.model.VacationDto
-import com.vacation.tripinmind.data.repository.VacationRepository
 import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.Filter
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ListenerRegistration
 import com.google.firebase.firestore.Query
 import com.vacation.tripinmind.data.local.interfaces.UserProfileDao
-import com.vacation.tripinmind.data.local.model.UserProfileDto
-import com.vacation.tripinmind.data.repository.UserProfileRepository
-import com.vacation.tripinmind.home.model.VacationFilter
+import com.vacation.tripinmind.data.local.interfaces.VacationDao
+import com.vacation.tripinmind.data.local.model.UserProfileEntity
+import com.vacation.tripinmind.data.local.model.VacationEntity
+import com.vacation.tripinmind.data.mapper.toDomain
+import com.vacation.tripinmind.data.mapper.toDto
+import com.vacation.tripinmind.data.repository.UserProfileRepositoryImpl
 import com.vacation.tripinmind.home.intent.VacationIntent
+import com.vacation.tripinmind.home.model.VacationFilter
 import com.vacation.tripinmind.home.viewmodel.HomeViewModel
+import com.vacation.tripinmind.repository.VacationRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
@@ -39,21 +42,20 @@ import org.mockito.kotlin.whenever
 class HomeViewModelTest {
     private val testDispatcher = StandardTestDispatcher()
 
-    private val vacationsFlow = MutableStateFlow<List<VacationDto>>(emptyList())
-    private val sharedVacationsFlow = MutableStateFlow<List<VacationDto>>(emptyList())
+    private val vacationsFlow = MutableStateFlow<List<VacationEntity>>(emptyList())
+    private val sharedVacationsFlow = MutableStateFlow<List<VacationEntity>>(emptyList())
 
-    private lateinit var fakeVacationDao: VacationDao
     private lateinit var fakeUserProfileDao: UserProfileDao
     private lateinit var mockFirestore: FirebaseFirestore
 
     private lateinit var mockFirebaseAuth: FirebaseAuth
     private lateinit var mockFirebaseCrashlytics: FirebaseCrashlytics
     private lateinit var vacationRepository: VacationRepository
-    private lateinit var userProfileRepository: UserProfileRepository
+    private lateinit var userProfileRepository: UserProfileRepositoryImpl
 
     private lateinit var viewModel: HomeViewModel
 
-    private val fakeVacation = VacationDto(
+    private val fakeVacation = VacationEntity(
         id = "1",
         name = "Paris",
         startDate = 1685577600000L,
@@ -66,7 +68,7 @@ class HomeViewModelTest {
         shareWith = listOf()
     )
 
-    private val fakeUserProfile = UserProfileDto(
+    private val fakeUserProfile = UserProfileEntity(
         uuid = "12345",
         shareCode = "123-456-123-456"
     )
@@ -86,32 +88,13 @@ class HomeViewModelTest {
         vacationsFlow.value = listOf(fakeVacation)
         sharedVacationsFlow.value = emptyList()
 
-        fakeVacationDao = object : VacationDao {
-            override fun getItemById(id: String): Flow<VacationDto> =
-                MutableStateFlow(fakeVacation)
-
-            override fun getAllItems(): Flow<List<VacationDto>> = vacationsFlow
-
-            override suspend fun insertItem(item: VacationDto) : Long { return 0 }
-
-            override suspend fun deleteItem(item: VacationDto) {
-                vacationsFlow.value = vacationsFlow.value.filter { it.id != item.id }
-            }
-
-            override suspend fun updateItem(item: VacationDto) {
-                vacationsFlow.value = vacationsFlow.value.map {
-                    if (it.id == item.id) item else it
-                }
-            }
-        }
-
         fakeUserProfileDao = object : UserProfileDao {
-            override suspend fun getItemById(uuid: String): UserProfileDto =
+            override suspend fun getItemById(uuid: String): UserProfileEntity =
                 fakeUserProfile
 
-            override suspend fun insertItem(item: UserProfileDto) { }
+            override suspend fun insertItem(item: UserProfileEntity) {}
 
-            override suspend fun getItemByCode(shareCode: String): UserProfileDto =
+            override suspend fun getItemByCode(shareCode: String): UserProfileEntity =
                 fakeUserProfile
         }
 
@@ -127,12 +110,23 @@ class HomeViewModelTest {
         whenever(mockQuery.addSnapshotListener(any())).thenReturn(mockRegistration)
 
         vacationRepository = mock(VacationRepository::class.java)
-        whenever(vacationRepository.getAllItems()).thenReturn(vacationsFlow)
-        whenever(vacationRepository.getSharedVacationsFlow()).thenReturn(sharedVacationsFlow)
+        whenever(vacationRepository.observeVacations()).thenReturn(vacationsFlow.map { vacations ->
+            vacations.map { it.toDomain() }
+        })
+        whenever(vacationRepository.getSharedVacationsFlow()).thenReturn(sharedVacationsFlow.map { vacations ->
+            vacations.map {
+                it.toDomain()
+            }
+        })
 
-        userProfileRepository = mock(UserProfileRepository::class.java)
+        userProfileRepository = mock(UserProfileRepositoryImpl::class.java)
 
-        viewModel = HomeViewModel(vacationRepository, userProfileRepository, mockFirebaseAuth, mockFirebaseCrashlytics)
+        viewModel = HomeViewModel(
+            vacationRepository,
+            userProfileRepository,
+            mockFirebaseAuth,
+            mockFirebaseCrashlytics
+        )
     }
 
     @After
@@ -143,8 +137,8 @@ class HomeViewModelTest {
     @Test
     fun `create share code should set crashlytics user id`() = runTest(testDispatcher) {
         backgroundScope.launch { viewModel.vacationState.collect {} }
-        whenever(userProfileRepository.insertItem()).thenReturn("123-456-123-456")
-        
+        whenever(userProfileRepository.insertItem()).thenReturn(Result.success("123-456-123-456"))
+
         viewModel.handleIntent(VacationIntent.CreateShareCode)
         advanceUntilIdle()
 
@@ -170,10 +164,10 @@ class HomeViewModelTest {
 
         assertThat(viewModel.vacationState.value.vacations).hasSize(1)
 
-        viewModel.handleIntent(VacationIntent.DeleteVacation(fakeVacation))
+        viewModel.handleIntent(VacationIntent.DeleteVacation(fakeVacation.toDomain()))
         advanceUntilIdle()
 
-        verify(vacationRepository).deleteItem(fakeVacation)
+        verify(vacationRepository).deleteItem(fakeVacation.toDomain())
     }
 
     @Test
@@ -184,10 +178,10 @@ class HomeViewModelTest {
         val state = viewModel.vacationState.value
         assertThat(state.vacations).hasSize(1)
 
-        viewModel.handleIntent(VacationIntent.ArchiveVacation(fakeVacation))
+        viewModel.handleIntent(VacationIntent.ArchiveVacation(fakeVacation.toDomain()))
         advanceUntilIdle()
 
-        verify(vacationRepository).updateItem(fakeVacation.copy(isArchived = true))
+        verify(vacationRepository).updateItem(fakeVacation.copy(isArchived = true).toDomain())
     }
 
     @Test
@@ -217,7 +211,7 @@ class HomeViewModelTest {
     @Test
     fun `create share code and emits share code`() = runTest(testDispatcher) {
         backgroundScope.launch { viewModel.vacationState.collect {} }
-        whenever(userProfileRepository.insertItem()).thenReturn("123-456-123-456")
+        whenever(userProfileRepository.insertItem()).thenReturn(Result.success("123-456-123-456"))
 
         var state = viewModel.vacationState.value
         assertThat(state.shareCode).isEmpty()

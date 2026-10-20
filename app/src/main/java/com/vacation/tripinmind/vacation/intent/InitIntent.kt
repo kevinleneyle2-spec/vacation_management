@@ -1,7 +1,7 @@
 package com.vacation.tripinmind.vacation.intent
 
-import com.vacation.tripinmind.data.local.model.Activity
-import com.vacation.tripinmind.data.local.model.VacationDto
+import com.vacation.tripinmind.model.Activity
+import com.vacation.tripinmind.model.Vacation
 
 sealed class InitIntent {
     data class UpdateName(val name: String) : InitIntent()
@@ -24,9 +24,9 @@ sealed class InitIntent {
 
     data class RemoveIdea(val index: Int) : InitIntent()
 
-    data class CreateVacation(val vacationDto: VacationDto) : InitIntent()
+    data class CreateVacation(val vacation: Vacation) : InitIntent()
 
-    data class UpdateVacation(val vacationDto: VacationDto) : InitIntent()
+    data class UpdateVacation(val vacation: Vacation) : InitIntent()
 
     data class LoadVacation(val id: String) : InitIntent()
 }

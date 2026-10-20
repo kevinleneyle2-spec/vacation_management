@@ -27,15 +27,15 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.vacation.tripinmind.data.local.model.VacationDto
 import com.vacation.tripinmind.R
 import com.vacation.tripinmind.home.model.VacationFilter
+import com.vacation.tripinmind.model.Vacation
 import com.vacation.tripinmind.ui.theme.MVIAppTheme
 
 @Composable
 fun VacationItem(
-    vacationDto: VacationDto,
-    onItemSelected: () -> Unit,
+    vacationDto: Vacation,
+    onItemSelected: (String?, Boolean) -> Unit,
     onDeleteClick: () -> Unit,
     onArchiveClick: () -> Unit,
     filter: VacationFilter,
@@ -55,7 +55,12 @@ fun VacationItem(
             .height(80.dp)
             .padding(horizontal = 16.dp)
             .testTag("vacationCard"),
-        onClick = { onItemSelected() },
+        onClick = {
+            onItemSelected(
+                vacationDto.id,
+                filter == VacationFilter.SHARED
+            )
+        },
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.tertiary.copy(alpha = 0.8f)
         ),
@@ -141,7 +146,7 @@ fun VacationItemPreview() {
     MVIAppTheme {
         Box(modifier = Modifier.padding(vertical = 16.dp)) {
             VacationItem(
-                vacationDto = VacationDto(
+                vacationDto = Vacation(
                     id = "1",
                     name = "Summer in Paris",
                     startDate = 1683705600000L,
@@ -153,7 +158,7 @@ fun VacationItemPreview() {
                     createdBy = "",
                     shareWith = listOf()
                 ),
-                onItemSelected = {},
+                onItemSelected = {_, _ -> },
                 onDeleteClick = {},
                 onArchiveClick = {},
                 filter = VacationFilter.PROJECTS
@@ -168,7 +173,7 @@ fun VacationItemSharedPreview() {
     MVIAppTheme {
         Box(modifier = Modifier.padding(vertical = 16.dp)) {
             VacationItem(
-                vacationDto = VacationDto(
+                vacationDto = Vacation(
                     id = "1",
                     name = "Summer in Paris",
                     startDate = 1683705600000L,
@@ -180,7 +185,7 @@ fun VacationItemSharedPreview() {
                     createdBy = "",
                     shareWith = listOf()
                 ),
-                onItemSelected = {},
+                onItemSelected = {_, _ -> },
                 onDeleteClick = {},
                 onArchiveClick = {},
                 filter = VacationFilter.SHARED

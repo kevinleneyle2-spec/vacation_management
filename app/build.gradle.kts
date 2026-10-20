@@ -10,7 +10,7 @@ plugins {
 
 android {
     namespace = "com.vacation.tripinmind"
-    compileSdk = 36
+    compileSdk = 37
 
     defaultConfig {
         applicationId = "com.vacation.tripinmind"
@@ -53,6 +53,7 @@ kotlin {
 }
 
 dependencies {
+    implementation(project(":domain"))
     implementation(project(":data"))
     ksp(libs.dagger.hilt.compiler)
     implementation(libs.dagger.hilt.android)

@@ -2,19 +2,23 @@ package com.vacation.tripinmind.vacation.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.vacation.tripinmind.data.local.model.Day
-import com.vacation.tripinmind.data.local.model.VacationDto
-import com.vacation.tripinmind.data.repository.VacationRepository
-import com.vacation.tripinmind.mviapp.util.UiText
 import com.google.firebase.auth.FirebaseAuth
 import com.vacation.tripinmind.R
+import com.vacation.tripinmind.model.Day
+import com.vacation.tripinmind.model.Vacation
+import com.vacation.tripinmind.mviapp.util.UiText
+import com.vacation.tripinmind.repository.VacationRepository
+import com.vacation.tripinmind.util.UiEvent
 import com.vacation.tripinmind.vacation.intent.InitIntent
 import com.vacation.tripinmind.vacation.model.VacationState
 import com.vacation.tripinmind.vacation.ui.InitViewModelActions
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
@@ -36,21 +40,34 @@ class InitViewModel @Inject constructor(
     private val _initValidation = MutableStateFlow(false)
     override val initValidation: StateFlow<Boolean> = _initValidation
 
+    private val _initUiEvent = Channel<UiEvent>()
+    val initUiEvent = _initUiEvent.receiveAsFlow()
+
     private val outputSdf = SimpleDateFormat("EEEE d MMMM yyyy", Locale.getDefault()).apply {
         timeZone = TimeZone.getTimeZone("UTC")
     }
 
     private var loadVacationJob: Job? = null
 
-    private fun createVacation(vacationDto: VacationDto) {
+    private fun createVacation(vacation: Vacation) {
         viewModelScope.launch {
-            vacationRepository.insertItem(vacationDto)
+            vacationRepository.insertItem(vacation)
+                .onFailure { e ->
+                    e.message?.let {
+                        _initUiEvent.send(UiEvent.ShowSnackbar(UiText.DynamicString(it)))
+                    }
+                }
         }
     }
 
-    private fun updateVacation(vacationDto: VacationDto) {
+    private fun updateVacation(vacation: Vacation) {
         viewModelScope.launch {
-            vacationRepository.updateItem(vacationDto)
+            vacationRepository.updateItem(vacation)
+                .onFailure { e ->
+                    e.message?.let {
+                        _initUiEvent.send(UiEvent.ShowSnackbar(UiText.DynamicString(it)))
+                    }
+                }
         }
     }
 
@@ -94,21 +111,28 @@ class InitViewModel @Inject constructor(
 
             is InitIntent.UpdateStartDate -> {
                 _initState.update { currentState ->
-                    val updatedEndDate = if (currentState.endDate > 0L && currentState.endDate < intent.date) {
-                        intent.date
-                    } else {
-                        currentState.endDate
-                    }
+                    val updatedEndDate =
+                        if (currentState.endDate > 0L && currentState.endDate < intent.date) {
+                            intent.date
+                        } else {
+                            currentState.endDate
+                        }
                     val newDays = calculateDays(intent.date, updatedEndDate, currentState.days)
-                    currentState.copy(startDate = intent.date, endDate = updatedEndDate, days = newDays)
+                    currentState.copy(
+                        startDate = intent.date,
+                        endDate = updatedEndDate,
+                        days = newDays
+                    )
                 }
                 updateValidation()
             }
 
             is InitIntent.UpdateEndDate -> {
                 _initState.update { currentState ->
-                    val validEndDate = if (intent.date >= currentState.startDate) intent.date else currentState.startDate
-                    val newDays = calculateDays(currentState.startDate, validEndDate, currentState.days)
+                    val validEndDate =
+                        if (intent.date >= currentState.startDate) intent.date else currentState.startDate
+                    val newDays =
+                        calculateDays(currentState.startDate, validEndDate, currentState.days)
                     currentState.copy(endDate = validEndDate, days = newDays)
                 }
                 updateValidation()
@@ -182,36 +206,45 @@ class InitViewModel @Inject constructor(
             is InitIntent.CreateVacation -> {
                 val uid = firebaseAuth.uid
                 if (uid != null) {
-                    _initState.update { it.copy(errorMessage = null) }
-                    createVacation(intent.vacationDto.copy(createdBy = uid))
+                    createVacation(intent.vacation.copy(createdBy = uid))
                 } else {
-                    _initState.update { it.copy(errorMessage = UiText.StringResource(R.string.common_error_auth_message)) }
+                    viewModelScope.launch {
+                        _initUiEvent.send(UiEvent.ShowSnackbar(UiText.StringResource(R.string.common_error_auth_message)))
+                    }
                 }
             }
 
-            is InitIntent.UpdateVacation -> updateVacation(intent.vacationDto)
+            is InitIntent.UpdateVacation -> updateVacation(intent.vacation)
 
             is InitIntent.LoadVacation -> {
                 loadVacationJob?.cancel()
                 loadVacationJob = viewModelScope.launch {
-                    vacationRepository.getItemById(intent.id).collect { vacation ->
-                        vacation?.let {
-                            _initState.update { currentState ->
-                                currentState.copy(
-                                    id = it.id,
-                                    vacationName = it.name,
-                                    startDate = it.startDate,
-                                    endDate = it.endDate,
-                                    days = it.days,
-                                    ideas = it.ideas,
-                                    image = it.image,
-                                    isArchived = it.isArchived,
-                                    createdBy = it.createdBy,
-                                    shareWith = it.shareWith,
-                                    shareWithUid = it.shareWithUid
-                                )
+                    try {
+                        vacationRepository.getItemById(intent.id).collect { vacation ->
+                            vacation?.let {
+                                _initState.update { currentState ->
+                                    currentState.copy(
+                                        id = it.id,
+                                        vacationName = it.name,
+                                        startDate = it.startDate,
+                                        endDate = it.endDate,
+                                        days = it.days,
+                                        ideas = it.ideas,
+                                        image = it.image,
+                                        isArchived = it.isArchived,
+                                        createdBy = it.createdBy,
+                                        shareWith = it.shareWith,
+                                        shareWithUid = it.shareWithUid
+                                    )
+                                }
+                                updateValidation()
                             }
-                            updateValidation()
+                        }
+                    } catch (e: CancellationException) {
+                        throw e
+                    } catch (e: Exception) {
+                        e.message?.let {
+                            _initUiEvent.send(UiEvent.ShowSnackbar(UiText.DynamicString(it)))
                         }
                     }
                 }

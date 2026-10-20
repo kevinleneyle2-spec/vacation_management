@@ -1,4 +1,4 @@
-package com.vacation.tripinmind.home.ui
+package com.vacation.tripinmind
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -11,8 +11,7 @@ import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.compose.rememberNavController
 import com.google.firebase.auth.FirebaseAuth
-import com.vacation.tripinmind.navigation.AppDestinations
-import com.vacation.tripinmind.navigation.AppNavHost
+import com.vacation.tripinmind.navigation.AppNavigation
 import com.vacation.tripinmind.ui.theme.MVIAppTheme
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.delay
@@ -26,16 +25,12 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         initSplashScreen()
-
         super.onCreate(savedInstanceState)
 
         setContent {
             MVIAppTheme {
                 val navController = rememberNavController()
-                AppNavHost(
-                    navController = navController,
-                    startDestination = AppDestinations.HOME_ROUTE
-                )
+                AppNavigation(navController = navController)
             }
         }
     }

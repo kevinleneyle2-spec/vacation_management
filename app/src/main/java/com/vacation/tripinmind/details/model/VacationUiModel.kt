@@ -1,6 +1,6 @@
 package com.vacation.tripinmind.details.model
 
-import com.vacation.tripinmind.data.local.model.VacationDto
+import com.vacation.tripinmind.model.Vacation
 
 enum class DetailsError {
     NOT_FOUND,
@@ -11,7 +11,7 @@ enum class DetailsError {
 }
 
 data class VacationUiModel(
-    val vacation: VacationDto,
+    val vacation: Vacation,
     val error: DetailsError? = null,
     val isSharedVacation: Boolean = false
 )

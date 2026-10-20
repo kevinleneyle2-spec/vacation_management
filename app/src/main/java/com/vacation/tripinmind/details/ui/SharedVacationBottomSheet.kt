@@ -67,9 +67,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.vacation.tripinmind.R
-import com.vacation.tripinmind.data.local.model.VacationDto
 import com.vacation.tripinmind.details.model.DetailsError
 import com.vacation.tripinmind.details.model.VacationUiModel
+import com.vacation.tripinmind.model.Vacation
 import com.vacation.tripinmind.ui.theme.MVIAppTheme
 import com.vacation.tripinmind.util.ShareCodeVisualTransformation
 
@@ -455,7 +455,7 @@ fun SharedVacationBottomSheetPreview() {
             onAddViewer = {},
             onClearError = {},
             vacationModel = VacationUiModel(
-                VacationDto(
+                Vacation(
                     id = "",
                     shareWith = listOf("AAA-111-AAA-111")
                 ), error = DetailsError.SUCCESS

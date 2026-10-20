@@ -4,15 +4,15 @@ import androidx.lifecycle.SavedStateHandle
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import com.google.firebase.auth.FirebaseAuth
-import com.vacation.tripinmind.data.local.model.Activity
-import com.vacation.tripinmind.data.local.model.Day
-import com.vacation.tripinmind.data.local.model.UserProfileDto
-import com.vacation.tripinmind.data.local.model.VacationDto
-import com.vacation.tripinmind.data.repository.UserProfileRepository
-import com.vacation.tripinmind.data.repository.VacationRepository
 import com.vacation.tripinmind.details.intent.DetailsIntent
 import com.vacation.tripinmind.details.model.DetailsError
 import com.vacation.tripinmind.details.viewmodel.DetailsViewModel
+import com.vacation.tripinmind.model.Activity
+import com.vacation.tripinmind.model.Day
+import com.vacation.tripinmind.model.UserProfile
+import com.vacation.tripinmind.model.Vacation
+import com.vacation.tripinmind.repository.UserProfileRepository
+import com.vacation.tripinmind.repository.VacationRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -46,17 +46,17 @@ class DetailsViewModelTest {
         activityLocation = "Paris"
     )
 
-    private val fakeUserProfileYourSelf = UserProfileDto(
+    private val fakeUserProfileYourSelf = UserProfile(
         uuid = "12345",
         shareCode = "000000000"
     )
 
-    private val fakeUserProfile = UserProfileDto(
+    private val fakeUserProfile = UserProfile(
         uuid = "54321",
         shareCode = "000000000"
     )
 
-    private val fakeVacation = VacationDto(
+    private val fakeVacation = Vacation(
         id = "1",
         name = "Paris Trip",
         startDate = 1714521600000L,
@@ -153,7 +153,7 @@ class DetailsViewModelTest {
 
     @Test
     fun `when AddViewer intent is sent then error NOT_YOURSELF is returned`() = runTest {
-        whenever(userProfileRepository.getItemByCode(any())).thenReturn(fakeUserProfileYourSelf)
+        whenever(userProfileRepository.getItemByCode(any())).thenReturn(Result.success(fakeUserProfileYourSelf))
 
         viewModel.vacation.test {
             skipItems(2)
@@ -168,10 +168,14 @@ class DetailsViewModelTest {
 
     @Test
     fun `when AddViewer intent is sent then error ALREADY_ADDED is returned`() = runTest {
-        whenever(userProfileRepository.getItemByCode(any())).thenReturn(UserProfileDto(
-            uuid = "123456",
-            shareCode = "111111"
-        ))
+        whenever(userProfileRepository.getItemByCode(any())).thenReturn(
+            Result.success(
+                UserProfile(
+                    uuid = "123456",
+                    shareCode = "111111"
+                )
+            )
+        )
 
         viewModel.vacation.test {
             skipItems(2)
@@ -186,8 +190,8 @@ class DetailsViewModelTest {
 
     @Test
     fun `when AddViewer intent is sent then error in UI model should be null`() = runTest {
-        whenever(userProfileRepository.getItemByCode(any())).thenReturn(fakeUserProfile)
-        whenever(vacationRepository.updateItem(any())).thenReturn(Unit)
+        whenever(userProfileRepository.getItemByCode(any())).thenReturn(Result.success(fakeUserProfile))
+        whenever(vacationRepository.updateItem(any())).thenReturn(Result.success(Unit))
 
         viewModel.vacation.test {
             skipItems(2)
@@ -206,19 +210,20 @@ class DetailsViewModelTest {
     }
 
     @Test
-    fun `when RemoveViewer intent is sent then vacationRepository updateItem is called with removed viewer`() = runTest {
-        whenever(vacationRepository.updateItem(any())).thenReturn(Unit)
+    fun `when RemoveViewer intent is sent then vacationRepository updateItem is called with removed viewer`() =
+        runTest {
+            whenever(vacationRepository.updateItem(any())).thenReturn(Result.success(Unit))
 
-        viewModel.vacation.test {
-            skipItems(2)
+            viewModel.vacation.test {
+                skipItems(2)
 
-            viewModel.handleIntent(DetailsIntent.RemoveViewer(0))
-            advanceUntilIdle()
+                viewModel.handleIntent(DetailsIntent.RemoveViewer(0))
+                advanceUntilIdle()
 
-            verify(vacationRepository).updateItem(check { updatedVacation ->
-                assertThat(updatedVacation.shareWith).isEmpty()
-                assertThat(updatedVacation.shareWithUid).isEmpty()
-            })
+                verify(vacationRepository).updateItem(check { updatedVacation ->
+                    assertThat(updatedVacation.shareWith).isEmpty()
+                    assertThat(updatedVacation.shareWithUid).isEmpty()
+                })
+            }
         }
-    }
 }

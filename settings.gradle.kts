@@ -25,3 +25,4 @@ dependencyResolutionManagement {
 rootProject.name = "TripInMind"
 include(":app")
 include(":data")
+include(":domain")

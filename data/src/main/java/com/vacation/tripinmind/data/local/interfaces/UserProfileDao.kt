@@ -4,17 +4,16 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
-import com.vacation.tripinmind.data.local.model.UserProfileDto
-import kotlinx.coroutines.flow.Flow
+import com.vacation.tripinmind.data.local.model.UserProfileEntity
 
 @Dao
 interface UserProfileDao {
     @Query("SELECT * from user_profile WHERE shareCode = :shareCode")
-    suspend fun getItemByCode(shareCode: String): UserProfileDto?
+    suspend fun getItemByCode(shareCode: String): UserProfileEntity?
 
     @Query("SELECT * from user_profile WHERE uuid = :uuid")
-    suspend fun getItemById(uuid: String): UserProfileDto?
+    suspend fun getItemById(uuid: String): UserProfileEntity?
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertItem(item: UserProfileDto)
+    suspend fun insertItem(item: UserProfileEntity)
 }

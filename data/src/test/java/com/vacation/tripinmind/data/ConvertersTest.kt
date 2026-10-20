@@ -1,7 +1,7 @@
 package com.vacation.tripinmind.data
 
-import com.vacation.tripinmind.data.local.Converters
-import com.vacation.tripinmind.data.local.model.Day
+import com.vacation.tripinmind.data.utils.Converters
+import com.vacation.tripinmind.data.local.model.DayEntity
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
@@ -29,7 +29,7 @@ class ConvertersTest {
 
     @Test
     fun `fromDayList and toDayList serialization roundtrip works`() {
-        val days = listOf(Day(date = 1789862400000,nameDay = "Jour 1", additionalInfo = "Info"))
+        val days = listOf(DayEntity(date = 1789862400000,nameDay = "Jour 1", additionalInfo = "Info"))
         val json = converters.fromDayList(days)
         val result = converters.toDayList(json)
 

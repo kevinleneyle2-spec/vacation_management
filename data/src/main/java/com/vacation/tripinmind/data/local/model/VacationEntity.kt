@@ -5,12 +5,12 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 
 @Entity(tableName = "vacation")
-data class VacationDto(
+data class VacationEntity(
     @PrimaryKey val id: String = "",
     @ColumnInfo val name: String = "",
     @ColumnInfo val startDate: Long = 0L,
     @ColumnInfo val endDate: Long = 0L,
-    @ColumnInfo val days: List<Day> = listOf(),
+    @ColumnInfo val days: List<DayEntity> = listOf(),
     @ColumnInfo val ideas: List<String> = listOf(),
     @ColumnInfo val image: String = "",
     @ColumnInfo val isArchived: Boolean = false,

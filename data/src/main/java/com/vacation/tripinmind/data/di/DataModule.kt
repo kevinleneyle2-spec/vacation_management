@@ -12,8 +12,14 @@ import com.vacation.tripinmind.data.local.database.UserProfileDatabase
 import com.vacation.tripinmind.data.local.database.VacationDatabase
 import com.vacation.tripinmind.data.local.interfaces.UserProfileDao
 import com.vacation.tripinmind.data.local.interfaces.VacationDao
-import com.vacation.tripinmind.data.repository.UserProfileRepository
-import com.vacation.tripinmind.data.repository.VacationRepository
+import com.vacation.tripinmind.data.remote.source.UserProfileFirestoreDataSource
+import com.vacation.tripinmind.data.remote.source.UserProfileRemoteDataSource
+import com.vacation.tripinmind.data.remote.source.VacationFirestoreDataSource
+import com.vacation.tripinmind.data.remote.source.VacationRemoteDataSource
+import com.vacation.tripinmind.data.repository.UserProfileRepositoryImpl
+import com.vacation.tripinmind.data.repository.VacationRepositoryImpl
+import com.vacation.tripinmind.repository.UserProfileRepository
+import com.vacation.tripinmind.repository.VacationRepository
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -51,12 +57,28 @@ object DataModule {
 
     @Provides
     @Singleton
+    fun provideVacationRemoteDataSource(
+        firestore: FirebaseFirestore
+    ): VacationRemoteDataSource {
+        return VacationFirestoreDataSource(firestore)
+    }
+
+    @Provides
+    @Singleton
+    fun provideUserProfileRemoteDataSource(
+        firestore: FirebaseFirestore
+    ): UserProfileRemoteDataSource {
+        return UserProfileFirestoreDataSource(firestore)
+    }
+
+    @Provides
+    @Singleton
     fun provideVacationRepository(
         vacationDao: VacationDao,
-        firestore: FirebaseFirestore,
+        remoteDataSource: VacationRemoteDataSource,
         firebaseAuth: FirebaseAuth
     ): VacationRepository {
-        return VacationRepository(vacationDao, firestore, firebaseAuth)
+        return VacationRepositoryImpl(vacationDao, remoteDataSource, firebaseAuth)
     }
 
     @Provides
@@ -75,9 +97,9 @@ object DataModule {
     @Singleton
     fun provideUserProfileRepository(
         userProfileDao: UserProfileDao,
-        firestore: FirebaseFirestore,
+        remoteDataSource: UserProfileRemoteDataSource,
         firebaseAuth: FirebaseAuth
     ): UserProfileRepository {
-        return UserProfileRepository(userProfileDao, firestore, firebaseAuth)
+        return UserProfileRepositoryImpl(userProfileDao, remoteDataSource, firebaseAuth)
     }
 }

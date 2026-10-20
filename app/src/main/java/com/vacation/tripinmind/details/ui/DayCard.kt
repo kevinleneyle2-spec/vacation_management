@@ -23,8 +23,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.vacation.tripinmind.R
-import com.vacation.tripinmind.data.local.model.Activity
-import com.vacation.tripinmind.data.local.model.Day
+import com.vacation.tripinmind.model.Activity
+import com.vacation.tripinmind.model.Day
 import com.vacation.tripinmind.ui.theme.MVIAppTheme
 
 @Composable

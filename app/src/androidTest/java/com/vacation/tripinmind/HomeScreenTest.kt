@@ -11,9 +11,10 @@ import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
-import com.vacation.tripinmind.data.local.model.VacationDto
+import com.vacation.tripinmind.data.local.model.VacationEntity
 import com.vacation.tripinmind.home.model.VacationUiViewState
 import com.vacation.tripinmind.home.ui.HomeScreenContent
+import com.vacation.tripinmind.model.Vacation
 import com.vacation.tripinmind.ui.theme.MVIAppTheme
 import org.junit.Assert.assertEquals
 import org.junit.Rule
@@ -26,7 +27,7 @@ class HomeScreenTest {
     @JvmField
     var composeTestRule: ComposeContentTestRule = createComposeRule()
 
-    private val fakeVacation = VacationDto(
+    private val fakeVacation = Vacation(
         id = "1",
         name = "Paris",
         startDate = 1683705600000L,
@@ -48,14 +49,17 @@ class HomeScreenTest {
     @Test
     fun new_vacation_button_works() {
         var navigated = false
+
         composeTestRule.setContent {
             MVIAppTheme {
                 HomeScreenContent(
                     vacationUiState = VacationUiViewState(),
-                    onDeleteVacation = {}, onArchiveVacation = {},
+                    onDeleteVacation = {},
+                    onArchiveVacation = {},
                     onToggleShowFilterVacations = {},
-                    onNavigate = { navigated = true },
-                    onShowQrcode = {}
+                    onShowQrcode = {},
+                    onVacationDetailsClick = { _, _ -> },
+                    onAddVacationClick = { navigated = true }
                 )
             }
         }
@@ -67,24 +71,23 @@ class HomeScreenTest {
 
     @Test
     fun vacation_details_click_works() {
-        var clickedId = -1L
+        var clicked = false
         composeTestRule.setContent {
             MVIAppTheme {
                 HomeScreenContent(
                     vacationUiState = VacationUiViewState(vacations = listOf(fakeVacation)),
                     onDeleteVacation = {}, onArchiveVacation = {},
                     onToggleShowFilterVacations = {},
-                    onNavigate = { route ->
-                        if (route.contains("1")) clickedId = 1
-                    },
-                    onShowQrcode = {}
+                    onShowQrcode = {},
+                    onVacationDetailsClick = { _, _ -> clicked = true },
+                    onAddVacationClick = { }
                 )
             }
         }
 
         composeTestRule.onNodeWithTag("vacationCard").performClick()
 
-        assertEquals(1L, clickedId)
+        assertEquals(true, clicked)
     }
 
     @Test
@@ -108,8 +111,9 @@ class HomeScreenTest {
                     onToggleShowFilterVacations = { selectFilter ->
                         uiState.value = uiState.value.copy(selectedFilter = selectFilter)
                     },
-                    onNavigate = {},
-                    onShowQrcode = {}
+                    onShowQrcode = {},
+                    onVacationDetailsClick = { _, _ -> },
+                    onAddVacationClick = { }
                 )
             }
         }
@@ -134,7 +138,7 @@ class HomeScreenTest {
 
         composeTestRule.onNodeWithText("No vacations archived").assertIsDisplayed()
 
-        composeTestRule.onNodeWithTag("vacationViewButton").performClick()
+        composeTestRule.onNodeWithTag("projectVacationViewButton").performClick()
 
         firstCard.assertIsDisplayed()
     }
@@ -160,8 +164,9 @@ class HomeScreenTest {
                     onToggleShowFilterVacations = { selectFilter ->
                         uiState.value = uiState.value.copy(selectedFilter = selectFilter)
                     },
-                    onNavigate = {},
-                    onShowQrcode = {}
+                    onShowQrcode = {},
+                    onVacationDetailsClick = { _, _ -> },
+                    onAddVacationClick = { }
                 )
             }
         }
@@ -184,8 +189,9 @@ class HomeScreenTest {
                     onDeleteVacation = { uiState.value = VacationUiViewState() },
                     onArchiveVacation = {},
                     onToggleShowFilterVacations = {},
-                    onNavigate = {},
-                    onShowQrcode = {}
+                    onShowQrcode = {},
+                    onVacationDetailsClick = { _, _ -> },
+                    onAddVacationClick = { }
                 )
             }
         }

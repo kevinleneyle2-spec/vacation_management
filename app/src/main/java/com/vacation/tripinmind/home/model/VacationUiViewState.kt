@@ -1,12 +1,11 @@
 package com.vacation.tripinmind.home.model
 
-import com.vacation.tripinmind.data.local.model.VacationDto
-import com.vacation.tripinmind.home.model.VacationFilter
+import com.vacation.tripinmind.model.Vacation
 
 data class VacationUiViewState(
     val isLoading: Boolean = false,
-    val vacations: List<VacationDto> = emptyList(),
-    val sharedVacations: List<VacationDto> = emptyList(),
+    val vacations: List<Vacation> = emptyList(),
+    val sharedVacations: List<Vacation> = emptyList(),
     val selectedFilter: VacationFilter = VacationFilter.PROJECTS,
     val shareCode: String = ""
 )

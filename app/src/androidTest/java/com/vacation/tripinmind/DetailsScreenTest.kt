@@ -8,7 +8,6 @@ import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTextInput
-import com.vacation.tripinmind.home.ui.MainActivity
 import org.junit.Rule
 import org.junit.Test
 import java.time.LocalDate
@@ -27,16 +26,19 @@ class DetailsScreenTest {
         val formatter = DateTimeFormatter.ofPattern("EEEE, MMMM d, yyyy", Locale.ENGLISH)
 
         val formattedDate = date.format(formatter)
+        val formattedEndDate = date.plusDays(1).format(formatter)
 
         composeTestRule.onNodeWithTag("newVacationButton").performClick()
 
         composeTestRule.onNodeWithText("Your vacation").assertIsDisplayed()
 
         composeTestRule.onNodeWithTag("initNameTextField").performTextInput("Paris")
-        composeTestRule.onNodeWithTag("initDateTextField").performClick()
+        composeTestRule.onNodeWithTag("initStartDateTextField").performClick()
         composeTestRule.onNodeWithText(formattedDate).performClick()
         composeTestRule.onNodeWithText("OK").performClick()
-        composeTestRule.onNodeWithTag("initNumDayTextField").performTextInput("5")
+        composeTestRule.onNodeWithTag("initEndDateTextField").performClick()
+        composeTestRule.onNodeWithText(formattedEndDate).performClick()
+        composeTestRule.onNodeWithText("OK").performClick()
 
         composeTestRule.onNodeWithTag("initNextButton").performClick()
 

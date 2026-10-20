@@ -3,9 +3,9 @@ package com.vacation.tripinmind.data.local.model
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class Day(
+data class DayEntity(
     val date: Long,
     val nameDay: String = "",
     val additionalInfo: String = "",
-    val activity: List<Activity> = listOf()
+    val activity: List<ActivityEntity> = listOf()
 )

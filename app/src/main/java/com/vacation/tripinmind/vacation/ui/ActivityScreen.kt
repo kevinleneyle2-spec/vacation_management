@@ -2,13 +2,8 @@ package com.vacation.tripinmind.vacation.ui
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.ButtonDefaults
@@ -17,6 +12,8 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.ScaffoldDefaults
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -24,32 +21,43 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.vacation.tripinmind.data.local.model.Activity
-import com.vacation.tripinmind.data.local.model.Day
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.vacation.tripinmind.R
-import com.vacation.tripinmind.navigation.AppDestinations
-import com.vacation.tripinmind.ui.theme.MVIAppTheme
+import com.vacation.tripinmind.util.UiEvent
 import com.vacation.tripinmind.vacation.intent.InitIntent
-import com.vacation.tripinmind.vacation.model.VacationState
 import com.vacation.tripinmind.vacation.viewmodel.InitViewModel
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ActivitiesScreen(
-    viewModel: InitViewModel,
+    viewModel: InitViewModel = hiltViewModel(),
     vacationId: String? = null,
-    onNavigate: (String) -> Unit = {},
+    onHomeClick: () -> Unit = {},
     onBackClick: () -> Unit = {}
 ) {
-    val initState by viewModel.initState.collectAsState()
+    val context = LocalContext.current
+    val initState by viewModel.initState.collectAsStateWithLifecycle()
+    val snackbarHostState = remember { SnackbarHostState() }
+
+    LaunchedEffect(Unit) {
+        viewModel.initUiEvent.collect { event ->
+            when (event) {
+                is UiEvent.ShowSnackbar -> {
+                    snackbarHostState.showSnackbar(event.message.asString(context))
+                }
+            }
+        }
+    }
 
     LaunchedEffect(vacationId) {
         if (vacationId != null) {
@@ -57,52 +65,6 @@ fun ActivitiesScreen(
         }
     }
 
-    ActivitiesContent(
-        state = initState,
-        onBackClick = onBackClick,
-        onUpdateAddInfo = { index, name ->
-            viewModel.handleIntent(InitIntent.UpdateAddInfo(index, name))
-        },
-        onAddDayActivities = { index, activity ->
-            viewModel.handleIntent(InitIntent.AddDayActivities(index, activity))
-        },
-        onModifyDayActivities = { dayNumber, index, activity ->
-            viewModel.handleIntent(InitIntent.UpdateDayActivities(dayNumber, index, activity))
-        },
-        onRemoveDayActivities = { dayNumber, index ->
-            viewModel.handleIntent(InitIntent.RemoveDayActivities(dayNumber, index))
-        },
-        onCreateVacation = {
-            if (vacationId != null) {
-                viewModel.handleIntent(InitIntent.UpdateVacation(initState.toVacationDto()))
-                onBackClick()
-            } else {
-                viewModel.handleIntent(InitIntent.CreateVacation(initState.toVacationDto()))
-                onNavigate(AppDestinations.HOME_ROUTE)
-            }
-        },
-        onAddIdea = { idea ->
-            viewModel.handleIntent(InitIntent.AddIdea(idea))
-        },
-        onRemoveIdea = { index ->
-            viewModel.handleIntent(InitIntent.RemoveIdea(index))
-        }
-    )
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun ActivitiesContent(
-    state: VacationState,
-    onBackClick: () -> Unit,
-    onUpdateAddInfo: (Int, String) -> Unit,
-    onAddDayActivities: (Int, Activity) -> Unit,
-    onModifyDayActivities: (Int, Int, Activity) -> Unit,
-    onRemoveDayActivities: (Int, Int) -> Unit,
-    onAddIdea: (String) -> Unit,
-    onRemoveIdea: (Int) -> Unit,
-    onCreateVacation: () -> Unit
-) {
     Scaffold(
         topBar = {
             TopAppBar(
@@ -140,9 +102,16 @@ fun ActivitiesContent(
                 ) {
                     TextButton(
                         onClick = {
-                            onCreateVacation()
+                            if (vacationId != null) {
+                                viewModel.handleIntent(InitIntent.UpdateVacation(initState.toVacation()))
+                                onBackClick()
+                            } else {
+                                viewModel.handleIntent(InitIntent.CreateVacation(initState.toVacation()))
+                                onHomeClick()
+                            }
                         },
-                        modifier = Modifier.fillMaxWidth()
+                        modifier = Modifier
+                            .fillMaxWidth()
                             .testTag("activityFinishButton"),
                         colors = ButtonDefaults.textButtonColors(
                             containerColor = MaterialTheme.colorScheme.primary,
@@ -157,88 +126,30 @@ fun ActivitiesContent(
                 }
             }
         },
-        contentWindowInsets = androidx.compose.material3.ScaffoldDefaults.contentWindowInsets
+        contentWindowInsets = ScaffoldDefaults.contentWindowInsets
     ) { paddingValues ->
-        LazyColumn(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(paddingValues),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
-        ) {
-            item {
-                Spacer(modifier = Modifier.height(8.dp))
-            }
 
-            itemsIndexed(
-                state.days
-            ) { index, day ->
-                ActivitiesItem(
-                    day = day,
-                    onAddInfo = { newValue ->
-                        if (newValue.length <= 100 && !newValue.contains("\n")) {
-                            onUpdateAddInfo(index, newValue)
-                        }
-                    },
-                    onAddActivity = { activity ->
-                        onAddDayActivities(
-                            index,
-                            activity
-                        )
-                    },
-                    onModifyActivity = { updateIndex, activity ->
-                        onModifyDayActivities(index, updateIndex, activity)
-                    },
-                    onRemoveActivity = { removeIndex ->
-                        onRemoveDayActivities(index, removeIndex)
-                    }
-                )
-            }
-
-            item {
-                Spacer(modifier = Modifier.height(16.dp))
-
-                IdeaItem(
-                    ideas = state.ideas,
-                    onAddIdea = { name ->
-                        onAddIdea(name)
-                    },
-                    onRemoveIdea = { index ->
-                        onRemoveIdea(index)
-                    }
-                )
-
-                Spacer(modifier = Modifier.height(16.dp))
-            }
-        }
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun ActivitiesScreenPreview() {
-    MVIAppTheme {
-        Surface {
-            ActivitiesContent(
-                state = VacationState(
-                    days = listOf(
-                        Day(
-                            date = 1789862400000,
-                            "Day 1",
-                            "test",
-                            listOf(Activity("Visit the Eiffel Tower", "10:00", "2h00"))
-                        ),
-                        Day(date = 1789862400000,"Day 2", "", listOf(Activity("Go to the Louvre", "14:00", "2h00")))
-                    )
-                ),
-                onBackClick = {},
-                onUpdateAddInfo = { _, _ -> },
-                onAddDayActivities = { _, _ -> },
-                onModifyDayActivities = { _, _, _ -> },
-                onRemoveDayActivities = { _, _ -> },
-                onCreateVacation = {},
-                onAddIdea = {},
-                onRemoveIdea = {}
-            )
-        }
+        ActivitiesScreenContent(
+            state = initState,
+            onUpdateAddInfo = { index, name ->
+                viewModel.handleIntent(InitIntent.UpdateAddInfo(index, name))
+            },
+            onAddDayActivities = { index, activity ->
+                viewModel.handleIntent(InitIntent.AddDayActivities(index, activity))
+            },
+            onModifyDayActivities = { dayNumber, index, activity ->
+                viewModel.handleIntent(InitIntent.UpdateDayActivities(dayNumber, index, activity))
+            },
+            onRemoveDayActivities = { dayNumber, index ->
+                viewModel.handleIntent(InitIntent.RemoveDayActivities(dayNumber, index))
+            },
+            onAddIdea = { idea ->
+                viewModel.handleIntent(InitIntent.AddIdea(idea))
+            },
+            onRemoveIdea = { index ->
+                viewModel.handleIntent(InitIntent.RemoveIdea(index))
+            },
+            modifier = Modifier.padding(paddingValues)
+        )
     }
 }

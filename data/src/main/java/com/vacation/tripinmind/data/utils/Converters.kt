@@ -1,8 +1,7 @@
-package com.vacation.tripinmind.data.local
+package com.vacation.tripinmind.data.utils
 
 import androidx.room.TypeConverter
-import com.vacation.tripinmind.data.local.model.Day
-import kotlinx.serialization.encodeToString
+import com.vacation.tripinmind.data.local.model.DayEntity
 import kotlinx.serialization.json.Json
 
 class Converters {
@@ -13,7 +12,7 @@ class Converters {
     }
 
     @TypeConverter
-    fun fromDayList(value: List<Day>?): String {
+    fun fromDayList(value: List<DayEntity>?): String {
         if (value == null) return "[]"
         return try {
             json.encodeToString(value)
@@ -23,7 +22,7 @@ class Converters {
     }
 
     @TypeConverter
-    fun toDayList(value: String?): List<Day> {
+    fun toDayList(value: String?): List<DayEntity> {
         if (value.isNullOrBlank()) return emptyList()
         return try {
             json.decodeFromString(value)
