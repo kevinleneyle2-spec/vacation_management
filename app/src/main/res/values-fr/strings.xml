@@ -72,6 +72,7 @@
     <string name="common_error_title">Erreur</string>
     <string name="common_delete_button">Supprimer</string>
     <string name="common_cancel_button">Annuler</string>
+    <string name="common_all_day_text">Toute la journée</string>">
     <string name="common_ok_button">OK</string>
     <string name="common_error_auth_message">Une erreur est apparue pendant l\'authentification.</string>
 </resources>

@@ -41,6 +41,7 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -63,6 +64,7 @@ import androidx.compose.ui.window.Dialog
 import com.vacation.tripinmind.R
 import com.vacation.tripinmind.model.Activity
 import com.vacation.tripinmind.model.Day
+import com.vacation.tripinmind.mviapp.util.UiText
 import com.vacation.tripinmind.ui.theme.MVIAppTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -82,8 +84,10 @@ fun ActivitiesItem(
     val timeListState = rememberLazyListState()
     val durationListState = rememberLazyListState()
 
+    val allDayText = stringResource(R.string.common_all_day_text)
+
     var errorMessageShowed by remember { mutableStateOf<Boolean?>(false) }
-    var updateActivityIndex by remember { mutableStateOf(-1) }
+    var updateActivityIndex by remember { mutableIntStateOf(-1) }
     var addressActivityValue by remember { mutableStateOf("") }
     var nameActivityValue by remember { mutableStateOf("") }
     var activityTimeValue by remember { mutableStateOf("12h00") }
@@ -99,8 +103,18 @@ fun ActivitiesItem(
 
     val durationOptions = remember {
         (0..6).flatMap { hour ->
-            listOf("00", "15", "30", "45").map { min ->
-                "${hour.toString().padStart(2, '0')}h$min"
+            if (hour != 6) {
+                listOf("00", "15", "30", "45").map { min ->
+                    when (hour) {
+                        0 if min == "00" -> {
+                            allDayText
+                        }
+                        else
+                            -> "${hour.toString().padStart(2, '0')}h$min"
+                    }
+                }
+            } else {
+                listOf("${hour.toString().padStart(2, '0')}h00")
             }
         }
     }
@@ -277,7 +291,8 @@ fun ActivitiesItem(
                 day.activity.forEachIndexed { index, activity ->
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
-                        modifier = Modifier.fillMaxWidth()
+                        modifier = Modifier
+                            .fillMaxWidth()
                             .testTag("activityList")
                     ) {
                         Text(
