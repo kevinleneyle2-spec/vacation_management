@@ -27,6 +27,9 @@ import java.util.Date
 import java.util.Locale
 import java.util.TimeZone
 import javax.inject.Inject
+import kotlin.time.Duration.Companion.days
+
+private val VALIDITY_DAYS = 20L.days
 
 @HiltViewModel
 class InitViewModel @Inject constructor(
@@ -73,14 +76,16 @@ class InitViewModel @Inject constructor(
 
     private fun updateValidation() {
         val state = _initState.value
+        val duration = if (state.endDate >= state.startDate) state.endDate - state.startDate else -1L
         val isValid = state.vacationName.isNotBlank() &&
                 state.startDate > 0L &&
-                state.endDate >= state.startDate
+                state.endDate >= state.startDate &&
+                duration <= VALIDITY_DAYS.inWholeMilliseconds
         _initValidation.value = isValid
     }
 
     private fun calculateDays(startDate: Long, endDate: Long, currentDays: List<Day>): List<Day> {
-        if (startDate <= 0L || endDate < startDate) return emptyList()
+        if (startDate !in 1..endDate) return emptyList()
 
         val count = ((endDate - startDate) / (1000 * 60 * 60 * 24)).toInt() + 1
         val baseDate = Date(startDate)
@@ -117,6 +122,12 @@ class InitViewModel @Inject constructor(
                         } else {
                             currentState.endDate
                         }
+                    val duration = if (updatedEndDate >= intent.date) updatedEndDate - intent.date else 0L
+                    if (duration > VALIDITY_DAYS.inWholeMilliseconds) {
+                        viewModelScope.launch {
+                            _initUiEvent.send(UiEvent.ShowSnackbar(UiText.StringResource(R.string.initscreen_date_max_duration_error)))
+                        }
+                    }
                     val newDays = calculateDays(intent.date, updatedEndDate, currentState.days)
                     currentState.copy(
                         startDate = intent.date,
@@ -131,6 +142,13 @@ class InitViewModel @Inject constructor(
                 _initState.update { currentState ->
                     val validEndDate =
                         if (intent.date >= currentState.startDate) intent.date else currentState.startDate
+                    val duration = validEndDate - currentState.startDate
+                    if (duration > VALIDITY_DAYS.inWholeMilliseconds) {
+                        viewModelScope.launch {
+                            _initUiEvent.send(UiEvent.ShowSnackbar(UiText.StringResource(R.string.initscreen_date_max_duration_error)))
+                        }
+                        return
+                    }
                     val newDays =
                         calculateDays(currentState.startDate, validEndDate, currentState.days)
                     currentState.copy(endDate = validEndDate, days = newDays)

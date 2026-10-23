@@ -9,6 +9,7 @@ import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performScrollTo
 import androidx.compose.ui.test.performTextInput
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import org.junit.Rule
@@ -133,20 +134,23 @@ class InitScreenTest {
         val formatter = DateTimeFormatter.ofPattern("EEEE, MMMM d, yyyy", Locale.ENGLISH)
 
         val formattedDate = date.format(formatter)
-        val formattedEndDate = date.plusDays(1).format(formatter)
+        val formattedEndDate = date.plusMonths(1).format(formatter)
 
         composeTestRule.onNodeWithTag("newVacationButton").performClick()
 
         composeTestRule.onNodeWithText("Your vacation").assertIsDisplayed()
 
+        composeTestRule.onNodeWithTag("initNameTextField").performTextInput("Paris")
         composeTestRule.onNodeWithTag("initStartDateTextField").performClick()
         composeTestRule.onNodeWithText(formattedDate).performClick()
         composeTestRule.onNodeWithText("OK").performClick()
 
         composeTestRule.onNodeWithTag("initEndDateTextField").performClick()
-        composeTestRule.onNodeWithText(formattedEndDate).performClick()
+        composeTestRule.onNodeWithText(formattedEndDate).performScrollTo().performClick()
         composeTestRule.onNodeWithText("OK").performClick()
 
-        //TODO need to fix a limit rule for next ticket
+        composeTestRule.onNodeWithTag("initNextButton").performClick()
+
+        composeTestRule.onNodeWithText("What have you planned?").assertIsNotDisplayed()
     }
 }

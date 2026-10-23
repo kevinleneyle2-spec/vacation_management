@@ -47,6 +47,7 @@
     <string name="initscreen_date_description">Select start date</string>
     <string name="initscreen_end_date_title">End date</string>
     <string name="initscreen_end_date_description">Select end date</string>
+    <string name="initscreen_date_max_duration_error">The maximum duration of a trip is 20 days.</string>
 
     <string name="activitiesscreen_title">What have you planned?</string>
     <string name="activitiesscreen_finish_button">FINISH</string>
