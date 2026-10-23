@@ -27,6 +27,10 @@ class MainActivity : ComponentActivity() {
         initSplashScreen()
         super.onCreate(savedInstanceState)
 
+        if (auth.currentUser == null) {
+            auth.signInAnonymously()
+        }
+
         setContent {
             MVIAppTheme {
                 val navController = rememberNavController()

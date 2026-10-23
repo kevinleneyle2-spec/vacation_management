@@ -62,6 +62,7 @@ class VacationRepositoryImpl @Inject constructor(
     }
 
     private suspend fun syncRemoteVacationById(id: String) {
+        if (firebaseAuth.currentUser == null) return
         val remoteVacation = remoteDataSource.getVacationById(id)
 
         if (remoteVacation != null) {
@@ -82,7 +83,9 @@ class VacationRepositoryImpl @Inject constructor(
 
         vacationDao.insertItem(finalItem.toEntity())
         return try {
-            remoteDataSource.saveVacation(finalItem.toDto())
+            if (firebaseAuth.currentUser != null) {
+                remoteDataSource.saveVacation(finalItem.toDto())
+            }
             Result.success(Unit)
         } catch (e: CancellationException) {
             throw e
@@ -95,7 +98,9 @@ class VacationRepositoryImpl @Inject constructor(
         val itemEntity = item.toEntity()
         vacationDao.deleteItem(itemEntity)
         return try {
-            remoteDataSource.deleteVacation(itemEntity.id)
+            if (firebaseAuth.currentUser != null) {
+                remoteDataSource.deleteVacation(itemEntity.id)
+            }
             Result.success(Unit)
         } catch (e: CancellationException) {
             throw e
@@ -108,7 +113,9 @@ class VacationRepositoryImpl @Inject constructor(
         val itemEntity = item.toEntity()
         vacationDao.upsertItem(itemEntity)
         return try {
-            remoteDataSource.saveVacation(item.toDto())
+            if (firebaseAuth.currentUser != null) {
+                remoteDataSource.saveVacation(item.toDto())
+            }
             Result.success(Unit)
         } catch (e: CancellationException) {
             throw e

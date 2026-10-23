@@ -43,7 +43,8 @@ class DetailsViewModelTest {
         activityName = "Tour Eiffel",
         activityTime = "10h00",
         activityDuration = "2h",
-        activityLocation = "Paris"
+        activityLocation = "Paris",
+        activityTravelTime = "01h00"
     )
 
     private val fakeUserProfileYourSelf = UserProfile(

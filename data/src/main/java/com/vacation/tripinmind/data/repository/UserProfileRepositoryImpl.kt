@@ -20,6 +20,13 @@ class UserProfileRepositoryImpl @Inject constructor(
 ) : UserProfileRepository {
 
     override suspend fun getItemByCode(shareCode: String): Result<UserProfile?> {
+        if (firebaseAuth.currentUser == null) {
+            try {
+                firebaseAuth.signInAnonymously().await()
+            } catch (_: Exception) {
+                // ignore
+            }
+        }
         return try {
             val userProfile = remoteDataSource.getUserProfileByShareCode(shareCode)
             Result.success(userProfile?.toDomain())

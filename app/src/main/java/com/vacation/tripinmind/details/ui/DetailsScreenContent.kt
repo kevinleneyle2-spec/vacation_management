@@ -48,7 +48,7 @@ fun DetailsScreenContent(
     onSharedVacationClick: () -> Unit = {},
     onEditClick: (String) -> Unit = {},
     onLocationClick: (String) -> Unit = {},
-    modifier: Modifier = Modifier,
+    modifier: Modifier,
 ) {
     Column(
         modifier = modifier
@@ -126,7 +126,7 @@ fun DetailsScreenContent(
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(top = 60.dp, bottom = 16.dp),
+                        .padding(top = 20.dp, bottom = 16.dp),
                     horizontalArrangement = Arrangement.Center
                 ) {
                     Image(
@@ -237,9 +237,9 @@ fun DetailsScreenContentPreview() {
                                 "Mercredi 5 mars 2025",
                                 "with my father",
                                 listOf(
-                                    Activity("Eiffel Tower", "01h00", "02h00", ""),
-                                    Activity("Eiffel Tower", "01h00", "02h00", ""),
-                                    Activity("Louvre Museum", "04h30", "02h00", "")
+                                    Activity("Eiffel Tower", "01h00", "02h00", "", "01h00"),
+                                    Activity("Eiffel Tower", "01h00", "02h00", "", "01h00"),
+                                    Activity("Louvre Museum", "04h30", "02h00", "", "01h00")
                                 )
                             ),
                             Day(
@@ -247,14 +247,15 @@ fun DetailsScreenContentPreview() {
                                 "Day 2",
                                 "mother",
                                 listOf(
-                                    Activity("Notre Dame", "", "09:00", "2h00"),
-                                    Activity("Seine River Cruise", "", "18:00", "2h00")
+                                    Activity("Notre Dame", "", "09:00", "2h00", "01h00"),
+                                    Activity("Seine River Cruise", "", "18:00", "2h00", "01h00")
                                 )
                             )
                         ),
                         ideas = listOf("piscine", "tennis")
                     )
                 ),
+                modifier = Modifier
             )
         }
     }
@@ -287,6 +288,7 @@ fun DetailsScreenContentSharedVacationPreview() {
                         ideas = listOf()
                     )
                 ),
+                modifier = Modifier
             )
         }
     }
@@ -319,6 +321,7 @@ fun DetailsScreenContentEmptyPreview() {
                         ideas = listOf()
                     )
                 ),
+                modifier = Modifier
             )
         }
     }

@@ -18,9 +18,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AccessTime
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.Edit
@@ -59,13 +57,16 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import androidx.compose.ui.window.Dialog
 import com.vacation.tripinmind.R
 import com.vacation.tripinmind.model.Activity
 import com.vacation.tripinmind.model.Day
-import com.vacation.tripinmind.mviapp.util.UiText
 import com.vacation.tripinmind.ui.theme.MVIAppTheme
+
+const val INIT_TIME_VALUE = "12h00"
+const val INIT_DURATION_VALUE = "01h00"
+const val INIT_TRAVEL_TIME_VALUE = "00h10"
+const val INIT_ADDRESS_VALUE = ""
+const val INIT_NAME_VALUE = ""
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -79,24 +80,39 @@ fun ActivitiesItem(
 ) {
     var showTimeSheet by remember { mutableStateOf(false) }
     var showDurationSheet by remember { mutableStateOf(false) }
+    var showTravelTimeSheet by remember { mutableStateOf(false) }
     var showAddActivityDialog by remember { mutableStateOf(false) }
     var showUpdateActivityDialog by remember { mutableStateOf(false) }
     val timeListState = rememberLazyListState()
     val durationListState = rememberLazyListState()
+    val travelTimeListState = rememberLazyListState()
 
     val allDayText = stringResource(R.string.common_all_day_text)
 
     var errorMessageShowed by remember { mutableStateOf<Boolean?>(false) }
     var updateActivityIndex by remember { mutableIntStateOf(-1) }
-    var addressActivityValue by remember { mutableStateOf("") }
-    var nameActivityValue by remember { mutableStateOf("") }
-    var activityTimeValue by remember { mutableStateOf("12h00") }
-    var activityDurationValue by remember { mutableStateOf("01h00") }
+    var addressActivityValue by remember { mutableStateOf(INIT_NAME_VALUE) }
+    var nameActivityValue by remember { mutableStateOf(INIT_ADDRESS_VALUE) }
+    var activityTimeValue by remember { mutableStateOf(INIT_TIME_VALUE) }
+    var activityTravelTimeValue by remember { mutableStateOf(INIT_TRAVEL_TIME_VALUE) }
+    var activityDurationValue by remember { mutableStateOf(INIT_DURATION_VALUE) }
 
     val timeOptions = remember {
         (0..23).flatMap { hour ->
             listOf("00", "15", "30", "45").map { min ->
                 "${hour.toString().padStart(2, '0')}h$min"
+            }
+        }
+    }
+
+    val travelTimeOptions = remember {
+        (0..6).flatMap { hour ->
+            if (hour != 6) {
+                listOf("00", "05","10","15","20","25","30","35","40","45","50","55").map { min ->
+                    "${hour.toString().padStart(2, '0')}h$min"
+                }
+            } else {
+                listOf("${hour.toString().padStart(2, '0')}h00")
             }
         }
     }
@@ -109,6 +125,7 @@ fun ActivitiesItem(
                         0 if min == "00" -> {
                             allDayText
                         }
+
                         else
                             -> "${hour.toString().padStart(2, '0')}h$min"
                     }
@@ -126,10 +143,11 @@ fun ActivitiesItem(
     }
 
     fun cleanDialog() {
-        nameActivityValue = ""
-        addressActivityValue = ""
-        activityTimeValue = "12h00"
-        activityDurationValue = "01h00"
+        nameActivityValue = INIT_NAME_VALUE
+        addressActivityValue = INIT_ADDRESS_VALUE
+        activityTimeValue = INIT_TIME_VALUE
+        activityDurationValue = INIT_DURATION_VALUE
+        activityTravelTimeValue = INIT_TRAVEL_TIME_VALUE
         showAddActivityDialog = false
         showUpdateActivityDialog = false
         updateActivityIndex = -1
@@ -314,6 +332,7 @@ fun ActivitiesItem(
                                 updateActivityIndex = index
                                 activityTimeValue = activity.activityTime
                                 activityDurationValue = activity.activityDuration
+                                activityTravelTimeValue = activity.activityTravelTime
                                 addressActivityValue = activity.activityLocation
                                 nameActivityValue = activity.activityName
                             },
@@ -374,195 +393,48 @@ fun ActivitiesItem(
             }
 
             if (showAddActivityDialog || showUpdateActivityDialog) {
-                Dialog(onDismissRequest = {
-                    cleanDialog()
-                }) {
-                    Card(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(16.dp),
-                        shape = RoundedCornerShape(16.dp),
-                        colors = CardDefaults.cardColors(containerColor = Color.White)
-                    ) {
-                        Column(
-                            modifier = Modifier
-                                .padding(16.dp)
-                                .fillMaxWidth(),
-                            horizontalAlignment = Alignment.CenterHorizontally
-                        ) {
-                            Text(
-                                text = stringResource(R.string.activitiesscreen_activities_add_title),
-                                fontSize = 20.sp,
-                                fontWeight = FontWeight.Bold,
-                                color = colorResource(R.color.orange)
-                            )
-
-                            Spacer(modifier = Modifier.height(16.dp))
-
-                            OutlinedTextField(
-                                value = nameActivityValue,
-                                onValueChange = { newValue ->
-                                    val truncated =
-                                        if (newValue.length > 25) newValue.take(25) else newValue
-                                    if (!truncated.contains("\n")) {
-                                        nameActivityValue = truncated
-                                    }
-                                },
-                                trailingIcon = {
-                                    if (nameActivityValue.isNotEmpty()) {
-                                        IconButton(onClick = { nameActivityValue = "" }) {
-                                            Icon(
-                                                imageVector = Icons.Default.Clear,
-                                                contentDescription = "Clear activity name",
-                                                tint = MaterialTheme.colorScheme.primary
-                                            )
-                                        }
-                                    }
-                                },
-                                label = { Text(stringResource(R.string.activitiesscreen_activities_description)) },
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .testTag("activityNameTextField"),
-                                singleLine = true
-                            )
-
-                            Spacer(modifier = Modifier.height(8.dp))
-
-                            OutlinedTextField(
-                                value = addressActivityValue,
-                                onValueChange = { newValue ->
-                                    val truncated =
-                                        if (newValue.length > 50) newValue.take(50) else newValue
-                                    if (!truncated.contains("\n")) {
-                                        addressActivityValue = truncated
-                                    }
-                                },
-                                trailingIcon = {
-                                    if (addressActivityValue.isNotEmpty()) {
-                                        IconButton(onClick = { addressActivityValue = "" }) {
-                                            Icon(
-                                                imageVector = Icons.Default.Clear,
-                                                contentDescription = "Clear address activity",
-                                                tint = MaterialTheme.colorScheme.primary
-                                            )
-                                        }
-                                    }
-                                },
-                                label = { Text(stringResource(R.string.activitiesscreen_address_activities)) },
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .testTag("activityAddressTextField"),
-                                singleLine = true
-                            )
-
-                            Spacer(modifier = Modifier.height(8.dp))
-
-                            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                                Box(
-                                    modifier = Modifier
-                                        .weight(1f)
-                                        .clickable { showTimeSheet = true }) {
-                                    OutlinedTextField(
-                                        value = activityTimeValue,
-                                        onValueChange = {},
-                                        readOnly = true,
-                                        enabled = false,
-                                        label = { Text(stringResource(R.string.activitiesscreen_time_title)) },
-                                        trailingIcon = {
-                                            Icon(
-                                                Icons.Default.AccessTime,
-                                                contentDescription = null,
-                                                tint = MaterialTheme.colorScheme.primary
-                                            )
-                                        },
-                                        colors = OutlinedTextFieldDefaults.colors(
-                                            disabledTextColor = MaterialTheme.colorScheme.onSurface,
-                                            disabledBorderColor = MaterialTheme.colorScheme.primary,
-                                            disabledLabelColor = MaterialTheme.colorScheme.primary,
-                                            disabledTrailingIconColor = MaterialTheme.colorScheme.primary,
-                                            disabledContainerColor = Color.Transparent
-                                        ),
-                                        modifier = Modifier
-                                            .fillMaxWidth()
-                                            .testTag("activityTimeTextField"),
+                ActivityDialog(
+                    title = stringResource(R.string.activitiesscreen_activities_add_title),
+                    nameValue = nameActivityValue,
+                    onNameChange = { nameActivityValue = it },
+                    addressValue = addressActivityValue,
+                    onAddressChange = { addressActivityValue = it },
+                    timeValue = activityTimeValue,
+                    onTimeClick = { showTimeSheet = true },
+                    travelTimeValue = activityTravelTimeValue,
+                    onTravelTimeClick = { showTravelTimeSheet = true },
+                    durationValue = activityDurationValue,
+                    onDurationClick = { showDurationSheet = true },
+                    checkAddAllowed = checkAddAllowed(),
+                    onDismiss = { cleanDialog() },
+                    onConfirm = {
+                        if (checkAddAllowed()) {
+                            if (showAddActivityDialog) {
+                                onAddActivity(
+                                    Activity(
+                                        activityName = nameActivityValue,
+                                        activityLocation = addressActivityValue,
+                                        activityTime = activityTimeValue,
+                                        activityDuration = activityDurationValue,
+                                        activityTravelTime = activityTravelTimeValue
                                     )
-                                }
-                                Box(
-                                    modifier = Modifier
-                                        .weight(1f)
-                                        .clickable { showDurationSheet = true }) {
-                                    OutlinedTextField(
-                                        value = activityDurationValue,
-                                        onValueChange = {},
-                                        readOnly = true,
-                                        enabled = false,
-                                        label = { Text(stringResource(R.string.activitiesscreen_duration_title)) },
-                                        trailingIcon = {
-                                            Icon(
-                                                Icons.Default.AccessTime,
-                                                contentDescription = null,
-                                                tint = MaterialTheme.colorScheme.primary
-                                            )
-                                        },
-                                        colors = OutlinedTextFieldDefaults.colors(
-                                            disabledTextColor = MaterialTheme.colorScheme.onSurface,
-                                            disabledBorderColor = MaterialTheme.colorScheme.primary,
-                                            disabledLabelColor = MaterialTheme.colorScheme.primary,
-                                            disabledTrailingIconColor = MaterialTheme.colorScheme.primary,
-                                            disabledContainerColor = Color.Transparent
-                                        ),
-                                        modifier = Modifier
-                                            .fillMaxWidth()
-                                            .testTag("activityDurationTextField"),
+                                )
+                            } else {
+                                onModifyActivity(
+                                    updateActivityIndex,
+                                    Activity(
+                                        activityName = nameActivityValue,
+                                        activityLocation = addressActivityValue,
+                                        activityTime = activityTimeValue,
+                                        activityDuration = activityDurationValue,
+                                        activityTravelTime = activityTravelTimeValue
                                     )
-                                }
+                                )
                             }
-
-                            Spacer(modifier = Modifier.height(24.dp))
-
-                            Row(
-                                modifier = Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.End
-                            ) {
-                                TextButton(onClick = {
-                                    cleanDialog()
-                                }) {
-                                    Text(stringResource(R.string.common_cancel_button))
-                                }
-                                TextButton(
-                                    onClick = {
-                                        if (checkAddAllowed()) {
-                                            if (showAddActivityDialog) {
-                                                onAddActivity(
-                                                    Activity(
-                                                        activityName = nameActivityValue,
-                                                        activityLocation = addressActivityValue,
-                                                        activityTime = activityTimeValue,
-                                                        activityDuration = activityDurationValue
-                                                    )
-                                                )
-                                            } else {
-                                                onModifyActivity(
-                                                    updateActivityIndex,
-                                                    Activity(
-                                                        activityName = nameActivityValue,
-                                                        activityLocation = addressActivityValue,
-                                                        activityTime = activityTimeValue,
-                                                        activityDuration = activityDurationValue
-                                                    )
-                                                )
-                                            }
-                                            cleanDialog()
-                                        }
-                                    },
-                                    enabled = checkAddAllowed()
-                                ) {
-                                    Text(stringResource(R.string.activitiesscreen_add_button))
-                                }
-                            }
+                            cleanDialog()
                         }
                     }
-                }
+                )
             }
 
             if (showTimeSheet) {
@@ -643,6 +515,46 @@ fun ActivitiesItem(
                     }
                 }
             }
+
+            if (showTravelTimeSheet) {
+                ModalBottomSheet(
+                    onDismissRequest = { showTravelTimeSheet = false },
+                    containerColor = Color.White
+                ) {
+                    LaunchedEffect(Unit) {
+                        val index = travelTimeOptions.indexOf(activityTravelTimeValue)
+                        if (index != -1) {
+                            travelTimeListState.scrollToItem(index)
+                        }
+                    }
+                    LazyColumn(
+                        state = travelTimeListState,
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(300.dp)
+                    ) {
+                        items(travelTimeOptions) { travelTime ->
+                            ListItem(
+                                headlineContent = {
+                                    Text(
+                                        text = travelTime,
+                                        modifier = Modifier.fillMaxWidth(),
+                                        textAlign = TextAlign.Center,
+                                        color = if (travelTime == activityTravelTimeValue) colorResource(
+                                            R.color.orange
+                                        ) else Color.Black
+                                    )
+                                },
+                                modifier = Modifier.clickable {
+                                    activityTravelTimeValue = travelTime
+                                    showTravelTimeSheet = false
+                                }
+                            )
+                        }
+                    }
+                }
+            }
         }
     }
 }
@@ -656,8 +568,8 @@ fun ActivitiesItemPreview() {
             nameDay = "Lundi 5 mai 2025",
             additionalInfo = "Additional info",
             activity = listOf(
-                Activity("Visit Eiffel Tower", "12h00", "2h00"),
-                Activity("Louvre Museum", "12h00", "2h00")
+                Activity("Visit Eiffel Tower", "12h00", "2h00", "01h00"),
+                Activity("Louvre Museum", "12h00", "2h00", "01h00")
             )
         )
 

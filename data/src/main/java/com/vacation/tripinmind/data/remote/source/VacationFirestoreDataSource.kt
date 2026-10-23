@@ -40,7 +40,7 @@ class VacationFirestoreDataSource @Inject constructor(
         val query = vacationCollection.where(Filter.arrayContains("shareWithUid", userId))
         val subscription = query.addSnapshotListener { snapshot, error ->
             if (error != null) {
-                close(error)
+                trySend(emptyList())
                 return@addSnapshotListener
             }
             val vacations = snapshot?.toObjects(VacationDto::class.java) ?: emptyList()

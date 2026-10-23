@@ -7,5 +7,6 @@ data class ActivityEntity(
     val activityName: String = "",
     val activityTime: String = "",
     val activityDuration: String = "",
-    val activityLocation: String = ""
+    val activityLocation: String = "",
+    val activityTravelTime: String = ""
 )

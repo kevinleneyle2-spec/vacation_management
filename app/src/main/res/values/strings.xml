@@ -37,6 +37,9 @@
     <string name="detailsscreen_share_error_already_added">This user is already a viewer.</string>
     <string name="detailsscreen_share_error_not_yourself">You can\'t add yourself.</string>
     <string name="detailsscreen_share_error_too_many_viewers">You have reached the limit of 5 viewers.</string>
+    <string name="detailsscreen_travel_duration_text">Travel duration: %1$s</string>
+    <string name="detailsscreen_activity_duration_text">Activity duration: %1$s</string>
+    <string name="detailsscreen_travel_text">Head to %1$s</string>
 
     <string name="initscreen_title">Your vacation</string>
     <string name="initscreen_name_title">Name of your vacation</string>
@@ -64,6 +67,7 @@
     <string name="activitiesscreen_activities_max_text">Sorry, you have created too many activities for this day.</string>
     <string name="activitiesscreen_add_button">ADD</string>
     <string name="activitiesscreen_time_title">Time</string>
+    <string name="activitiesscreen_travel_time_title">Car Travel Time</string>
     <string name="activitiesscreen_duration_title">Duration</string>
     <string name="activitiesscreen_activities_empty">No activity planned yet.</string>
     <string name="activitiesscreen_ideas_empty">No ideas yet.</string>

@@ -60,8 +60,9 @@ class InitViewModelTest {
                     Activity(
                         activityName = "Louvre",
                         activityTime = "11h00",
-                        activityDuration = "1h",
-                        activityLocation = "Paris Museum"
+                        activityDuration = "01h00",
+                        activityLocation = "Paris Museum",
+                        activityTravelTime = "01h00"
                     )
                 )
             )

@@ -8,7 +8,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -35,7 +35,7 @@ fun DayCard(
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .height(300.dp),
+            .height(360.dp),
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.tertiary
@@ -66,12 +66,14 @@ fun DayCard(
             Spacer(modifier = Modifier.height(16.dp))
 
             if (day.activity.isNotEmpty()) {
+                val sortedActivities = day.activity.sortedBy { it.activityTime }
                 LazyColumn(
                     verticalArrangement = Arrangement.spacedBy(4.dp),
                     modifier = Modifier.fillMaxSize()
                 ) {
-                    items(day.activity.sortedBy { it.activityTime }) { activity ->
-                        ActivityRow(activity, onLocationClick = onLocationClick)
+                    itemsIndexed(sortedActivities) { index, activity ->
+                        val isLast = index == sortedActivities.size - 1
+                        ActivityRow(activity, isLast = isLast, onLocationClick = onLocationClick)
                     }
                 }
             } else {
@@ -96,7 +98,7 @@ fun DayCardPreview() {
                     nameDay = "Lundi 5 mars 2025",
                     additionalInfo = "with my father",
                     activity = listOf(
-                        Activity("Eiffel Tower", "01h00", "02h00", "")
+                        Activity("Eiffel Tower", "01h00", "02h00", "", "01H00")
                     )
                 ),
                 onLocationClick = { }

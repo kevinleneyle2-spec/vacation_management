@@ -44,7 +44,8 @@ fun ActivityDto.toEntity(): ActivityEntity {
         activityName = activityName,
         activityTime = activityTime,
         activityDuration = activityDuration,
-        activityLocation = activityLocation
+        activityLocation = activityLocation,
+        activityTravelTime = activityTravelTime
     )
 }
 
@@ -82,7 +83,8 @@ fun ActivityDto.toDomain(): Activity {
         activityName = activityName,
         activityTime = activityTime,
         activityDuration = activityDuration,
-        activityLocation = activityLocation
+        activityLocation = activityLocation,
+        activityTravelTime = activityTravelTime
     )
 }
 
@@ -91,7 +93,8 @@ fun ActivityEntity.toDto(): ActivityDto {
         activityName = activityName,
         activityTime = activityTime,
         activityDuration = activityDuration,
-        activityLocation = activityLocation
+        activityLocation = activityLocation,
+        activityTravelTime = activityTravelTime
     )
 }
 
@@ -129,7 +132,8 @@ fun ActivityEntity.toDomain(): Activity {
         activityName = activityName,
         activityTime = activityTime,
         activityDuration = activityDuration,
-        activityLocation = activityLocation
+        activityLocation = activityLocation,
+        activityTravelTime = activityTravelTime
     )
 }
 
@@ -196,7 +200,8 @@ fun Activity.toDto(): ActivityDto {
         activityName = activityName,
         activityTime = activityTime,
         activityDuration = activityDuration,
-        activityLocation = activityLocation
+        activityLocation = activityLocation,
+        activityTravelTime = activityTravelTime
     )
 }
 

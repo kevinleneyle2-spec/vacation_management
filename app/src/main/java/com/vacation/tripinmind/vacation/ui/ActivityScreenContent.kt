@@ -91,13 +91,13 @@ fun ActivitiesScreenPreview() {
                             date = 1789862400000,
                             "Day 1",
                             "test",
-                            listOf(Activity("Visit the Eiffel Tower", "10:00", "2h00"))
+                            listOf(Activity("Visit the Eiffel Tower", "10:00", "2h00", "01h00"))
                         ),
                         Day(
                             date = 1789862400000,
                             "Day 2",
                             "",
-                            listOf(Activity("Go to the Louvre", "14:00", "2h00"))
+                            listOf(Activity("Go to the Louvre", "14:00", "2h00", "01h00"))
                         )
                     )
                 ),
